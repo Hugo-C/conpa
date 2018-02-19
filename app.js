@@ -1,4 +1,5 @@
 var express = require('express');
+var db = require('./js/db');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -7,7 +8,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var mysql = require('./routes/mysql');
+var editor = require('./routes/editor')
 
 var app = express();
 
@@ -25,7 +26,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/mysql', mysql);
+app.use('/editor', editor);
+
+// connect to MySQL on start
+db.connect(db.MODE_TEST, function(err){
+    if(err){
+        console.log('Unable to connect to MySQL');
+        process.exit(1);
+    }else{
+        console.log('Connected to MySQL');
+    }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -33,7 +44,6 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -47,3 +57,4 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+app.listen(8080);
