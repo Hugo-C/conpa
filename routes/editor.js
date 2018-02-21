@@ -5,6 +5,7 @@ var upload = multer().single('uploadCSV');
 var url = require('url');
 var querystring = require('querystring');
 var path = require('path');
+var importCSV = require('../js/importCSV');
 var exportCSV = require('../js/exportCSV');
 var db = require('../js/db');
 var keys = require('../js/dbConstants');
@@ -42,6 +43,16 @@ router.post('/uploadCSV', function (req, res) {
       res.send();
   })
 });
+
+
+router.get('/importCSV', function(req, res, next) {
+    var path = req.query.path;
+    if (path != null){
+        importCSV.importFromCsv(path);
+    }
+    res.send("OK");
+});
+
 
 router.get('/exportCSV', function(req, res){
     var params = querystring.parse(url.parse(req.url).query);

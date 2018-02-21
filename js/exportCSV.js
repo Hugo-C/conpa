@@ -15,7 +15,7 @@ const FAMILY_CARD = 4;
  *
  * @param {object array} records : data to write in csv file
  * @param {boolean array} familiesExport : current state of the families cards recovery
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function finalizeWriting(records, familiesExport, onFileReady){
     for(task = 0; task < familiesExport.length; task++){
@@ -77,7 +77,7 @@ function writeIntoColumn(records, familyNb, object, content){
  * @param {object array} rows : cards to add in the records array
  * @param {integer} column : csv column of the cards family [0-4]
  * @param {boolean array} familiesExport : current state of the families cards recovery
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function processFamilyCards(err, records, rows, column, familiesExport, onFileReady){
     if(err){
@@ -103,7 +103,7 @@ function processFamilyCards(err, records, rows, column, familiesExport, onFileRe
  * @param {callback} onDataRecovered : function called to process retrieved data
  * @param {integer} destColumn : csv column of the cards family [0-4]
  * @param {boolean array} familiesExport : current state of the families cards recovery
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function recoverFamilyCards(familyId, records, onDataRecovered, destColumn, familiesExport, onFileReady){
     db.getFamilyCards(familyId, function(err, result){
@@ -118,7 +118,7 @@ function recoverFamilyCards(familyId, records, onDataRecovered, destColumn, fami
  * @param {error} err : error returned by sql query if this one has failed
  * @param {object array} records : array of data to write in the csv file
  * @param {object array} rows : cards to add in the records array
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  *
  */
 function processFamilies(err, records, rows, onFileReady){
@@ -143,7 +143,7 @@ function processFamilies(err, records, rows, onFileReady){
  * @param {unsigned integer} cardGameId : id of the card game for which we want to retrieve families
  * @param {object array} records : array of data to write in the csv file
  * @param {callback} onDataRecovered : function called to process retrieved data
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function recoverFamiliesAndLogos(cardGameId, records, onDataRecovered, onFileReady){
     db.getFamiliesAndLogos(cardGameId, function(err, result){
@@ -158,7 +158,7 @@ function recoverFamiliesAndLogos(cardGameId, records, onDataRecovered, onFileRea
  * @param {error} err : error returned by sql query if this one has failed
  * @param {object array} records : array of data to write in the csv file
  * @param {object array} rows : cards to add in the records array
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function processCardGame(err, records, rows, onFileReady){
     if(err){
@@ -177,7 +177,7 @@ function processCardGame(err, records, rows, onFileReady){
  * @param {string} language : language of card game we want to retrieve
  * @param {object array} records : array of data to write in the csv file
  * @param {callback} onDataRecovered : function called to process retrieved data
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function recoverCardGame(cardGame, language, records, onDataRecovered, onFileReady){
     db.getCardGame(cardGame, language, function(err, result){
@@ -191,9 +191,9 @@ function recoverCardGame(cardGame, language, records, onDataRecovered, onFileRea
  *
  * @param {string} cardGame : name of card game we want to export
  * @param {string} language : language of card game we want to export
- * @param {callack} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 exports.exportToCSV = function(cardGame, language, onFileReady){
     records = new Array(); // array used to store retrieved data before to be write into csv file
     recoverCardGame(cardGame, language, records, processCardGame, onFileReady);
-}
+};
