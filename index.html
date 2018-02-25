@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
 </head>
     <body>
 
-        <img src="text.png" onclick="boutonClique();" id="bouton" />
+        <img src="text.png" onmousedown="return false" onclick="boutonClique();" id="bouton" />
+        <!-- onmousedown="return false" disable drag and drop -->
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
-        <svg x="50" y="50" width="1500" height="650" id="svg" style="background-color: cornflowerblue"></svg>
+        <svg x="50" y="50" width="1500" height="650" id="svg">
+        </svg>
 
         <script type="text/javascript">
 
             var clicking = false; //Boolean to test if mousemove to size a rect
             var select = false; //Boolean to test if a rect is select
-            var rectSelect, textSelect;
-            var rectCreate, textCreate;
+            var prevRecSelect = null;
+            var rectSelect;  // an Element which has an svg rect
+            var rectCreate;  // an svg rect
             var x, y; //Coordinates of mouse in svg
             var clickX, clickY;
             var deplace = false;
@@ -35,106 +39,66 @@
             }
 
             svg.addEventListener('mousemove',function(evt){
-                var loc = cursorPoint(evt);
+                let loc = cursorPoint(evt);
                 x = loc.x;
                 y = loc.y;
             },false);
 
             //------------------------------------------------------------
             //Block select text (Bidouille provisoire)
-            function noselection(target) {
-                if (typeof target.onselectstart != "undefined") {
+            /*function noselection(target) {
+                if (typeof target.onselectstart !== "undefined") {
                     target.onselectstart = function () {
                         return false;
                     }
                 }
-                else if (typeof target.style.MozUserSelect != "undefined") target.style.MozUserSelect = "none";
+                else if (typeof target.style.MozUserSelect !== "undefined") target.style.MozUserSelect = "none";
                 else {
                     target.onmousedown = function () {
                         return false;
                     }
                 }
             }
-            noselection(document.body);
+            noselection(document.body);*/
             //------------------------------------------------------------
 
             //Select a rect with mouse
             function selectRect(){
-                rectSelect = null;
-                textSelect = null;
-                select = false;
-                var arrayRects = document.body.getElementsByTagName("rect");
-                var arrayTexts = document.body.getElementsByTagName("text");
+                if (rectSelect != null) {
+                    prevRecSelect = rectSelect;
+                    rectSelect = null;
+                }
 
-                for(var i=0; i < arrayRects.length; i++) {
+                let e = Element.getElementIn(x, y);
+                if (e != null) {
+                    rectSelect = e;
+                    rectSelect.select = true;
+                    rectSelect.putFront();
+                    rectSelect.text.focus();
+                }
 
-                    arrayRects[i].style.strokeDasharray = '0';
-                    //Select rect
-                    if( parseInt(arrayRects[i].getAttribute("x")) + parseInt(arrayRects[i].getAttribute("width")) > x
-                        && arrayRects[i].getAttribute("x") < x
-                        && parseInt(arrayRects[i].getAttribute("y")) + parseInt(arrayRects[i].getAttribute("height")) > y
-                        && arrayRects[i].getAttribute("y") < y){
-
-                        rectSelect = arrayRects[i];
-
-                        //Select text
-                        for(var j=0; j < arrayTexts.length; j++) {
-                            if(arrayTexts[j].getAttribute("x")-10 < x
-                                && x < parseInt(arrayTexts[j].getAttribute("x")) + parseInt(arrayTexts[j].getAttribute("width")) + 10
-                                && arrayTexts[j].getAttribute("y")-25 < y
-                                && y < parseInt(arrayTexts[j].getAttribute("y")) + parseInt(arrayTexts[j].getAttribute("height")) + 25){
-
-                                textSelect = arrayTexts[j];
-                            }
-                        }
-
-                        //Test if a text is select by the mouse
-                        /*function getSelectedText(){
-                            if (window.getSelection){
-                                return window.getSelection().toString();
-                            }
-                            else if (document.getSelection){
-                                return document.getSelection();
-                            }
-                            else if (document.selection){
-                                return document.selection.createRange().text;
-                            }
-                        }*/
-
-                        if (rectSelect != null && textSelect != null) {
-                            rectSelect.style.strokeDasharray = '10';
-                            select = true;
-                            textSelect.focus()
-                        }
-                    }
+                if (prevRecSelect != null && rectSelect != null){  // link both selected elements
+                    Element.linkRect(rectSelect, prevRecSelect);
+                    rectSelect.select = false;
+                    rectSelect = null;
+                }
+                if (prevRecSelect != null) {
+                    prevRecSelect.select = false;
+                    prevRecSelect = null;
                 }
             }
 
-
-
-            $('body').on('click', function(){
+            let bodyJQ = $('body');
+            bodyJQ.on('click', function(){
                 selectRect();
             });
 
-            $('svg').on('mousedown', function(){
+            let svgJQ = $('svg');
+            svgJQ.on('mousedown', function(){
                 //Create a rect
                 if(document.getElementById("bouton").src.indexOf("textC.png") > -1) {
-                    var c = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    c.style.fill = 'red';
-                    c.style.stroke = 'black';
-                    c.style.strokeWidth = '2';
-                    c.setAttribute("x", x);
-                    c.setAttribute("y", y);
-                    document.querySelector('svg').append(c);
-                    rectCreate = c;
-
-                    var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    t.setAttribute("x", x + 10);
-                    t.setAttribute("y", y + 25);
-                    t.style.fill = 'black';
-                    document.querySelector('svg').append(t);
-                    textCreate = t;
-
+                    let c = new Element(x, y);
+                    rectCreate = c.rect;
                     clicking = true;
                 }
                 //Move a rect
@@ -145,36 +109,32 @@
                 }
             });
 
-            $('body').on('mouseup', function(){
-                if (rectCreate != null && textCreate != null && (rectCreate.getAttribute("height") <= 30 || rectCreate.getAttribute("width") <= 70)){
+            bodyJQ.on('mouseup', function(){
+                if (rectCreate != null && (rectCreate.getAttribute("height") <= 30 || rectCreate.getAttribute("width") <= 70)){
                     rectCreate.remove();
-                    textCreate.remove();
                 }
                 deplace = false;
                 clicking = false;
                 rectCreate = null;
-                textCreate = null;
                 document.getElementById("bouton").src = "text.png";
             });
 
-            $('svg').on('mousemove', function(){
+            svgJQ.on('mousemove', function(){
                 if(!select) this.style.cursor = 'default';
                 //Size a rect
                 if (clicking) {
                     if (x >= rectCreate.getAttribute("x") && y >= rectCreate.getAttribute("y")){
                         rectCreate.setAttribute("height", y - rectCreate.getAttribute("y"));
                         rectCreate.setAttribute("width", x - rectCreate.getAttribute("x"));
-                        textCreate.setAttribute("height", y - 25 - textCreate.getAttribute("y"));
-                        textCreate.setAttribute("width", x - 10 - textCreate.getAttribute("x"));
                     }
-                    if (rectCreate.getAttribute("height") > 30 && rectCreate.getAttribute("width") > 70 && textCreate.getAttribute("text") == null) textCreate.textContent = "Texte...";
-                    else textCreate.textContent = null;
+                    //if (rectCreate.getAttribute("height") > 30 && rectCreate.getAttribute("width") > 70 && textCreate.getAttribute("text") == null) textCreate.textContent = "Texte...";
+                    //else textCreate.textContent = null;
                 }
                 if (select){
-                    var rx = parseInt(rectSelect.getAttribute("x"));
-                    var ry = parseInt(rectSelect.getAttribute("y"));
-                    var rw = parseInt(rectSelect.getAttribute("width"));
-                    var rh = parseInt(rectSelect.getAttribute("height"));
+                    var rx = parseInt(rectSelect.rect.getAttribute("x"));
+                    var ry = parseInt(rectSelect.rect.getAttribute("y"));
+                    var rw = parseInt(rectSelect.rect.getAttribute("width"));
+                    var rh = parseInt(rectSelect.rect.getAttribute("height"));
                     if ((x > rx-3 && x < rx+3 && y > ry-3 && y < rh+ry+3)
                         || (x > rw+rx-3 && x < rx+rw+3 && y > ry-3 && y < rh+ry+3)
                         || (y > ry-3 && y < ry+3 && x > rx-3 && x < rx+rw+3)
@@ -185,19 +145,19 @@
                 }
                 //Move a rect
                 if(deplace){
-                    var stepX = parseInt(rectSelect.getAttribute("x")) + x - clickX;
-                    var stepY = parseInt(rectSelect.getAttribute("y")) + y - clickY;
-                    var stepTX = parseInt(textSelect.getAttribute("x")) + x - clickX;
-                    var stepTY = parseInt(textSelect.getAttribute("y")) + y - clickY;
-                    if (stepX < 10) rectSelect.setAttribute("x", 10); textSelect.setAttribute("x", 20);
-                    if (stepY < 10) rectSelect.setAttribute("y", 10); textSelect.setAttribute("y", 35);
+                    let stepX = parseInt(rectSelect.x) + x - clickX;
+                    let stepY = parseInt(rectSelect.y) + y - clickY;
+                    //var stepTX = parseInt(textSelect.getAttribute("x")) + x - clickX;
+                    //var stepTY = parseInt(textSelect.getAttribute("y")) + y - clickY;
+                    //if (stepX < 10) rectSelect.setAttribute("x", 10); textSelect.setAttribute("x", 20);
+                    //if (stepY < 10) rectSelect.setAttribute("y", 10); textSelect.setAttribute("y", 35);
                     if (stepX >= 10) {
-                        rectSelect.setAttribute("x", stepX);
-                        textSelect.setAttribute("x", stepTX);
+                        rectSelect.x = stepX;
+                        //textSelect.setAttribute("x", stepTX);
                     }
                     if (stepY >= 10){
-                        rectSelect.setAttribute("y", stepY);
-                        textSelect.setAttribute("y", stepTY);
+                        rectSelect.y = stepY;
+                        //textSelect.setAttribute("y", stepTY);
                     }
                     clickX = x;
                     clickY = y;
