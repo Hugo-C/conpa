@@ -1,0 +1,16 @@
+div{
+    caret-color: #ffd337;
+}
+
+.foreign {
+    text-align: left;
+}
+
+.insideforeign {
+    display: inline-block;
+}
+
+svg {
+    border:1px solid black;
+    background-color: cornflowerblue
+}
