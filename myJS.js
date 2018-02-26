@@ -121,6 +121,14 @@ class Element {  // warning : Element need svg to be declared
     get x() {
         return this.rect.x.baseVal.value;
     }
+	
+	/**
+     * Set the rect's x value
+     * 
+     */
+    set x(value) {
+        this.rect.setAttribute("x", value);
+    }
 
     /**
      * Get the rect's y value
@@ -128,6 +136,14 @@ class Element {  // warning : Element need svg to be declared
      */
     get y() {
         return this.rect.y.baseVal.value;
+    }
+	
+	/**
+     * Set the rect's y value
+     * 
+     */
+    set y(value) {
+        this.rect.setAttribute("y", value);
     }
 
     /**

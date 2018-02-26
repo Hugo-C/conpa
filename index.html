@@ -18,7 +18,6 @@
         <script type="text/javascript">
 
             var clicking = false; //Boolean to test if mousemove to size a rect
-            var select = false; //Boolean to test if a rect is select
             var prevRecSelect = null;
             var rectSelect;  // an Element which has an svg rect
             var rectCreate;  // an svg rect
@@ -74,13 +73,14 @@
                     rectSelect = e;
                     rectSelect.select = true;
                     rectSelect.putFront();
-                    rectSelect.text.focus();
+                    //rectSelect.text.focus();
                 }
 
                 if (prevRecSelect != null && rectSelect != null){  // link both selected elements
                     Element.linkRect(rectSelect, prevRecSelect);
                     rectSelect.select = false;
                     rectSelect = null;
+					
                 }
                 if (prevRecSelect != null) {
                     prevRecSelect.select = false;
@@ -102,7 +102,7 @@
                     clicking = true;
                 }
                 //Move a rect
-                else if (select && this.style.cursor === 'move'){
+                else if (rectSelect != null && this.style.cursor === 'move'){
                     clickX = x;
                     clickY = y;
                     deplace = true;
@@ -120,7 +120,7 @@
             });
 
             svgJQ.on('mousemove', function(){
-                if(!select) this.style.cursor = 'default';
+                if(rectSelect == null) this.style.cursor = 'default';
                 //Size a rect
                 if (clicking) {
                     if (x >= rectCreate.getAttribute("x") && y >= rectCreate.getAttribute("y")){
@@ -130,11 +130,11 @@
                     //if (rectCreate.getAttribute("height") > 30 && rectCreate.getAttribute("width") > 70 && textCreate.getAttribute("text") == null) textCreate.textContent = "Texte...";
                     //else textCreate.textContent = null;
                 }
-                if (select){
-                    var rx = parseInt(rectSelect.rect.getAttribute("x"));
-                    var ry = parseInt(rectSelect.rect.getAttribute("y"));
-                    var rw = parseInt(rectSelect.rect.getAttribute("width"));
-                    var rh = parseInt(rectSelect.rect.getAttribute("height"));
+                if (rectSelect != null){
+                    var rx = parseInt(rectSelect.x);
+                    var ry = parseInt(rectSelect.y);
+                    var rw = parseInt(rectSelect.width);
+                    var rh = parseInt(rectSelect.height);
                     if ((x > rx-3 && x < rx+3 && y > ry-3 && y < rh+ry+3)
                         || (x > rw+rx-3 && x < rx+rw+3 && y > ry-3 && y < rh+ry+3)
                         || (y > ry-3 && y < ry+3 && x > rx-3 && x < rx+rw+3)
