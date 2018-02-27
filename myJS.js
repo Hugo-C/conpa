@@ -40,6 +40,111 @@ class Element {  // warning : Element need svg to be declared
     }
 
     /**
+     * Get the rect's x value
+     * @return {number}
+     */
+    get x() {
+        return this.rect.x.baseVal.value;
+    }
+
+	/**
+     * Set the rect's x value
+     *
+     */
+    set x(value) {
+        this.rect.setAttribute("x", value);
+        this.refreshPosition();
+    }
+
+    /**
+     * Get the rect's y value
+     * @return {number}
+     */
+    get y() {
+        return this.rect.y.baseVal.value;
+    }
+
+	/**
+     * Set the rect's y value
+     *
+     */
+    set y(value) {
+        this.rect.setAttribute("y", value);
+        this.refreshPosition();
+    }
+
+    /**
+     * Get the rect's width value
+     * @return {number}
+     */
+    get width() {
+        return this.rect.width.baseVal.value;
+    }
+
+    /**
+     * Set the rect's width value
+     * @param value {number}
+     */
+    set width(value) {
+        this.rect.setAttribute("width", value);
+    }
+	
+    /**
+     * Get the rect's height value
+     * @return {number}
+     */
+    get height() {
+        return this.rect.height.baseVal.value;
+    }
+
+    /**
+     * Set the rect's height value
+     * @param value {number}
+     */
+    set height(value) {
+        this.rect.setAttribute("height", value);
+    }
+	
+    /**
+     * Return the element's center by x and y coordinates
+     * @return {{x: number, y: number}}
+     */
+    get center() {
+        let xCenter = this.x + this.width / 2;
+        let yCenter = this.y + this.height / 2;
+        return {x: xCenter, y: yCenter};
+    }
+
+    /**
+     * Set the element as selected
+     * @param isSelect {boolean}
+     */
+    set select(isSelect) {
+        if (isSelect) {
+            this.rect.style.strokeDasharray = '10';
+            rectSelect.textDiv.focus();
+        } else {
+            this.rect.style.strokeDasharray = '0';
+        }
+    }
+
+    /**
+     * Get the text content of the element
+     * @return {String}
+     */
+    get textContent(){
+        return this.textNode.date;
+    }
+
+    /**
+     * Set the text content of the element
+     * @param text {String}
+     */
+    set textContent(text) {
+        this.textNode.data = text;
+    }
+
+    /**
      * Link two rect with a line
      * @param e1 {Element} : first element to link
      * @param e2 {Element} : second element to link
@@ -53,6 +158,23 @@ class Element {  // warning : Element need svg to be declared
             e1.putFront();
             e2.putFront();
         }
+    }
+
+    /**
+     * Try to find an element at the coordinate
+     * if no element is found at the coordinate return null
+     * @param x {int} : x coordinate
+     * @param y {int} : y coordinate
+     * @return {Element} : an element at the coordinate
+     */
+    static getElementIn(x, y) {
+        let res = null;
+        myElements.forEach(function(element) {
+            if(element.isIn(x, y)){
+                res = element;
+            }
+        });
+        return res;
     }
 
     /**
@@ -87,96 +209,6 @@ class Element {  // warning : Element need svg to be declared
     }
 
     /**
-     * Try to find an element at the coordinate
-     * if no element is found at the coordinate return null
-     * @param x {int} : x coordinate
-     * @param y {int} : y coordinate
-     * @return {Element} : an element at the coordinate
-     */
-    static getElementIn(x, y) {
-        let res = null;
-        myElements.forEach(function(element) {
-            if(element.isIn(x, y)){
-                res = element;
-            }
-        });
-        return res;
-    }
-
-    /**
-     * Get the rect's x value
-     * @return {number}
-     */
-    get x() {
-        return this.rect.x.baseVal.value;
-    }
-	
-	/**
-     * Set the rect's x value
-     * 
-     */
-    set x(value) {
-        this.rect.setAttribute("x", value);
-        this.refreshPosition();
-    }
-
-    /**
-     * Get the rect's y value
-     * @return {number}
-     */
-    get y() {
-        return this.rect.y.baseVal.value;
-    }
-	
-	/**
-     * Set the rect's y value
-     * 
-     */
-    set y(value) {
-        this.rect.setAttribute("y", value);
-        this.refreshPosition();
-    }
-
-    /**
-     * Get the rect's width value
-     * @return {number}
-     */
-    get width() {
-        return this.rect.width.baseVal.value;
-    }
-
-    /**
-     * Get the rect's height value
-     * @return {number}
-     */
-    get height() {
-        return this.rect.height.baseVal.value;
-    }
-
-    /**
-     * Return the element's center by x and y coordinates
-     * @return {{x: number, y: number}}
-     */
-    get center() {
-        let xCenter = this.x + this.width / 2;
-        let yCenter = this.y + this.height / 2;
-        return {x: xCenter, y: yCenter};
-    }
-
-    /**
-     * Set the element as selected
-     * @param isSelect {boolean}
-     */
-    set select(isSelect) {
-        if (isSelect) {
-            this.rect.style.strokeDasharray = '10';
-            rectSelect.textDiv.focus();
-        } else {
-            this.rect.style.strokeDasharray = '0';
-        }
-    }
-
-    /**
      * Add a link to the element
      * @param link {Link} : the link to add
      */
@@ -208,6 +240,26 @@ class Link {
     }
 
     /**
+     * Create a new line between two points
+     * @param x1 {String} : x coordinate of the first point
+     * @param y1 {String} : y coordinate of the first point
+     * @param x2 {String} : x coordinate of the second point
+     * @param y2 {String} : y coordinate of the second point
+     * @return {SVGAElement} the svg line created
+     */
+    static createLine(x1, y1, x2, y2) {
+        let l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        l.setAttribute("x1", x1);
+        l.setAttribute("y1", y1);
+        l.setAttribute("x2", x2);
+        l.setAttribute("y2", y2);
+        l.setAttribute("stroke", "black");
+        l.setAttribute("stroke-width", STROKE_WIDTH);
+        svg.appendChild(l);
+        return l;
+    }
+
+    /**
      * Reposition a link
      */
     refreshPosition(){
@@ -227,29 +279,24 @@ class Link {
     hasElement(e) {
         return e === this.e1 || e === this.e2;
     }
-
-    /**
-     * Create a new line between two points
-     * @param x1 {String} : x coordinate of the first point
-     * @param y1 {String} : y coordinate of the first point
-     * @param x2 {String} : x coordinate of the second point
-     * @param y2 {String} : y coordinate of the second point
-     * @return {SVGAElement} the svg line created
-     */
-    static createLine(x1, y1, x2, y2) {
-        let l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        l.setAttribute("x1", x1);
-        l.setAttribute("y1", y1);
-        l.setAttribute("x2", x2);
-        l.setAttribute("y2", y2);
-        l.setAttribute("stroke", "black");
-        l.setAttribute("stroke-width", STROKE_WIDTH);
-        svg.appendChild(l);
-        return l;
-    }
 }
 
 function boutonClique(){
     if(document.getElementById("bouton").src.indexOf("text.png") > -1) document.getElementById("bouton").src = "textC.png";
     else document.getElementById("bouton").src = "text.png";
+}
+
+/**
+ * Paste a string as a new Element
+ * @param x {String} : x location of the new element
+ * @param y {String} : y location of the new element
+ * @param s {String} : string to be pasted as a new element
+ * @return {Element} : element created in the process
+ */
+function pasteAsElement(x, y, s) {
+    let pasteElement = new Element(x, y);
+    pasteElement.textContent = s;
+    pasteElement.width = s.length * 10 + 10;
+    pasteElement.height = 50;
+    return pasteElement;
 }

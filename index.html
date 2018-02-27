@@ -5,7 +5,7 @@
     <title>Title</title>
     <link rel="stylesheet" type="text/css" href="mystyle.css">
 </head>
-    <body>
+    <body onpaste="return false;">
 
         <img src="text.png" onmousedown="return false" onclick="boutonClique();" id="bouton" />
         <!-- onmousedown="return false" disable drag and drop -->
@@ -161,6 +161,10 @@
                     clickY = y;
                     if (x < 10 || y < 10) deplace = false;
                 }
+            });
+
+            document.addEventListener('paste', function (evt) {
+                pasteAsElement(x, y, evt.clipboardData.getData('text/plain'));
             });
 
         </script>
