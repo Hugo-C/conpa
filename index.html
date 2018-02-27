@@ -20,7 +20,7 @@
             var clicking = false; //Boolean to test if mousemove to size a rect
             var prevRecSelect = null;
             var rectSelect;  // an Element which has an svg rect
-            var rectCreate;  // an svg rect
+            var rectCreate;  // the latest Element added
             var x, y; //Coordinates of mouse in svg
             var clickX, clickY;
             var deplace = false;
@@ -95,8 +95,7 @@
             svgJQ.on('mousedown', function(){
                 //Create a rect
                 if(document.getElementById("bouton").src.indexOf("textC.png") > -1) {
-                    let c = new Element(x, y);
-                    rectCreate = c.rect;
+                    rectCreate = new Element(x, y);
                     clicking = true;
                 }
                 //Move a rect
@@ -108,8 +107,8 @@
             });
 
             bodyJQ.on('mouseup', function(){
-                if (rectCreate != null && (rectCreate.getAttribute("height") <= 30 || rectCreate.getAttribute("width") <= 70)){
-                    rectCreate.remove();
+                if (rectCreate != null && (rectCreate.height <= 30 || rectCreate.width <= 70)){
+                    rectCreate.myRemove();
                 }
                 deplace = false;
                 clicking = false;
@@ -121,9 +120,9 @@
                 if(rectSelect == null) this.style.cursor = 'default';
                 //Size a rect
                 if (clicking) {
-                    if (x >= rectCreate.getAttribute("x") && y >= rectCreate.getAttribute("y")){
-                        rectCreate.setAttribute("height", y - rectCreate.getAttribute("y"));
-                        rectCreate.setAttribute("width", x - rectCreate.getAttribute("x"));
+                    if (x >= rectCreate.x && y >= rectCreate.y){
+                        rectCreate.width  = x - rectCreate.x;
+                        rectCreate.height = y - rectCreate.y;
                     }
                     //if (rectCreate.getAttribute("height") > 30 && rectCreate.getAttribute("width") > 70 && textCreate.getAttribute("text") == null) textCreate.textContent = "Texte...";
                     //else textCreate.textContent = null;
@@ -165,6 +164,13 @@
 
             document.addEventListener('paste', function (evt) {
                 pasteAsElement(x, y, evt.clipboardData.getData('text/plain'));
+            });
+
+            bodyJQ.keydown(function(event){
+                if(event.keyCode === 46 && rectSelect !== null){
+                    rectSelect.myRemove();
+                    rectSelect = null;
+                }
             });
 
         </script>

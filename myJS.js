@@ -49,7 +49,7 @@ class Element {  // warning : Element need svg to be declared
 
 	/**
      * Set the rect's x value
-     *
+     * @param value {number}
      */
     set x(value) {
         this.rect.setAttribute("x", value);
@@ -66,7 +66,7 @@ class Element {  // warning : Element need svg to be declared
 
 	/**
      * Set the rect's y value
-     *
+     * @param value {number}
      */
     set y(value) {
         this.rect.setAttribute("y", value);
@@ -182,12 +182,16 @@ class Element {  // warning : Element need svg to be declared
      * @param e {Element} : the element to check
      */
     isLinkedTo(e) {
+        let res = false;
+        if(e === this)
+            res = true;
+
         this.myLinks.forEach(function (link) {
             if (link.hasElement(e)) {
-                return true;
+                res = true;
             }
         });
-        return false;
+        return res;
     }
 
     /**
@@ -216,11 +220,36 @@ class Element {  // warning : Element need svg to be declared
         this.myLinks.push(link);
     }
 
+    /**
+     * Refresh the position of the element inside the svg
+     */
     refreshPosition() {
         this.text.setAttributeNS(null, "transform", "translate(" + (this.x + 5) + " " + (this.y + 10) + ")");
         this.myLinks.forEach(function (link) {
            link.refreshPosition();
         });
+    }
+
+    /**
+     * Remove the element and all links attached to it
+     */
+    myRemove(){
+        let l;
+        this.rect.remove();
+        this.text.remove();
+        while(this.myLinks.length > 0){
+            l = this.myLinks.pop();
+            l.myRemove();
+        }
+        removeFromArray(myElements, this);
+    }
+
+    /**
+     * Remove the connection between a link and this element
+     * @param link {Link} : the link to remove
+     */
+    removeLink(link){
+        removeFromArray(this.myLinks, link);
     }
 }
 
@@ -260,6 +289,15 @@ class Link {
     }
 
     /**
+     * Remove the link
+     */
+    myRemove() {
+        this.line.remove();
+        this.e1.removeLink(this);
+        this.e2.removeLink(this);
+    }
+
+    /**
      * Reposition a link
      */
     refreshPosition(){
@@ -277,7 +315,7 @@ class Link {
      * @returns {boolean}
      */
     hasElement(e) {
-        return e === this.e1 || e === this.e2;
+        return (e === this.e1 || e === this.e2);
     }
 }
 
@@ -299,4 +337,18 @@ function pasteAsElement(x, y, s) {
     pasteElement.width = s.length * 10 + 10;
     pasteElement.height = 50;
     return pasteElement;
+}
+
+/**
+ * Remove the element e from the array
+ * @param array {array}
+ * @param e {*} : the element to remove
+ * @return {array} the array without the first occurrence of e
+ */
+function removeFromArray(array, e){
+    let index = array.indexOf(e);
+    if (index > -1) {
+        array = array.splice(index, 1);
+    }
+    return array;
 }
