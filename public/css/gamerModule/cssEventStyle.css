@@ -1,0 +1,67 @@
+div#generalChannel:hover {
+  background-color: grey;
+}
+
+div#playerPlayerChannel:hover {
+  background-color: grey;
+}
+
+div#playerAnimatorChannel:hover {
+  background-color: grey;
+}
+
+button:focus {
+  outline: 0;
+}
+
+button#bouton:focus {
+  background-image: url("/img/gamerModule/textC.png");
+}
+
+button#sendButton:hover {
+  background-image: url("/img/gamerModule/sendButtonOnHover.svg")
+}
+
+button#sendButton:active {
+  background-image: url("/img/gamerModule/sendButtonOnClick.svg")
+}
+
+button#skipButton:hover {
+  background-image: url("/img/gamerModule/skipButtonOnHover.svg");
+}
+
+button#skipButton:active {
+  background-image: url("/img/gamerModule/skipButtonOnClick.svg");
+}
+
+button#clear:hover {
+  background-image: url("/img/gamerModule/clearTextOnHover.png");
+}
+
+button#clear:active {
+  background-image: url("/img/gamerModule/clearTextOnClick.png");
+}
+
+button#copy:hover {
+  background-image: url("/img/gamerModule/copyTextOnHover.png");
+}
+
+button#copy:active {
+  background-image: url("/img/gamerModule/copyTextOnClick.png");
+}
+
+button#undo:hover {
+  background-image: url("/img/gamerModule/undoOnHover.png");
+}
+
+button#undo:active {
+  background-image: url("/img/gamerModule/undoOnClick.png");
+}
+
+button#cardHelp:hover {
+  background-image: url("/img/gamerModule/infoSupOnHover.png");
+}
+
+button#cardHelp:active {
+  background-image: url("/img/gamerModule/infoSupOnClick.png");
+}

@@ -1,0 +1,33 @@
+div#gamePanel(class="col-lg-10 col-md-10 col-sm-10 col-xs-10")
+  div#playerInfos(class="row")
+    div#pseudoLabel(class="col-lg-1 col-md-1 col-sm-1 col-xs-1")
+    div#pseudoDisplay(class="col-lg-3 col-md-3 col-sm-3 col-xs-3")
+    div#questionLabel(class="col-lg-1 col-md-1 col-sm-1 col-xs-1")
+    div#questionDisplay(class="col-lg-7 col-md-7 col-sm-7 col-xs-7")
+  div#playerProduction(class="row")
+    div#productionList(class="col-lg-1 col-md-1 col-sm-1 col-xs-1")
+      div#myProduction(class="row")
+        button#myOwn(class="col-lg-12 col-md-12 col-sm-12") My production
+      div#option(class="row")
+        button#privacy(class="col-lg-12 col-md-12 col-sm-12")
+      div#playersProduction(class="row")
+        p#playersProductionLabel(class="col-lg-12 col-md-12 col-sm-12") Players production
+    div#productionArea(class="col-lg-11 col-md-11 col-sm-11 col-xs-11")
+      button#displayList
+      div#svgMenu
+        button#bouton(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+      svg#production
+  div#chatInfos(class="col-lg-12 col-md-12 col-sm-12 col-xs-12")
+    div#chat(class="col-lg-7 col-md-7 col-sm-7 col-xs-7")
+      div#dialogBox(class="row")
+        div#messages(class="col-lg-12 col-md-12 col-sm-12 col-xs-12")
+      div#inputBox(class="row")
+        input#inputField(class="col-lg-11 col-md-11 col-sm-11 col-xs-11" type="text" value="Write your message here !")
+        button#sendButton(class="col-lg-1 col-md-1 col-sm-1 col-xs-1")
+    div#infos(class="col-lg-5 col-md-5 col-sm-5 col-xs-5")
+      div#notes(class="row")
+        textarea#notesArea(class="col-lg-11 col-md-11 col-sm-11 col-xs-11") Write your notes here !
+        div#menu(class="col-lg-1 col-md-1 col-sm-1 col-xs-1")
+          button#copy.notesTool
+          button#clear.notesTool
+          button#undo.notesTool
