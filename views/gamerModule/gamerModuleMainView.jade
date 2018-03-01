@@ -1,0 +1,24 @@
+doctype html
+
+html
+  head
+    title Conpa
+    meta(charset="utf-8")
+    link(href="/css/bootstrap.min.css" rel="stylesheet")
+    link(href="/css/scrollBarStyle.css" rel="stylesheet")
+    link(href="/css/gamerModule/style.css" rel="stylesheet")
+    link(href="/css/gamerModule/cssEventStyle.css" rel="stylesheet")
+    link(href="/css/gamerModule/gameBarStyle.css" rel="stylesheet")
+    link(href="/css/gamerModule/cardStyle.css" rel="stylesheet")
+  body
+    div#content(class="container-fluid")
+      div#game(class="row")
+        include gamePanel.jade
+        include gameBar.jade
+    
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+    script(src="http://code.jquery.com/jquery.min.js")
+    script(src="/js/gamerModule/moduleEvents.js")
+    script(src="/js/gamerModule/svg.js")
+    script(src="/js/gamerModule/svgClasses.js")
+    script(src="/js/gamerModule/utils.js")

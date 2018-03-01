@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/scrollBarStyle.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/cardGameEditor/sideNavStyle.css">
+    <link rel="stylesheet" href="/css/cardGameEditor/selectorStyle.css">
+    <title>Card game editor</title>
+  </head>
+  <body>
+    <div id="content" class="container-fluid">
+      <div id="sideNav" class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        <div id="logoEditor" class="row">
+          <div id="logo" class="centeredImage col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10"></div>
+        </div>
+        <div id="cardGameName" class="centeredColumn row">
+          <p id="label" class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10">Card Game title</p>
+          <input id="inputName" type="text" class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10">
+        </div>
+        <div id="cardActions" class="centeredRow row"><i id="addCardButton" class="centeredImage col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4 col-xs-offset-1 col-xs-4"></i><i id="removeCardButton" class="centeredImage col-lg-offset-2 col-lg-4 col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4 col-xs-offset-2 col-xs-4"></i></div>
+        <div id="savingActions" class="centeredColumn row">
+          <div id="save" class="centeredRow col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10"><i id="saveButton" class="centeredImage col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4 col-xs-offset-1 col-xs-4"></i>
+            <p id="saveLabel" class="col-lg-7 col-md-7 col-sm-7 col-xs-7">save</p>
+          </div>
+          <div id="saveAs" class="centeredRow col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10"><i id="saveAsButton" class="centeredImage col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4 col-xs-offset-1 col-xs-4"></i>
+            <p id="saveAsLabel" class="col-lg-7 col-md-7 col-sm-7 col-xs-7">save as</p>
+          </div>
+        </div>
+        <div id="sharingActions" class="centeredRow row">
+          <label id="exportToCSVLabel" for="exportToCSV" class="centeredImage col-lg-4 col-md-4 col-sm-4 col-xs-4"></label>
+          <input id="exportToCSV" style="display: none">
+          <label id="importToCSVLabel" for="importToCSV" class="centeredImage col-lg-4 col-md-4 col-sm-4 col-xs-4"></label>
+          <input id="importToCSV" type="file" accept=".csv" style="display: none">
+          <label id="exportToPdfLabel" for="exportToPDF" class="centeredImage col-lg-4 col-md-4 col-sm-4 col-xs-4"></label>
+          <input id="exportToPdf" type="file" style="display: none">
+        </div>
+      </div>
+    </div>
+    <!--TODO: include gui editor here-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+    <script src="/js/uploadCSVEvent.js"></script>
+    <script src="/js/downloadCSVEvent.js"></script>
+  </body>
+</html>

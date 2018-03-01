@@ -1,0 +1,83 @@
+div#gameBar {
+  height: 100%;
+  padding: 0;
+  border: 2px solid black;
+  overflow-y: scroll;
+  background-color: lightgrey;
+}
+
+div#barContent {
+  height: 100%;
+  padding-bottom: 5%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+div.fieldLabel {
+  margin-top: 2%;
+  margin-bottom: 2%;
+  color: black;
+  font-size: 1.8vw;
+}
+
+div.box {
+  height: 100%;
+  padding: 0;
+  border: 2px solid black;
+  box-shadow: 6px 6px 8px grey;
+  background-color: white;
+}
+
+div.row {
+  margin: 0;
+}
+
+div#turnBoxRow {
+  height: 5%;
+}
+
+div#questionBoxRow {
+  height: 10%;
+}
+
+div#playerCardRow {
+  height: 35%;
+}
+
+div#timerBoxRow {
+  height: 5%;
+}
+
+div#gameTimer {
+  margin-bottom: 5%;
+}
+
+div#timer {
+  height: 100%;
+  padding: 0;
+}
+
+button#skipButton {
+  height: 100%;
+  padding: 0;
+  background-image: url("/img/gamerModule/skipButton.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* screen size lower than 800px, reduce space between components to
+     gain missing space */
+@media screen and (max-height: 700px) {
+  div#diceBoxRow {
+    height: 12%;
+  }
+}
+
+/* screen size upper than 800px, possible to increase space between
+     components to improved the readability */
+@media screen and (min-height: 700px) {
+  div#diceBoxRow {
+    height: 15%;
+  }
+}

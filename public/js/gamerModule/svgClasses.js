@@ -47,7 +47,7 @@ class Element {  // warning : Element need svg to be declared
         return this.rect.x.baseVal.value;
     }
 
-	/**
+    /**
      * Set the rect's x value
      * @param value {number}
      */
@@ -64,7 +64,7 @@ class Element {  // warning : Element need svg to be declared
         return this.rect.y.baseVal.value;
     }
 
-	/**
+    /**
      * Set the rect's y value
      * @param value {number}
      */
@@ -88,7 +88,7 @@ class Element {  // warning : Element need svg to be declared
     set width(value) {
         this.rect.setAttribute("width", value);
     }
-	
+
     /**
      * Get the rect's height value
      * @return {number}
@@ -104,7 +104,7 @@ class Element {  // warning : Element need svg to be declared
     set height(value) {
         this.rect.setAttribute("height", value);
     }
-	
+
     /**
      * Return the element's center by x and y coordinates
      * @return {{x: number, y: number}}
@@ -226,7 +226,7 @@ class Element {  // warning : Element need svg to be declared
     refreshPosition() {
         this.text.setAttributeNS(null, "transform", "translate(" + (this.x + 5) + " " + (this.y + 10) + ")");
         this.myLinks.forEach(function (link) {
-           link.refreshPosition();
+            link.refreshPosition();
         });
     }
 
@@ -317,38 +317,4 @@ class Link {
     hasElement(e) {
         return (e === this.e1 || e === this.e2);
     }
-}
-
-function boutonClique(){
-    if(document.getElementById("bouton").src.indexOf("text.png") > -1) document.getElementById("bouton").src = "textC.png";
-    else document.getElementById("bouton").src = "text.png";
-}
-
-/**
- * Paste a string as a new Element
- * @param x {String} : x location of the new element
- * @param y {String} : y location of the new element
- * @param s {String} : string to be pasted as a new element
- * @return {Element} : element created in the process
- */
-function pasteAsElement(x, y, s) {
-    let pasteElement = new Element(x, y);
-    pasteElement.textContent = s;
-    pasteElement.width = s.length * 10 + 10;
-    pasteElement.height = 50;
-    return pasteElement;
-}
-
-/**
- * Remove the element e from the array
- * @param array {array}
- * @param e {*} : the element to remove
- * @return {array} the array without the first occurrence of e
- */
-function removeFromArray(array, e){
-    let index = array.indexOf(e);
-    if (index > -1) {
-        array = array.splice(index, 1);
-    }
-    return array;
 }

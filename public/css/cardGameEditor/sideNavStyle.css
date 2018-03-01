@@ -1,0 +1,171 @@
+.centeredRow {
+  display: flex;
+  align-items: center;
+}
+
+.centeredColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.centeredImage {
+  background-size: contain;
+  background-origin: content-box;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+div#content {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+}
+
+div#sideNav {
+  height: 100%;
+  padding: 0;
+  position: fixed;
+  background-color: lightgrey;
+  border-right: 3px solid black;
+  overflow: hidden;
+}
+
+div#logoEditor {
+  height: 25%;
+  margin: 0;
+  border-bottom: 3px solid black;
+}
+
+div#logo {
+  height: 90%;
+  padding: 0;
+  background-image: url('/img/cardGameEditor/logoConpaEditor2.png');
+}
+
+div#cardGameName {
+  height: 20%;
+  margin: 0;
+  padding: 0;
+  border-bottom: 3px solid black;
+}
+
+p#label {
+  margin-bottom: 10%;
+  padding: 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.6vw;
+}
+
+input#inputName {
+  text-align: center;
+  font-size: 1.2vw;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+
+div#cardActions {
+  height: 20%;
+  margin: 0;
+  padding: 0;
+  border-bottom: 3px solid black;
+}
+
+i#addCardButton {
+  height: 80%;
+  padding: 0;
+  background-image: url('/img/cardGameEditor/addCard.png');
+}
+
+i#removeCardButton {
+  height: 80%;
+  padding: 0;
+  background-image: url('/img/cardGameEditor/removeCard.png');
+}
+
+div#savingActions {
+  height: 20%;
+  margin: 0;
+  padding: 0;
+  border-bottom: 3px solid black;
+}
+
+div#save {
+  height: 40%;
+  padding: 0;
+  margin-bottom: 5%;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+i#saveButton {
+  height: 80%;
+  padding: 0;
+  background-image: url('/img/cardGameEditor/saveIcon.png');
+  background-size: contain;
+  background-origin: content-box;
+  background-repeat: no-repeat;
+}
+
+p#saveLabel {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.8vw;
+}
+
+div#saveAs {
+  height: 40%;
+  padding: 0;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+i#saveAsButton {
+  height: 80%;
+  padding: 0;
+  background-image: url('/img/cardGameEditor/saveAsIcon.png');
+  background-size: contain;
+  background-origin: content-box;
+  background-repeat: no-repeat;
+}
+
+p#saveAsLabel {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.8vw;
+}
+
+div#sharingActions {
+  height: 15%;
+  margin: 0;
+  padding: 0;
+}
+
+label#exportToCSVLabel {
+    height: 50%;
+    padding: 0;
+    background-image: url('/img/cardGameEditor/export_csv.png');
+}
+
+label#importToCSVLabel {
+    height: 50%;
+    padding: 0;
+    background-image: url('/img/cardGameEditor/import_csv.png');
+}
+
+label#exportToPdfLabel {
+    height: 50%;
+    padding: 0;
+    background-image: url('/img/cardGameEditor/export_pdf.png');
+}
