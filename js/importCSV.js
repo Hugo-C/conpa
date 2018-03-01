@@ -21,15 +21,9 @@ function addCards(records, family, familyId) {
     while(j < records.length && records[j][family] !== ""){
         // we process each cards
         // TODO add the cards by batch
-        var sql = ["INSERT INTO ", keys.CARD_TABLE, " (", keys.CT_KEY_CONTENT, ", ", keys.CT_KEY_INFORMATION, ", ",
-            keys.CT_KEY_CARD_FAMILY, ") VALUES (?, ?, ?);"].join("");
-        var values = [records[j][family], records[j]["info sup " + family], familyId];
-        con.query(sql, values, function (err) {
-            if (err) {
-                console.log("err : " + err.message);
-            } else {
-                console.log("I added a card");
-            }
+        db.addCard(records[j][family], records[j]["info sup " + family], familyId, function(err, result){
+            if(err) console.log("err : " + err.message);
+            else console.log("I added a card");
         });
         j++;
     }
@@ -44,18 +38,22 @@ function addCards(records, family, familyId) {
  * @param addCards {function} : The function that will add the family's cards
  */
 var addFamily = function (records, family, cardGameId, logoId, addCards) {
-    var sql = ["INSERT INTO ", keys.CARD_FAMILY_TABLE, " (", keys.CFT_KEY_NAME, ", ",  keys.CFT_KEY_LOGO, ", ",
-        keys.CFT_KEY_CARD_GAME, ") VALUES (?, ?, ?);"].join("");
-    var values = [records[0][family], logoId, cardGameId];
-    con.query(sql, values, function (err, result) {
+
+    function onFamilyAdded(err, result){
         if (err) {
             console.log("err : " + err.message);
         }else {
             console.log("I added a cardFamily : " + family);
             addCards(records, family, result.insertId);
         }
-    });
-};
+    }
+
+    console.log(logoId);
+    if(logoId == 'NULL')
+        db.addCardFamilyWithoutLogo(records[0][family], cardGameId, onFamilyAdded);
+    else
+        db.addCardFamilyWithLogo(records[0][family], logoId, cardGameId, onFamilyAdded);
+}
 
 /**
  * Process the family of the record, by adding a logo, a name and all the cards that belong to the family
@@ -65,16 +63,19 @@ var addFamily = function (records, family, cardGameId, logoId, addCards) {
  * @param addFamily {function} : The function that will add the family name and it's cards
  */
 function processFamily(records, family, cardGameId, addFamily) {
-    var sql = ["INSERT INTO ", keys.FAMILY_LOGO_TABLE, " (", keys.FLT_KEY_LOGO, ") VALUES (?);"].join("");
-    var values = [records[2][family]];
-    con.query(sql, values, (function (err, result) {
-        if (err) {
-            console.log("err : " + err.message);
-        } else {
-            console.log("I added a new Logo : " + result.insertId);
-            addFamily(records, family, cardGameId, result.insertId, addCards);
-        }
-    }));
+    var logo = records[2][family];
+    var logoId = 'NULL';
+    if(logo != ''){
+        db.addLogo(logo, function(err, result){
+            if(err){
+                console.log(err);
+            }else{
+                logoId = result.insertId;
+                console.log("I added a new Logo : " + logoId);
+            }
+        });
+    }
+    addFamily(records, family, cardGameId, logoId, addCards);
 }
 
 /**
@@ -100,9 +101,7 @@ var processFamilies = function(records, cardGameId) {
 function addCardGame(records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
     console.log("Connected!");
-    var sql = ["INSERT INTO ", keys.CARD_GAME_TABLE, " (", keys.CGT_KEY_NAME, ", ", keys.CGT_KEY_LANGUAGE, ") VALUES (?, ?);"].join("");
-    var values = [records[0]['nom jeu'], records[0]['langue']];
-    con.query(sql, values, function (err, result) {
+    db.addCardGame(records[0]['nom jeu'], records[0]['langue'], function(err, result){
         if (err) {
             console.log("err : " + err.message);
         } else {
@@ -122,5 +121,6 @@ exports.importFromCsv = function(path){
         console.log(records);
         if(records.length > 0)
             addCardGame(records, processFamilies);
+        fs.unlinkSync(path);
     });
 };

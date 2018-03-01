@@ -9,6 +9,7 @@ var importCSV = require('../js/importCSV');
 var exportCSV = require('../js/exportCSV');
 var db = require('../js/db');
 var keys = require('../js/dbConstants');
+var fs = require('fs');
 
 // give card game editor web page
 router.get('/', function(req, res){
@@ -25,34 +26,39 @@ router.get('/', function(req, res){
                                     result[index][keys.CGT_KEY_LANGUAGE] + ")");
             }
             if('selector' in params && params['selector'] == 'yes'){
-                res.render("cardGameEditorView", {cardGames: cardGamesArray, selector: params['selector']});
+                res.render("editorMainView", {cardGames: cardGamesArray, selector: params['selector']});
             }else{
-                res.render("cardGameEditorView", {cardGames: cardGamesArray, selector: 'no'});
+                res.render("editorMainView", {cardGames: cardGamesArray, selector: 'no'});
             }
         }
     });
 });
 
 router.post('/uploadCSV', function (req, res) {
-  upload(req, res, function (err) {
-      if (err) {
-        return // An error occurred when uploading
-      }
-      // TODO : parse csv and add them into database
-      res.writeHead(200);
-      res.send();
-  })
+    upload(req, res, function (err) {
+        if (err) {
+            console.log(err);
+            res.writeHead(500);
+            res.send();
+            return // An error occurred when uploading
+        }else{
+            var file = req.file;
+            var fileName = file.originalname;
+            var dest = "./upload/" + fileName;
+            fs.writeFile(dest, file.buffer, function(err){
+                if(err){
+                    console.log(err);
+                    res.writeHead(500);
+                    res.send();
+                    return // An error occurred when uploading
+                }
+            });
+            importCSV.importFromCsv(dest);
+            res.writeHead(200);
+            res.send();
+        }
+    });
 });
-
-
-router.get('/importCSV', function(req, res, next) {
-    var path = req.query.path;
-    if (path != null){
-        importCSV.importFromCsv(path);
-    }
-    res.send("OK");
-});
-
 
 router.get('/exportCSV', function(req, res){
     var params = querystring.parse(url.parse(req.url).query);
