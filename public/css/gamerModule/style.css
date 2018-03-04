@@ -184,6 +184,14 @@ svg#production {
   width: 92%;
 }
 
+.foreign {
+  text-align: left;
+}
+
+.insideforeign {
+  display: inline-block;
+}
+
 div#chatInfos {
   height: 25%;
   padding: 0;
