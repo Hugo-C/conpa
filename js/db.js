@@ -20,10 +20,10 @@ var state = {
  */
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
-        host: '',
-        port: '',
-        user: '',
-        password: '',
+        host: '78.240.16.90',
+        port: '50000',
+        user: 'julien',
+        password: 'StimpflingMysql73100',
         database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
     });
     state.mode = mode;
@@ -37,6 +37,21 @@ exports.connect = function(mode, done){
  */
 exports.get = function(){
     return state.pool;
+}
+
+exports.startTransaction = function(){
+    var sql = "SET autocommit=0;";
+    state.pool.query(sql);
+}
+
+exports.rollback = function(){
+    var sql = "ROLLBACK;";
+    state.pool.query(sql);
+}
+
+exports.commit = function(){
+    var sql = "COMMIT; SET autocommit=1;";
+    state.pool.query(sql);
 }
 
 /**
@@ -92,7 +107,7 @@ exports.getFamiliesAndLogos = function(cardGameId, callback){
  *
  * @param {string} cardGame : name of card game we want to retrieved
  * @param {string} language : language of card game we want to retrieved
- * @param {callack} callack : function called to process retrieved data
+ * @param {callack} callback : function called to process retrieved data
  */
 exports.getCardGame = function(cardGame, language, callback){
     var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
@@ -108,7 +123,7 @@ exports.getCardGame = function(cardGame, language, callback){
 /**
  * Retrieves all card game stored in database
  *
- * @param {callack} callack : function called to process retrieved data
+ * @param {callack} callback : function called to process retrieved data
  */
 exports.getCardGames = function(callback){
     var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE + ';';
@@ -124,16 +139,16 @@ exports.getCardGames = function(callback){
  * @param {string} content : content of the card
  * @param {string} description : additional information
  * @param {integer} familyId : id of the card family
- * @param {callack} callack : function called to inform of the success of the operation
+ * @param {callack} callback : function called to inform of the success of the operation
  */
-exports.addCard = function(content, description, familyId, callack){
+exports.addCard = function(content, description, familyId, callback){
     var sql = 'INSERT INTO ' + keys.CARD_TABLE +
               ' (' + keys.CT_KEY_CONTENT + ', ' + keys.CT_KEY_INFORMATION + ', ' + keys.CT_KEY_CARD_FAMILY + ')' +
               ' VALUES (?, ?, ?);';
     var values = [content, description == '' ? 'NULL' : description, familyId];
     state.pool.query(sql, values, function(err, result){
-        if(err) callack(err);
-        else callack(null, result);
+        if(err) callback(err);
+        else callback(null, result);
     });
 }
 
@@ -142,16 +157,16 @@ exports.addCard = function(content, description, familyId, callack){
  *
  * @param {string} name : family's name
  * @param {integer} cardGameId : id of the family's card game
- * @param {callack} callack : function called to inform of the success of the operation
+ * @param {callack} callback : function called to inform of the success of the operation
  */
-exports.addCardFamilyWithoutLogo = function(name, cardGameId, callack){
+exports.addCardFamilyWithoutLogo = function(name, cardGameId, callback){
     var sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
               ' (' + keys.CFT_KEY_NAME + ', ' + keys.CFT_KEY_CARD_GAME + ')' +
               ' VALUES (?, ?);';
     var values = [name, cardGameId];
     state.pool.query(sql, values, function(err, result){
-        if(err) callack(err);
-        else callack(null, result);
+        if(err) callback(err);
+        else callback(null, result);
     });
 }
 
@@ -161,16 +176,16 @@ exports.addCardFamilyWithoutLogo = function(name, cardGameId, callack){
  * @param {string} name : family's name
  * @param {integer} logoId : id of the associated logo
  * @param {integer} cardGameId : id of the family's card game
- * @param {callack} callack : function called to inform of the success of the operation
+ * @param {callack} callback : function called to inform of the success of the operation
  */
-exports.addCardFamilyWithLogo = function(name, logoId, cardGameId, callack){
+exports.addCardFamilyWithLogo = function(name, logoId, cardGameId, callback){
     var sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
               ' (' + keys.CFT_KEY_NAME + ', ' + keys.CFT_KEY_LOGO + ', ' + keys.CFT_KEY_CARD_GAME + ')' +
               ' VALUES (?, ?, ?);';
     var values = [name, logoId, cardGameId];
     state.pool.query(sql, values, function(err, result){
-        if(err) callack(err);
-        else callack(null, result);
+        if(err) callback(err);
+        else callback(null, result);
     });
 }
 
@@ -178,27 +193,56 @@ exports.addCardFamilyWithLogo = function(name, logoId, cardGameId, callack){
  * Add a card game into the database
  *
  * @param {string} logo : base64 image
- * @param {callack} callack : function called to inform of the success of the operation
+ * @param {callack} callback : function called to inform of the success of the operation
  */
-exports.addLogo = function(logo, callack){
+exports.addLogo = function(logo, callback){
     var sql = 'INSERT INTO ' + keys.FAMILY_LOGO_TABLE +
               ' (' + keys.FLT_KEY_LOGO + ')' +
               ' VALUES (?);';
     console.log(sql);
     var value = [logo];
     state.pool.query(sql, value, function(err, result){
-        if(err) callack(err);
-        else callack(null, result);
+        if(err) callback(err);
+        else callback(null, result);
     });
 }
 
-exports.addCardGame = function(name, language, callack){
+exports.cardGameExists = function(name, language, callback){
+    var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
+              ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
+    var values = [name, language];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(false);
+        }else{
+            if(result.length > 0){
+                callback(true);
+            }else{
+                callback(false);
+            }
+        }
+    });
+}
+
+exports.removeCardGame = function(name, language, callback){
+    var sql = 'DELETE FROM ' + keys.CARD_GAME_TABLE +
+              ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
+    var values = [name, language];
+    state.pool.query(sql, values, function(err){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
+
+exports.addCardGame = function(name, language, callback){
     var sql = 'INSERT INTO ' + keys.CARD_GAME_TABLE +
               ' (' + keys.CGT_KEY_NAME + ', ' + keys.CGT_KEY_LANGUAGE + ')' +
               ' VALUES (? , ?);';
     var values = [name, language];
     state.pool.query(sql, values, function(err, result){
-        if(err) callack(err);
+        if(err) callback(err);
         else callback(null, result);
     });
 }

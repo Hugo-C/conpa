@@ -3,17 +3,12 @@ var parse = require('csv-parse/lib/sync');
 var keys = require('../js/dbConstants');
 var db = require('../js/db');
 
-
-// create a connection to the database
-var pass = function(){};
-db.connect(db.MODE_TEST, pass);
-var con = db.get();
-
 /**
  * Import the cards of the family to the database
- * @param records {Array.<string, string>} : The records of families to process
- * @param family {string} : The family name, used as key in the record
- * @param familyId {int} : The id of the family
+ *
+ * @param {Array.<string, string>} records : The records of families to process
+ * @param {string} family : The family name, used as key in the record
+ * @param {int} familyId : The id of the family
  */
 function addCards(records, family, familyId) {
     records = records.slice(4);  // first 4 éléments aren't about cards
@@ -22,8 +17,11 @@ function addCards(records, family, familyId) {
         // we process each cards
         // TODO add the cards by batch
         db.addCard(records[j][family], records[j]["info sup " + family], familyId, function(err, result){
-            if(err) console.log("err : " + err.message);
-            else console.log("I added a card");
+            if(err){
+                console.log("err : " + err.message);
+            }else{
+                console.log("I added a card");
+            }
         });
         j++;
     }
@@ -31,11 +29,12 @@ function addCards(records, family, familyId) {
 
 /**
  * Import the family'name to the database then add it's cards
- * @param records {Array.<string, string>} : The records of families to process
- * @param family {string} : The family name, used as key in the record
- * @param cardGameId {int} : The id of the card game
- * @param logoId {int} : The id of the logo of the family
- * @param addCards {function} : The function that will add the family's cards
+ *
+ * @param {Array.<string, string>} records : The records of families to process
+ * @param {string} family : The family name, used as key in the record
+ * @param {int} cardGameId : The id of the card game
+ * @param {int} logoId : The id of the logo of the family
+ * @param {callack} addCards : The function that will add the family's cards
  */
 var addFamily = function (records, family, cardGameId, logoId, addCards) {
 
@@ -57,10 +56,11 @@ var addFamily = function (records, family, cardGameId, logoId, addCards) {
 
 /**
  * Process the family of the record, by adding a logo, a name and all the cards that belong to the family
- * @param records {Array.<string, string>} : The records of families to process
- * @param family {string} : The family name, used as key in the record
- * @param cardGameId {int} : The id of the card game
- * @param addFamily {function} : The function that will add the family name and it's cards
+ *
+ * @param {Array.<string, string>} records : The records of families to process
+ * @param {string} family : The family name, used as key in the record
+ * @param {int} cardGameId : The id of the card game
+ * @param {callack} addFamily : The function that will add the family name and it's cards
  */
 function processFamily(records, family, cardGameId, addFamily) {
     var logo = records[2][family];
@@ -80,8 +80,9 @@ function processFamily(records, family, cardGameId, addFamily) {
 
 /**
  * Process all the families of the record by calling processFamily to each one
- * @param records {Array.<string, string>} : The records of families to process
- * @param cardGameId {int} : The id of the card game
+ *
+ * @param {Array.<string, string>} records : The records of families to process
+ * @param {int} cardGameId : The id of the card game
  */
 var processFamilies = function(records, cardGameId) {
     let nbrFamilies = (Object.keys(records[0]).length - 1) / 2;
@@ -95,12 +96,12 @@ var processFamilies = function(records, cardGameId) {
 
 /**
  * Add a new card game to the database and process it's families
- * @param records {Array.<string, string>} : The records of elements to add
- * @param processFamilies {function} : The function to process the families of the card game
+ *
+ * @param {Array.<string, string>} records : The records of elements to add
+ * @param {callack} processFamilies : The function to process the families of the card game
  */
 function addCardGame(records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
-    console.log("Connected!");
     db.addCardGame(records[0]['nom jeu'], records[0]['langue'], function(err, result){
         if (err) {
             console.log("err : " + err.message);
@@ -112,15 +113,39 @@ function addCardGame(records, processFamilies) {
 }
 
 /**
+ * Remove old card game and add the new one in the database
+ *
+ * @param {Array.<string, string>} records : The records of elements to add
+ * @param {function} processFamilies : The function to process the families of the card game
+ */
+function updateCardGame(records, processFamilies) {
+    // TODO we may want to handle errors in a way that failed request revert DB to a previous state
+    db.removeCardGame(records[0]['nom jeu'], records[0]['langue'], function(err){
+        if(err){
+            console.log(err);
+            return;
+        }else{
+            addCardGame(records, processFamilies);
+        }
+    })
+
+}
+
+/**
  * Import a csv file representing a deck/cardGame to a mysql database
  * @param {string} path - The path to the file to import
+ * @param {boolean} newCardGame : indicate if adding card game already exists in the database
  */
-exports.importFromCsv = function(path){
+exports.importFromCsv = function(path, newCardGame){
     fs.readFile(path, function(err, data) {
         var records = parse(data, {columns: true});
         console.log(records);
-        if(records.length > 0)
-            addCardGame(records, processFamilies);
+        if(records.length > 0){
+            if(newCardGame)
+                addCardGame(records, processFamilies);
+            else
+                updateCardGame(records, processFamilies);
+        }
         fs.unlinkSync(path);
     });
 };

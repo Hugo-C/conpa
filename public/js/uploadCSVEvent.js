@@ -53,7 +53,6 @@ function loadHandler(event, fileToRead){
     csv = processData(csv); // retrieves each csv lines
     if(checkConformity(csv)){
         uploadCSV(fileToRead);
-        alert("CSV uploaded");
     }else{
         alert("CSV invalid");
     }
@@ -103,13 +102,34 @@ function errorHandler(event){
 }
 
 /**
- * Send http request to the server to upload the csv file
+ * Uploads csv file to the server and ask it to import card game into database
+ * If server answers that card game already exists, a confirmation is send to
+ * the user to overwrite old card game version.
  */
 function uploadCSV(csvFile){
     var formData = new FormData();
     formData.append("uploadCSV", csvFile);
 
     var request = new XMLHttpRequest();
+
+    request.onload = function(){
+        console.log("request loaded");
+        if(request.status == 200) console.log("import successful");
+        else if(request.status == 256){
+            console.log("already have this game");
+            console.log(request.responseText);
+            var updateCardGame = confirm("This card game already exists !\nWould you overwrite it ?");
+            var req;
+            if(updateCardGame)
+                req = "/editor/updateCardGame?cardGame=" + request.responseText + "&update=yes";
+            else
+                req = "/editor/updateCardGame?cardGame=" + request.responseText + "&update=no";
+            var updateRequest = new XMLHttpRequest();
+            updateRequest.open("post", req, true);
+            updateRequest.send();
+        }
+    }
+
     request.open("post", "/editor/uploadCSV", true);
     request.send(formData);
 }
