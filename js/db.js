@@ -20,10 +20,10 @@ var state = {
  */
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
-        host: '78.240.16.90',
-        port: '50000',
-        user: 'julien',
-        password: 'StimpflingMysql73100',
+        host: '',
+        port: '',
+        user: '',
+        password: '',
         database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
     });
     state.mode = mode;
