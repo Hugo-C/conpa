@@ -1,4 +1,7 @@
 var express = require('express');
+var app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 var db = require('./js/db');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -11,7 +14,7 @@ var users = require('./routes/users');
 var editor = require('./routes/editor');
 var gamerModule = require('./routes/gamerModule');
 
-var app = express();
+server.listen(8080);
 
 // view engine setup
 app.set('views', [path.join(__dirname, 'views/'),
@@ -61,4 +64,3 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
-app.listen(8080);
