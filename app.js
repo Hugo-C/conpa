@@ -69,17 +69,16 @@ app.use(function(err, req, res, next) {
 io.on('connection', function (socket) {
     console.log("wow");
     socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data) {
-        console.log(data);
-    });
+    var clients = Object.keys(io.sockets.sockets);
+    console.log("my clients : " + clients);
+    socket.broadcast.emit("players", clients);
     socket.on('message', function(data){
+        console.log("dest : " + data["dest"] + " msg : " + data["msg"]);
         if(data["dest"] === "all"){
-            console.log("j'envoie à tous le monde");
+            socket.broadcast.emit('msg', data['msg']);
         } else {
-            console.log("j'envoie à la personne : " + data["dest"]);
+            io.sockets.connected[data["dest"]].emit("message", data['msg']);  // FIXME
         }
-        console.log("msg : " + data["msg"]);
-        io.emit('message', data["msg"]);
     });
 });
 
