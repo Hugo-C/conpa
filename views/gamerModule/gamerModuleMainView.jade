@@ -18,7 +18,11 @@ html
     
     script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
     script(src="//code.jquery.com/jquery.min.js")
+    script(src="/scripts/socket.io-client/dist/socket.io.js")
     script(src="/js/gamerModule/moduleEvents.js")
     script(src="/js/gamerModule/svg.js")
     script(src="/js/gamerModule/svgClasses.js")
     script(src="/js/gamerModule/utils.js")
+    script(type="text/javascript").
+      var socket = io.connect('//localhost:8080/gamerModule');
+      console.log("wow");

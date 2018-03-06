@@ -15,6 +15,7 @@ var editor = require('./routes/editor');
 var gamerModule = require('./routes/gamerModule');
 
 server.listen(8080);
+io.listen(server);
 
 // view engine setup
 app.set('views', [path.join(__dirname, 'views/'),
@@ -34,6 +35,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/editor', editor);
 app.use('/gamerModule', gamerModule);
+app.use('/scripts', express.static(__dirname + '/node_modules/'));
 
 // connect to MySQL on start
 db.connect(db.MODE_TEST, function(err){
@@ -63,4 +65,24 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
+io.on('connection', function (socket) {
+    console.log("wow");
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data) {
+        console.log(data);
+    });
+    socket.on('message', function(data){
+        if(data["dest"] === "all"){
+            console.log("j'envoie à tous le monde");
+        } else {
+            console.log("j'envoie à la personne : " + data["dest"]);
+        }
+        console.log("msg : " + data["msg"]);
+        io.emit('message', data["msg"]);
+    });
+});
+
 module.exports = app;
+exports.io = io;
+
