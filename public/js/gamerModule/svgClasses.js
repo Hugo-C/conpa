@@ -1,4 +1,6 @@
 const STROKE_WIDTH = "10";
+const TEXTAREA_MARGIN = 10;
+const TEXTAREA_MESSAGE = "taper votre texte ici";
 
 let myElements = [];  // list all elements in the svg
 
@@ -21,20 +23,31 @@ class Element {  // warning : Element need svg to be declared
 
         this.text = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
         this.textDiv = document.createElement("div");
-        this.textNode = document.createTextNode("Click to edit");
-        this.textDiv.appendChild(this.textNode);
-        this.textDiv.setAttribute("contentEditable", "true");
-        //this.textDiv.setAttribute("width", "auto");
-		this.textDiv.setAttribute("height", "scroll");
-		this.textDiv.setAttribute("width", "10");
+		
+        this.textDiv.setAttribute("width", "auto");
+        this.textDiv.setAttribute("height", "auto");
+        this.textDiv.setAttribute("border", "none");
+        this.textDiv.classList.add("insideforeign");
+        this.text.appendChild(this.textDiv);
+        this.textArea = document.createElement("textarea");
+
+        this.textArea.setAttribute("spellcheck", "true");
+        this.textArea.setAttribute("placeholder", TEXTAREA_MESSAGE);
+
+
+        this.textArea.setAttribute("width", "auto");
+        this.textArea.setAttribute("height", "auto");
+        this.textDiv.appendChild(this.textArea);
+
         this.text.setAttribute("width", "100%");
         this.text.setAttribute("height", "100%");
         this.text.classList.add("foreign"); //to make div fit text
-        this.textDiv.classList.add("insideforeign"); //to make div fit text
+        this.textArea.classList.add("insideforeign"); //to make div fit text
+        this.textArea.classList.add("myTextArea"); //to make div fit text
+		
         this.text.setAttributeNS(null, "transform", "translate(" + (this.x + 5) + " " + (this.y + 10) + ")");
         svg.appendChild(this.text);
-        this.text.appendChild(this.textDiv);
-        svg.append(this.text);
+        //svg.append(this.text);
         myElements.push(this);
 		
         this.myLinks = [];
@@ -88,6 +101,11 @@ class Element {  // warning : Element need svg to be declared
      */
     set width(value) {
         this.rect.setAttribute("width", value);
+        if (Number(value) > TEXTAREA_MARGIN * 2){
+            this.text.setAttribute("width", String(Number(value) - TEXTAREA_MARGIN));
+        } else {
+            this.text.setAttribute("width", String(value));
+        }
     }
 
     /**
@@ -103,7 +121,12 @@ class Element {  // warning : Element need svg to be declared
      * @param value {number}
      */
     set height(value) {
-        this.rect.setAttribute("height", value);
+        this.rect.setAttribute("height", String(value));
+        if (Number(value) > TEXTAREA_MARGIN * 2){
+            this.text.setAttribute("height", String(Number(value) - TEXTAREA_MARGIN));
+        } else {
+            this.text.setAttribute("height", String(value));
+        }
     }
 
     /**
@@ -123,7 +146,7 @@ class Element {  // warning : Element need svg to be declared
     set select(isSelect) {
         if (isSelect) {
             this.rect.style.strokeDasharray = '10';
-            rectSelect.textDiv.focus();
+            rectSelect.textArea.focus();
         } else {
             this.rect.style.strokeDasharray = '0';
         }
