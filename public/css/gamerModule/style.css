@@ -190,6 +190,25 @@ svg#production {
 
 .insideforeign {
   display: inline-block;
+  overflow: hidden;
+  border: none;
+
+  width: 100%;
+  height: 100%;
+}
+
+.myTextArea {
+  "remove textarea style
+  border: none;
+  background-color: transparent;
+  resize: none;
+  outline: none;
+  overflow: auto;
+
+  display: flex; "fit the textarea inside a div
+  pointer-events: none; "fix a chrome bug
+
+  "force default border
 }
 
 div#chatInfos {
