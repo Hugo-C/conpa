@@ -18,6 +18,11 @@ button#bouton:focus {
   background-image: url("/img/gamerModule/textC.png");
 }
 
+/*TODO
+  button#colorButton:focus {
+  background-image: url("/img/gamerModule/Red2.png");
+}*/
+
 button#sendButton:hover {
   background-image: url("/img/gamerModule/sendButtonOnHover.svg")
 }

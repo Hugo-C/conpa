@@ -179,6 +179,13 @@ button#bouton {
   background-image: url("/img/gamerModule/text.png");
 }
 
+/*TODO
+  button#colorButton {
+  height: 20%;
+  padding: 0;
+  background-image: url("/img/gamerModule/Red.png");
+}*/
+
 svg#production {
   height: 100%;
   width: 92%;

@@ -69,7 +69,14 @@ function selectRect(){
 
 let bodyJQ = $('body');
 bodyJQ.on('click', function(){
-    selectRect();
+	//Color a rect
+	var colorButton = $('selectedColor');
+	if(colorButton.is(":focus" && prevRecSelect != null)){
+		prevRecSelect.changeColor(colorButton.getAttribute('color'));	// To update!
+	}
+	else{
+		selectRect();
+	}
 });
 
 let svgJQ = $('svg');

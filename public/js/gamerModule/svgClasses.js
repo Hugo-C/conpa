@@ -24,18 +24,19 @@ class Element {  // warning : Element need svg to be declared
         this.textNode = document.createTextNode("Click to edit");
         this.textDiv.appendChild(this.textNode);
         this.textDiv.setAttribute("contentEditable", "true");
-        this.textDiv.setAttribute("width", "auto");
+        //this.textDiv.setAttribute("width", "auto");
+		this.textDiv.setAttribute("height", "scroll");
+		this.textDiv.setAttribute("width", "10");
         this.text.setAttribute("width", "100%");
         this.text.setAttribute("height", "100%");
         this.text.classList.add("foreign"); //to make div fit text
         this.textDiv.classList.add("insideforeign"); //to make div fit text
-        //this.textDiv.addEventListener("mousedown", elementMousedown, false);
         this.text.setAttributeNS(null, "transform", "translate(" + (this.x + 5) + " " + (this.y + 10) + ")");
         svg.appendChild(this.text);
         this.text.appendChild(this.textDiv);
         svg.append(this.text);
         myElements.push(this);
-
+		
         this.myLinks = [];
     }
 
@@ -200,6 +201,13 @@ class Element {  // warning : Element need svg to be declared
     putFront() {
         svg.appendChild(this.rect);
         svg.appendChild(this.text);
+    }
+	
+	/**
+     * Change the color of the rectangle
+     */
+    changeColor(c) {
+        this.rect.style.fill(c);
     }
 
     /**
