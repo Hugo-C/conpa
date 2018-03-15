@@ -1,7 +1,3 @@
-document.addEventListener('paste', function (evt) {
-    pasteAsElement(x, y, evt.clipboardData.getData('text/plain'));
-});
-
 bodyJQ.keydown(function(event){
     if(event.keyCode === 46 && rectSelect !== null){
         rectSelect.myRemove();
@@ -14,10 +10,11 @@ bodyJQ.keydown(function(event){
  * @param x {String} : x location of the new element
  * @param y {String} : y location of the new element
  * @param s {String} : string to be pasted as a new element
+ * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
  * @return {Element} : element created in the process
  */
-function pasteAsElement(x, y, s) {
-    let pasteElement = new Element(x, y);
+function pasteAsElement(x, y, s, parent) {
+    let pasteElement = new Element(x, y, parent);
     pasteElement.textContent = s;
     pasteElement.width = s.length * 10 + 10;
     pasteElement.height = 50;

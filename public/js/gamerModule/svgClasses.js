@@ -5,21 +5,23 @@ const TEXTAREA_MESSAGE = "taper votre texte ici";
 let myElements = [];  // list all elements in the svg
 
 
-class Element {  // warning : Element need svg to be declared
+class Element {
 
     /**
      * Constructor of the Element class
      * @param x {String} : x coordinate
      * @param y {String} : y coordinate
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
      */
-    constructor(x, y) {
+    constructor(x, y, parent) {
+        this.parent = parent;
         this.rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         this.rect.style.fill = 'red';
         this.rect.style.stroke = 'black';
         this.rect.style.strokeWidth = '2';
         this.rect.setAttribute("x", x);
         this.rect.setAttribute("y", y);
-        svg.append(this.rect);
+        this.parent.appendChild(this.rect);
 
         this.text = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
         this.textDiv = document.createElement("div");
@@ -46,8 +48,7 @@ class Element {  // warning : Element need svg to be declared
         this.textArea.classList.add("myTextArea"); //to make div fit text
 		
         this.text.setAttributeNS(null, "transform", "translate(" + (this.x + 5) + " " + (this.y + 10) + ")");
-        svg.appendChild(this.text);
-        //svg.append(this.text);
+        this.parent.appendChild(this.text);
         myElements.push(this);
 		
         this.myLinks = [];
@@ -165,17 +166,18 @@ class Element {  // warning : Element need svg to be declared
      * @param text {String}
      */
     set textContent(text) {
-        this.textNode.data = text;
+        this.textArea.value = text;
     }
 
     /**
      * Link two rect with a line
      * @param e1 {Element} : first element to link
      * @param e2 {Element} : second element to link
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
      */
-    static linkRect(e1, e2) {
+    static linkRect(e1, e2, parent) {
         if(!e1.isLinkedTo(e2)){
-            let link = new Link(e1, e2);
+            let link = new Link(e1, e2, parent);
             e1.addLink(link);
             e2.addLink(link);
             // put elements in front
@@ -222,8 +224,8 @@ class Element {  // warning : Element need svg to be declared
      * Put the Element on front of the svg
      */
     putFront() {
-        svg.appendChild(this.rect);
-        svg.appendChild(this.text);
+        this.parent.appendChild(this.rect);
+        this.parent.appendChild(this.text);
     }
 	
 	/**
@@ -290,22 +292,27 @@ class Link {
      * Create a new link between two link
      * @param e1 {Element} : first element to link
      * @param e2 {Element} : second element to link
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
      */
-    constructor(e1, e2) {
+    constructor(e1, e2, parent) {
+        this.e1 = e1;
+        this.e2 = e2;
+        this.parent = parent;
+
         let pos1 = e1.center;
         let pos2 = e2.center;
         this.line = Link.createLine(pos1.x, pos1.y, pos2.x, pos2.y);
-        this.e1 = e1;
-        this.e2 = e2;
+        this.parent.appendChild(this.line);
     }
 
     /**
-     * Create a new line between two points
+     * Create a new line between two points without adding it to the svg
+     *
      * @param x1 {String} : x coordinate of the first point
      * @param y1 {String} : y coordinate of the first point
      * @param x2 {String} : x coordinate of the second point
      * @param y2 {String} : y coordinate of the second point
-     * @return {SVGAElement} the svg line created
+     * @return {SVGLineElement} the svg line created
      */
     static createLine(x1, y1, x2, y2) {
         let l = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -315,7 +322,6 @@ class Link {
         l.setAttribute("y2", y2);
         l.setAttribute("stroke", "black");
         l.setAttribute("stroke-width", STROKE_WIDTH);
-        svg.appendChild(l);
         return l;
     }
 
