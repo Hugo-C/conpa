@@ -184,14 +184,6 @@ svg#production {
   width: 92%;
 }
 
-.foreign {
-  text-align: left;
-}
-
-.insideforeign {
-  display: inline-block;
-}
-
 /* ****************************** */
 
 #gamePanel > :nth-child(3) > :first-child {
@@ -271,3 +263,26 @@ button#clear {
 button#undo {
   background-image: url("/img/gamerModule/undo.png");
 }
+
+/* Classes used with the svg */
+
+.foreign {
+  text-align: left;
+}
+
+.insideforeign {
+  display: inline-block;
+}
+
+.myTextArea {
+  border: none;
+  background-color: transparent;
+  resize: none;
+  outline: none;
+  overflow: auto;
+
+  display: flex; "fit the textarea inside a div
+  pointer-events: none; "fix a chrome bug
+}
+
+/* ************************* */
