@@ -6,23 +6,23 @@ html
     meta(charset="utf-8")
     link(href="/css/bootstrap.min.css" rel="stylesheet")
     link(href="/css/scrollBarStyle.css" rel="stylesheet")
-    link(href="/css/gamerModule/style.css" rel="stylesheet")
+    link(href="/css/gamerModule/gamePanelStyle.css" rel="stylesheet")
     link(href="/css/gamerModule/cssEventStyle.css" rel="stylesheet")
     link(href="/css/gamerModule/gameBarStyle.css" rel="stylesheet")
     link(href="/css/gamerModule/cardStyle.css" rel="stylesheet")
   body
     div#content(class="container-fluid")
-      div#game(class="row")
+      div(class="row")
         include gamePanel.jade
         include gameBar.jade
     
     script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
     script(src="//code.jquery.com/jquery.min.js")
-    script(src="/scripts/socket.io-client/dist/socket.io.js")
+    script(src="/js/pagePrivileges.js")
     script(src="/js/gamerModule/moduleEvents.js")
     script(src="/js/gamerModule/svg.js")
     script(src="/js/gamerModule/svgClasses.js")
     script(src="/js/gamerModule/utils.js")
-    script(type="text/javascript").
-      var socket = io.connect('//localhost:8080/gamerModule');
-      console.log("wow");
+    script(src="/scripts/socket.io-client/dist/socket.io.js")
+    script(src="/js/gamerModule/socketConnectionManager.js")
+    script(src="/js/gamerModule/chatManager.js")

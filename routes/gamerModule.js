@@ -5,5 +5,4 @@ router.get('/', function(req, res, next) {
     res.render('gamerModuleMainView');
 });
 
-
 module.exports = router;

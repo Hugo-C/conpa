@@ -1,0 +1,273 @@
+body, html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  padding: 5px;
+}
+
+button {
+  border: none;
+  background-color: Transparent;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* police parameters */
+.fieldLabel {
+  font-size: 24px;
+  font-weight: bold;
+  font-family: fantasy;
+  padding: 0;
+}
+
+.basicContainer {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.bordered {
+  border: 2px solid black;
+}
+
+#content {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+}
+
+#content > div {
+  height: 100%;
+}
+
+/* ****************************** */
+
+#gamePanel > div {
+  margin: 0;
+  padding: 0;
+  border-bottom: 2px solid black;
+}
+
+#gamePanel > :nth-child(1) {
+  height: 5%;
+}
+
+#gamePanel > :nth-child(2) {
+  height: 70%;
+}
+
+#gamePanel > :nth-child(3) {
+  height: 25%;
+  border: none;
+}
+
+/* ****************************** */
+
+#gamePanel > :nth-child(1) > :nth-child(2n+1) {
+  border-right: 2px solid black;
+  background-size: cover;
+  background-origin:  content-box;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#gamePanel > :nth-child(1) > :nth-child(1) {
+  background-image: url('/img/gamerModule/player.svg');
+}
+
+#gamePanel > :nth-child(1) > :nth-child(2) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gamePanel > :nth-child(1) > :nth-child(2) > span {
+  font-size: 2vw;
+  font-weight: bold;
+  color: black;
+  font-family: fantasy sans-serif;
+}
+
+#gamePanel > :nth-child(1) > :nth-child(3) {
+  border-left: 2px solid black;
+  background-image: url('/img/gamerModule/question.svg');
+}
+
+
+/* ****************************** */
+
+#gamePanel > :nth-child(2) > :first-child {
+  border-right: 2px solid black;
+  background-color: lightgrey;
+  display: block;
+}
+
+#gamePanel > :nth-child(2) > :last-child {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#gamePanel > :nth-child(2) > :first-child > div {
+  border-bottom: 2px solid black;
+}
+
+#gamePanel > :nth-child(2) > :first-child > :nth-child(1),
+#gamePanel > :nth-child(2) > :first-child > :nth-child(2) {
+  height: 5%;
+}
+
+#gamePanel > :nth-child(2) > :first-child > :nth-child(1) {
+  background-color: grey;
+}
+
+#gamePanel > :nth-child(2) > :first-child > :nth-child(2) {
+  display: flex;
+  align-items: center;
+}
+
+#gamePanel > :nth-child(2) > :first-child > :nth-child(3) {
+  height: 10%;
+  background-color: grey;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+#gamePanel > :nth-child(2) > :first-child > :nth-child(3) > p,
+button#getMyProduction {
+  color: black;
+  font-size: 0.9vw;
+  font-weight: bold;
+}
+
+button#setPrivacy {
+  background-image: url("/img/gamerModule/private.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#gamePanel > :nth-child(2) > :first-child > :nth-child(3) > p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+button#displayList {
+  width: 1%;
+  border-right: 1px solid black;
+  background-color: grey;
+  background-image: url("/img/gamerModule/hide.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+div#svgMenu {
+  width: 7%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-right: 2px solid black;
+  background-color: lightgrey;
+}
+
+button#bouton {
+  height: 10%;
+  padding: 0;
+  background-image: url("/img/gamerModule/text.png");
+}
+
+svg#production {
+  width: 92%;
+}
+
+.foreign {
+  text-align: left;
+}
+
+.insideforeign {
+  display: inline-block;
+}
+
+/* ****************************** */
+
+#gamePanel > :nth-child(3) > :first-child {
+  border-right: 2px solid black;
+}
+
+#gamePanel > :nth-child(3) > :first-child > div {
+  padding: 0;
+}
+
+#gamePanel > :nth-child(3) > :first-child > :first-child {
+  height: 88%;
+  border-bottom: 2px solid black;
+}
+
+#gamePanel > :nth-child(3) > :first-child > :last-child {
+  height: 12%;
+}
+
+section#messages {
+  padding-left: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  word-wrap: break-word;
+}
+
+input#inputBox {
+  border: none;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+select#chatPlayers {
+  height: 100%;
+  padding-left: 0;
+  font-size: 1vw;
+  background-color: Transparent;
+  border-left: 2px solid black;
+}
+
+button#sendButton {
+  border-left: 2px solid black;
+  background-image: url("/img/gamerModule/sendButton.svg");
+  background-size: cover;
+}
+
+textarea#notesArea {
+  height: 100%;
+  resize: none;
+}
+
+div#menu {
+  border-left: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+button.notesTool {
+  height: 20%;
+  width: 100%;
+  margin-bottom: 20%;
+}
+
+button#copy {
+  margin-top: 10%;
+  background-image: url("/img/gamerModule/copyText.png");
+}
+
+button#clear {
+  background-image: url("/img/gamerModule/clearText.png");
+}
+
+button#undo {
+  background-image: url("/img/gamerModule/undo.png");
+}

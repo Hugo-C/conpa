@@ -1,0 +1,66 @@
+//output:test.html
+doctype html
+
+html
+  meta(charset="utf-8")
+  link(href="/css/bootstrap.min.css" rel="stylesheet")
+  link(href="/css/scrollBarStyle.css" rel="stylesheet")
+  link(href="/css/connection/connectionStyle.css" rel="stylesheet")
+body
+  div#form_wrapper(class="form_wrapper")
+    form(class="register")
+      h3 Register
+      div
+        label Username:
+          span(class="error_username")
+        input(type="text" name="username" pattern="^[A-Za-z0-9]{4,}$" required)
+      div
+        label Email:
+          span(class="error_email")
+        input(type="email" name="email" required)
+      div
+        label Password:
+          span(class="error_password")
+        input(type="password" name="password" pattern="^[A-Za-z0-9]{8,}$" required)
+      div(class="bottom")
+        div(class="remember")
+          input(type="checkbox")
+          span Send me updates
+        input(type="submit" value="Register")
+        a(href="connection" rel="login" class="linkform") You have an account already? Log in here
+        div(class="clear")
+            
+    form(class="login active")
+      h3 Login
+      div
+        label Username:
+          span(class="error_login") 
+        input(type="text" name="username" required)
+      div
+        label Password: 
+          a(href="forgot_password.html" rel="forgot_password" class="forgot linkform") Forgot your password?
+        input(type="password" name="password" required)
+      div(class="bottom")
+        div(class="remember")
+          input(type="checkbox")
+          span Keep me logged in
+        input(type="submit" value="Login")
+        a(href="connection" rel="register" class="linkform") You don't have an account yet? Register here
+        div(class="clear")
+        
+    form(class="forgot_password")
+      h3 Forgot Password
+      div
+        label Username or Email:
+        input(type="text" name="email")
+      div(class="bottom")
+        input(type="submit" value="Send reminder")
+        a(href="connection" rel="login" class="linkform") Suddenly remebered? Log in here
+        a(href="connection" rel="register" class="linkform") You don't have an account? Register here
+        div(class="clear")
+    
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+    script(src="/bower/js-md5/src/md5.js")
+    script(src="//code.jquery.com/jquery.min.js")
+    script(src="/js/connection/pageManager.js")
+    script(src="/js/connection/formProcess.js")

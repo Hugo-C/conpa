@@ -16,8 +16,8 @@ $("#undo").on("click", function(){
 });
 
 $("#displayList").on("click", function(){
-    var productionList = $("#productionList");
-    var productionArea = $("#productionArea");
+    var productionList = $("#gamePanel > :nth-child(2) > :first-child");
+    var productionArea = $("#gamePanel > :nth-child(2) > :last-child");
     var displayButton = $("#displayList");
     if(productionList.css('display') == 'none'){
         productionList.css('display', 'block');
@@ -54,14 +54,14 @@ $("#notesArea").focusout(function(){
     }
 });
 
-$("#inputField").on("focus", function(){
+$("#inputBox").on("focus", function(){
     var value = $("input#inputField").val();
     if(value.match(/^Write your message here !/)){
         $("input#inputField").val("");
     }
 });
 
-$("#inputField").focusout(function(){
+$("#inputBox").focusout(function(){
     var value = $("input#inputField").val();
     var value = $.trim(value);
     if(value === ""){

@@ -1,0 +1,164 @@
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+header {
+  height: 20%;
+  padding-top: 5px;
+  background-image: url("/img/mainPage/header.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.identityCard {
+  height: 80%;
+  padding: 0;
+  border: 2px solid black;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+}
+
+.defaultStyle {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.flexContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemsCentered {
+  display: flex;
+  align-items: center;
+}
+
+.row {
+  margin: 0;
+}
+
+div#profilePicture {
+  height: 80%;
+  border: 2px solid black;
+}
+
+.userInfos {
+  height: 100%;
+  padding: 0;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+
+.userInfos > div {
+  margin-bottom: 5%;
+}
+
+.userInfos > div > span {
+  font-size: 1.2vw;
+  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  color: #fff;
+}
+
+span#pseudoLabel {
+  font-weight: bold;
+}
+
+button#disconnect {
+  height: 100%;
+  background-color: Transparent;
+  background-image: url("/img/mainPage/disconnect2.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right;
+  border: none;
+}
+
+div#title {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid black;
+  border-radius: 10px;
+  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-size: 3.5vw;
+  font-weight: bold;
+  letter-spacing: 5px;
+  box-shadow: 0px 0px 2px #fff inset;
+}
+
+.header1 {
+  height: 40%;
+}
+
+.header1 > div {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+}
+
+.header2 {
+  height: 15%;
+}
+
+.header3 {
+  height: 20%;
+}
+
+.header4 {
+  height: 25%;
+}
+
+.siteInfo {
+  height: 40%;
+  border: 2px solid black;
+}
+
+.tabContainer {
+  height: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.tabContainer > div {
+  background-color: rgba(0, 0, 0, 0.7);
+  font-weight: bold;
+  font-size: 2vw;
+  font-family: fantasy;
+  color: #fff;
+}
+
+.tab {
+  height: 100%;
+  border: 2px solid black;
+  cursor: pointer;
+}
+
+.startPath {
+  border-left: 4px solid;
+}
+
+.leftPath {
+  border-top: 4px solid;
+  border-left: 4px solid;
+}
+
+.rightPath {
+  border-top: 4px solid;
+  border-right: 4px solid;
+}
+
+.pathActivated {
+  border-color: red;
+}
+
+.pageContent {
+  height: 80%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
