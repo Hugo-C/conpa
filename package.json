@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "postinstall": "bower install"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
@@ -24,7 +25,8 @@
     "serve-favicon": "~2.4.5",
     "should": "^13.2.1",
     "socket.io": "^2.0.4",
-    "sqlstring": "^2.3.0"
+    "sqlstring": "^2.3.0",
+    "bower": "1.8.0"
   },
   "devDependencies": {
     "jsdoc": "^3.5.5"
