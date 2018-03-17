@@ -39,9 +39,19 @@ module.exports = class Game {
     }
 
     removePlayer(player){
-        this.players.remove(player);
+        //this.players.remove(player);
         for(var node = this.players.node; node; node = this.players.next(node)){
             if(node.value.pseudoEquals(player.getPseudo())){
+                this.players.remove(node);
+                return;
+            }
+        }
+    }
+
+    removePlayerByPseudo(pseudo){
+        //this.players.remove(player);
+        for(var node = this.players.node; node; node = this.players.next(node)){
+            if(node.value.pseudoEquals(pseudo)){
                 this.players.remove(node);
                 return;
             }

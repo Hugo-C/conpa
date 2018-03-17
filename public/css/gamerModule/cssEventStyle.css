@@ -23,12 +23,20 @@ button#bouton:focus {
   background-image: url("/img/gamerModule/Red2.png");
 }*/
 
+button#exit:hover {
+  background-image: url('/img/gamerModule/exitOnHover.svg');
+}
+
+button#exit:active {
+  background-image: url('/img/gamerModule/exitOnClick.svg');
+}
+
 button#sendButton:hover {
-  background-image: url("/img/gamerModule/sendButtonOnHover.svg")
+  background-image: url("/img/gamerModule/sendButtonOnHover.svg");
 }
 
 button#sendButton:active {
-  background-image: url("/img/gamerModule/sendButtonOnClick.svg")
+  background-image: url("/img/gamerModule/sendButtonOnClick.svg");
 }
 
 button#skipButton:hover {

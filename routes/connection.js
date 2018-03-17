@@ -56,6 +56,7 @@ router.post('/login', urlencodedParser, function(req, res, next){
         });
     }
 
+    // prevents multi account open at the same time
     function checkIfAlreadyConnect(){
         db.isConnected(username, function(connected){
             if(connected){
