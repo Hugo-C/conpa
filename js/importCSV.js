@@ -11,7 +11,7 @@ var db = require('../js/db');
  * @param {int} familyId : The id of the family
  */
 function addCards(records, family, familyId) {
-    records = records.slice(4);  // first 4 éléments aren't about cards
+    records = records.slice(2);  // first 4 éléments aren't about cards
     var j = 0;
     while(j < records.length && records[j][family] !== ""){
         // we process each cards
@@ -36,46 +36,17 @@ function addCards(records, family, familyId) {
  * @param {int} logoId : The id of the logo of the family
  * @param {callack} addCards : The function that will add the family's cards
  */
-var addFamily = function (records, family, cardGameId, logoId, addCards) {
+function addFamily(records, family, cardGameId, addCards) {
 
     function onFamilyAdded(err, result){
         if (err) {
-            console.log("err : " + err.message);
+            console.log("err family : " + err.message);
         }else {
             console.log("I added a cardFamily : " + family);
             addCards(records, family, result.insertId);
         }
     }
-
-    console.log(logoId);
-    if(logoId == 'NULL')
-        db.addCardFamilyWithoutLogo(records[0][family], cardGameId, onFamilyAdded);
-    else
-        db.addCardFamilyWithLogo(records[0][family], logoId, cardGameId, onFamilyAdded);
-}
-
-/**
- * Process the family of the record, by adding a logo, a name and all the cards that belong to the family
- *
- * @param {Array.<string, string>} records : The records of families to process
- * @param {string} family : The family name, used as key in the record
- * @param {int} cardGameId : The id of the card game
- * @param {callack} addFamily : The function that will add the family name and it's cards
- */
-function processFamily(records, family, cardGameId, addFamily) {
-    var logo = records[2][family];
-    var logoId = 'NULL';
-    if(logo != ''){
-        db.addLogo(logo, function(err, result){
-            if(err){
-                console.log(err);
-            }else{
-                logoId = result.insertId;
-                console.log("I added a new Logo : " + logoId);
-            }
-        });
-    }
-    addFamily(records, family, cardGameId, logoId, addCards);
+    db.addCardFamilyWithoutLogo(records[0][family], cardGameId, onFamilyAdded);
 }
 
 /**
@@ -90,7 +61,7 @@ var processFamilies = function(records, cardGameId) {
 
     for (let i = 1; i < nbrFamilies; i++){
         let family = "famille " + i;
-        processFamily(records, family, cardGameId, addFamily);
+        addFamily(records, family, cardGameId, addCards);
     }
 };
 
@@ -133,6 +104,7 @@ function updateCardGame(records, processFamilies) {
 
 /**
  * Import a csv file representing a deck/cardGame to a mysql database
+ *
  * @param {string} path - The path to the file to import
  * @param {boolean} newCardGame : indicate if adding card game already exists in the database
  */
@@ -141,10 +113,8 @@ exports.importFromCsv = function(path, newCardGame){
         var records = parse(data, {columns: true});
         console.log(records);
         if(records.length > 0){
-            if(newCardGame)
-                addCardGame(records, processFamilies);
-            else
-                updateCardGame(records, processFamilies);
+            if(newCardGame) addCardGame(records, processFamilies);
+            else updateCardGame(records, processFamilies);
         }
         fs.unlinkSync(path);
     });

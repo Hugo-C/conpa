@@ -1,8 +1,8 @@
 var mysql = require('mysql');
 var keys = require('./dbConstants');
 
-var PRODUCTION_DB = 'conpaCardGameDatabase'; // name of the production database
-var TEST_DB = 'conpaCardGameDatabase'; // name of the test database
+var PRODUCTION_DB = ''; // name of the production database
+var TEST_DB = ''; // name of the test database
 
 exports.MODE_TEST = 'mode_test';
 exports.MODE_PRODUCTION = 'mode_production';
@@ -21,7 +21,6 @@ var state = {
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
         host: '',
-        port: '',
         user: '',
         password: '',
         database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
@@ -87,13 +86,11 @@ exports.getFamilyCards = function(familyId, callback){
  * @param {unsigned integer} cardGameId : id of the card game for which we want to retrieve families and associated logos
  * @param {callack} callback : function called to process retrieved data
  */
-exports.getFamiliesAndLogos = function(cardGameId, callback){
+exports.getFamilies = function(cardGameId, callback){
     var sql = 'SELECT ' + keys.CARD_FAMILY_TABLE + '.' + keys.CFT_KEY_ID +
               ', ' + keys.CFT_KEY_NAME +
-              ', ' + keys.FLT_KEY_LOGO +
+              ', ' + keys.CFT_KEY_LOGO +
               ' FROM ' + keys.CARD_FAMILY_TABLE +
-              ' LEFT JOIN ' + keys.FAMILY_LOGO_TABLE +
-              ' ON ' + keys.CFT_KEY_LOGO + ' = ' + keys.FAMILY_LOGO_TABLE + '.' + keys.FLT_KEY_ID +
               ' WHERE ' + keys.CFT_KEY_CARD_GAME + ' = ?;';
     var value = [cardGameId];
     state.pool.query(sql, value, function(err, result){
@@ -174,15 +171,15 @@ exports.addCardFamilyWithoutLogo = function(name, cardGameId, callback){
  * Add a family into the database
  *
  * @param {string} name : family's name
- * @param {integer} logoId : id of the associated logo
+ * @param {string} logo : name of the logo image
  * @param {integer} cardGameId : id of the family's card game
  * @param {callack} callback : function called to inform of the success of the operation
  */
-exports.addCardFamilyWithLogo = function(name, logoId, cardGameId, callback){
+exports.addCardFamilyWithLogo = function(name, logo, cardGameId, callback){
     var sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
               ' (' + keys.CFT_KEY_NAME + ', ' + keys.CFT_KEY_LOGO + ', ' + keys.CFT_KEY_CARD_GAME + ')' +
               ' VALUES (?, ?, ?);';
-    var values = [name, logoId, cardGameId];
+    var values = [name, logo, cardGameId];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -190,23 +187,12 @@ exports.addCardFamilyWithLogo = function(name, logoId, cardGameId, callback){
 }
 
 /**
- * Add a card game into the database
+ * Check if a cardgame is already in the database
  *
- * @param {string} logo : base64 image
- * @param {callack} callback : function called to inform of the success of the operation
+ * @param {string} name : cardgame's name
+ * @param {string} language : cardgame's language
+ * @param {callack} callack : function called with a boolean to send the response
  */
-exports.addLogo = function(logo, callback){
-    var sql = 'INSERT INTO ' + keys.FAMILY_LOGO_TABLE +
-              ' (' + keys.FLT_KEY_LOGO + ')' +
-              ' VALUES (?);';
-    console.log(sql);
-    var value = [logo];
-    state.pool.query(sql, value, function(err, result){
-        if(err) callback(err);
-        else callback(null, result);
-    });
-}
-
 exports.cardGameExists = function(name, language, callback){
     var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
@@ -225,6 +211,13 @@ exports.cardGameExists = function(name, language, callback){
     });
 }
 
+/**
+ * Remove a cardgame from the database
+ *
+ * @param {string} name : cardgame's name
+ * @param {string} language : cardgame's language
+ * @param {callack} callack : function use to throw errors
+ */
 exports.removeCardGame = function(name, language, callback){
     var sql = 'DELETE FROM ' + keys.CARD_GAME_TABLE +
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
@@ -236,6 +229,13 @@ exports.removeCardGame = function(name, language, callback){
     });
 }
 
+/**
+ * Add a new cardgame in the database (cardgame must not already exist)
+ *
+ * @param {string} name : cardgame's name
+ * @param {string} language : cardgame's language
+ * @param {callack} callack : function use to throw errors and return cardgame id
+ */
 exports.addCardGame = function(name, language, callback){
     var sql = 'INSERT INTO ' + keys.CARD_GAME_TABLE +
               ' (' + keys.CGT_KEY_NAME + ', ' + keys.CGT_KEY_LANGUAGE + ')' +
@@ -244,5 +244,76 @@ exports.addCardGame = function(name, language, callback){
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
+    });
+}
+
+exports.registerUser = function(pseudo, email, password, callback){
+    var sql = 'INSERT INTO ' + keys.USER_TABLE +
+              ' (' + keys.UT_KEY_PSEUDO + ', ' + keys.UT_KEY_PASSWORD + ', ' + keys.UT_KEY_EMAIL + ')' +
+              ' VALUES (?, ?, ?);';
+    var values = [pseudo, password, email];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+}
+
+exports.userExists = function(user, callback){
+    var sql = 'SELECT *' +
+              ' FROM ' + keys.USER_TABLE +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    console.log(sql);
+    var value = [user];
+    state.pool.query(sql, value, function(err, result){
+        console.log(result);
+        if(err) callback(false);
+        else callback(result.length > 0);
+    });
+}
+
+exports.isConnected = function(user, callback){
+    var sql = 'SELECT ' + keys.UT_CONNECT +
+              ' FROM ' + keys.USER_TABLE +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    console.log(sql);
+    var value = [user];
+    state.pool.query(sql, value, function(err, result){
+        console.log(result);
+        if(err) callback(false);
+        else callback(result[0][keys.UT_CONNECT] == '1');
+    });
+}
+
+exports.getPassword = function(pseudo, callback){
+    var sql = 'SELECT ' + keys.UT_KEY_PASSWORD +
+              ' FROM ' + keys.USER_TABLE +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    console.log(sql);
+    var value = [pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else callback(null, result[0][keys.UT_KEY_PASSWORD]);
+    });
+}
+
+exports.connectUser = function(pseudo, callback){
+    var sql = 'UPDATE ' + keys.USER_TABLE +
+              ' SET ' + keys.UT_CONNECT + ' = 1' +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+              var value = [pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
+
+exports.disconnectUser = function(pseudo, callback){
+    var sql = 'UPDATE ' + keys.USER_TABLE +
+              ' SET ' + keys.UT_CONNECT + ' = 0' +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+              var value = [pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else callback(null);
     });
 }

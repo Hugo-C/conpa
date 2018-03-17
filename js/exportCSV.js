@@ -5,10 +5,8 @@ var fs = require('fs');
 var csv = require('fast-csv');
 
 const FAMILY_NAME = 0;
-const LOGO_HEADER = 1;
-const FAMILY_LOGO = 2;
-const FAMILY_CARDS_HEADER = 3;
-const FAMILY_CARD = 4;
+const CARDS_HEADER = 1;
+const CARD = 2;
 
 /**
  * Write records into csv file
@@ -49,8 +47,8 @@ function writeIntoColumn(records, familyNb, object, content){
     var family = "famille " + (familyNb + 1); // header of the family column
     var infoFamily = "info sup famille " + (familyNb + 1); // header of the family informations column
     switch (object) {
-        case FAMILY_CARD:
-            var line = FAMILY_CARD + content["cardNumber"];
+        case CARD:
+            var line = CARD + content["cardNumber"];
             if(records.length == line){ // no data have been written on this line, we add new one
                 records.push({[family]: content["content"],
                               [infoFamily]: content["information"]});
@@ -84,10 +82,10 @@ function processFamilyCards(err, records, rows, column, familiesExport, onFileRe
         console.log(err);
     }else{
         for(card = 0; card < rows.length; card++){
-            writeIntoColumn(records, column, FAMILY_CARD,
+            writeIntoColumn(records, column, CARD,
                 {"cardNumber" : card,
                  "content" : rows[card][keys.CT_KEY_CONTENT],
-                 "information" : rows[card][keys.CT_KEY_INFORMATION]});
+                 "information" : rows[card][keys.CT_KEY_INFORMATION] == "NULL" ? "" : rows[card][keys.CT_KEY_INFORMATION]});
         }
         familiesExport[column] = true; // all cards of this family have been add to records array
         finalizeWriting(records, familiesExport, onFileReady); // this family may be the last to be add
@@ -100,15 +98,15 @@ function processFamilyCards(err, records, rows, column, familiesExport, onFileRe
  *
  * @param {unsigned integer} familyId : id of the family for which we want to retrieve cards
  * @param {object array} records : array of data to write in the csv file
- * @param {callback} onDataRecovered : function called to process retrieved data
+ * @param {callback} processFamilyCards : function called to process retrieved data
  * @param {integer} destColumn : csv column of the cards family [0-4]
  * @param {boolean array} familiesExport : current state of the families cards recovery
  * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
-function recoverFamilyCards(familyId, records, onDataRecovered, destColumn, familiesExport, onFileReady){
+function recoverFamilyCards(familyId, records, processFamilyCards, destColumn, familiesExport, onFileReady){
     db.getFamilyCards(familyId, function(err, result){
-        if(err) onDataRecovered(err);
-        else onDataRecovered(null, records, result, destColumn, familiesExport, onFileReady);
+        if(err) processFamilyCards(err);
+        else processFamilyCards(null, records, result, destColumn, familiesExport, onFileReady);
     });
 }
 
@@ -129,9 +127,7 @@ function processFamilies(err, records, rows, onFileReady){
                                                                   // values are 'true', we can write records data in csv
         for(fafa = 0; fafa < rows.length; fafa++){
             writeIntoColumn(records, fafa, FAMILY_NAME, rows[fafa][keys.CFT_KEY_NAME]);
-            writeIntoColumn(records, fafa, LOGO_HEADER, "logo");
-            writeIntoColumn(records, fafa, FAMILY_LOGO, rows[fafa][keys.FLT_KEY_LOGO]);
-            writeIntoColumn(records, fafa, FAMILY_CARDS_HEADER, "cartes famille " + (fafa + 1));
+            writeIntoColumn(records, fafa, CARDS_HEADER, "cartes famille " + (fafa + 1));
             recoverFamilyCards(rows[fafa][keys.CFT_KEY_ID], records, processFamilyCards, fafa, familiesExport, onFileReady);
         }
     }
@@ -142,13 +138,13 @@ function processFamilies(err, records, rows, onFileReady){
  *
  * @param {unsigned integer} cardGameId : id of the card game for which we want to retrieve families
  * @param {object array} records : array of data to write in the csv file
- * @param {callback} onDataRecovered : function called to process retrieved data
+ * @param {callback} processFamilies : function called to process retrieved data
  * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
-function recoverFamiliesAndLogos(cardGameId, records, onDataRecovered, onFileReady){
-    db.getFamiliesAndLogos(cardGameId, function(err, result){
-        if(err) onDataRecovered(err);
-        else onDataRecovered(null, records, result, onFileReady);
+function recoverFamilies(cardGameId, records, processFamilies, onFileReady){
+    db.getFamilies(cardGameId, function(err, result){
+        if(err) processFamilies(err);
+        else processFamilies(null, records, result, onFileReady);
     });
 }
 
@@ -166,7 +162,7 @@ function processCardGame(err, records, rows, onFileReady){
     }else{
         records.push({"nom jeu" : rows[0][keys.CGT_KEY_NAME],
                       "langue" : rows[0][keys.CGT_KEY_LANGUAGE]}); // adding name and card game language as data to be written
-        recoverFamiliesAndLogos(rows[0][keys.CGT_KEY_ID], records, processFamilies, onFileReady);
+        recoverFamilies(rows[0][keys.CGT_KEY_ID], records, processFamilies, onFileReady);
     }
 }
 
@@ -176,13 +172,13 @@ function processCardGame(err, records, rows, onFileReady){
  * @param {string} cardGame : name of card game we want to retrieve
  * @param {string} language : language of card game we want to retrieve
  * @param {object array} records : array of data to write in the csv file
- * @param {callback} onDataRecovered : function called to process retrieved data
+ * @param {callback} processCardGame : function called to process retrieved data
  * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
-function recoverCardGame(cardGame, language, records, onDataRecovered, onFileReady){
+function recoverCardGame(cardGame, language, records, processCardGame, onFileReady){
     db.getCardGame(cardGame, language, function(err, result){
-        if(err) onDataRecovered(err);
-        else onDataRecovered(null, records, result, onFileReady);
+        if(err) processCardGame(err);
+        else processCardGame(null, records, result, onFileReady);
     });
 }
 

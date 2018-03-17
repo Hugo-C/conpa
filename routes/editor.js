@@ -14,6 +14,7 @@ var fs = require('fs');
 
 // give card game editor web page
 router.get('/', function(req, res){
+  
     db.getCardGames(function(err, result){
         if(err){
             console.log(err);
