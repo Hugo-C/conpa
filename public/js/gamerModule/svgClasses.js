@@ -1,41 +1,56 @@
 const STROKE_WIDTH = "10";
+const TEXTAREA_MARGIN = 10;
+const TEXTAREA_MESSAGE = "taper votre texte ici";
 
 let myElements = [];  // list all elements in the svg
 
 
-class Element {  // warning : Element need svg to be declared
+class Element {
 
     /**
      * Constructor of the Element class
      * @param x {String} : x coordinate
      * @param y {String} : y coordinate
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
      */
-    constructor(x, y) {
+    constructor(x, y, parent) {
+        this.parent = parent;
         this.rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         this.rect.style.fill = 'red';
         this.rect.style.stroke = 'black';
         this.rect.style.strokeWidth = '2';
         this.rect.setAttribute("x", x);
         this.rect.setAttribute("y", y);
-        svg.append(this.rect);
+        this.parent.appendChild(this.rect);
 
         this.text = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
         this.textDiv = document.createElement("div");
-        this.textNode = document.createTextNode("Click to edit");
-        this.textDiv.appendChild(this.textNode);
-        this.textDiv.setAttribute("contentEditable", "true");
+		
         this.textDiv.setAttribute("width", "auto");
+        this.textDiv.setAttribute("height", "auto");
+        this.textDiv.setAttribute("border", "none");
+        this.textDiv.classList.add("insideforeign");
+        this.text.appendChild(this.textDiv);
+        this.textArea = document.createElement("textarea");
+
+        this.textArea.setAttribute("spellcheck", "true");
+        this.textArea.setAttribute("placeholder", TEXTAREA_MESSAGE);
+
+
+        this.textArea.setAttribute("width", "auto");
+        this.textArea.setAttribute("height", "auto");
+        this.textDiv.appendChild(this.textArea);
+
         this.text.setAttribute("width", "100%");
         this.text.setAttribute("height", "100%");
         this.text.classList.add("foreign"); //to make div fit text
-        this.textDiv.classList.add("insideforeign"); //to make div fit text
-        //this.textDiv.addEventListener("mousedown", elementMousedown, false);
+        this.textArea.classList.add("insideforeign"); //to make div fit text
+        this.textArea.classList.add("myTextArea"); //to make div fit text
+		
         this.text.setAttributeNS(null, "transform", "translate(" + (this.x + 5) + " " + (this.y + 10) + ")");
-        svg.appendChild(this.text);
-        this.text.appendChild(this.textDiv);
-        svg.append(this.text);
+        this.parent.appendChild(this.text);
         myElements.push(this);
-
+		
         this.myLinks = [];
     }
 
@@ -87,6 +102,11 @@ class Element {  // warning : Element need svg to be declared
      */
     set width(value) {
         this.rect.setAttribute("width", value);
+        if (Number(value) > TEXTAREA_MARGIN * 2){
+            this.text.setAttribute("width", String(Number(value) - TEXTAREA_MARGIN));
+        } else {
+            this.text.setAttribute("width", String(value));
+        }
     }
 
     /**
@@ -102,7 +122,12 @@ class Element {  // warning : Element need svg to be declared
      * @param value {number}
      */
     set height(value) {
-        this.rect.setAttribute("height", value);
+        this.rect.setAttribute("height", String(value));
+        if (Number(value) > TEXTAREA_MARGIN * 2){
+            this.text.setAttribute("height", String(Number(value) - TEXTAREA_MARGIN));
+        } else {
+            this.text.setAttribute("height", String(value));
+        }
     }
 
     /**
@@ -122,7 +147,7 @@ class Element {  // warning : Element need svg to be declared
     set select(isSelect) {
         if (isSelect) {
             this.rect.style.strokeDasharray = '10';
-            rectSelect.textDiv.focus();
+            rectSelect.textArea.focus();
         } else {
             this.rect.style.strokeDasharray = '0';
         }
@@ -141,17 +166,18 @@ class Element {  // warning : Element need svg to be declared
      * @param text {String}
      */
     set textContent(text) {
-        this.textNode.data = text;
+        this.textArea.value = text;
     }
 
     /**
      * Link two rect with a line
      * @param e1 {Element} : first element to link
      * @param e2 {Element} : second element to link
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
      */
-    static linkRect(e1, e2) {
+    static linkRect(e1, e2, parent) {
         if(!e1.isLinkedTo(e2)){
-            let link = new Link(e1, e2);
+            let link = new Link(e1, e2, parent);
             e1.addLink(link);
             e2.addLink(link);
             // put elements in front
@@ -198,8 +224,15 @@ class Element {  // warning : Element need svg to be declared
      * Put the Element on front of the svg
      */
     putFront() {
-        svg.appendChild(this.rect);
-        svg.appendChild(this.text);
+        this.parent.appendChild(this.rect);
+        this.parent.appendChild(this.text);
+    }
+	
+	/**
+     * Change the color of the rectangle
+     */
+    changeColor(c) {
+        this.rect.style.fill(c);
     }
 
     /**
@@ -259,22 +292,27 @@ class Link {
      * Create a new link between two link
      * @param e1 {Element} : first element to link
      * @param e2 {Element} : second element to link
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
      */
-    constructor(e1, e2) {
+    constructor(e1, e2, parent) {
+        this.e1 = e1;
+        this.e2 = e2;
+        this.parent = parent;
+
         let pos1 = e1.center;
         let pos2 = e2.center;
         this.line = Link.createLine(pos1.x, pos1.y, pos2.x, pos2.y);
-        this.e1 = e1;
-        this.e2 = e2;
+        this.parent.appendChild(this.line);
     }
 
     /**
-     * Create a new line between two points
+     * Create a new line between two points without adding it to the svg
+     *
      * @param x1 {String} : x coordinate of the first point
      * @param y1 {String} : y coordinate of the first point
      * @param x2 {String} : x coordinate of the second point
      * @param y2 {String} : y coordinate of the second point
-     * @return {SVGAElement} the svg line created
+     * @return {SVGLineElement} the svg line created
      */
     static createLine(x1, y1, x2, y2) {
         let l = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -284,7 +322,6 @@ class Link {
         l.setAttribute("y2", y2);
         l.setAttribute("stroke", "black");
         l.setAttribute("stroke-width", STROKE_WIDTH);
-        svg.appendChild(l);
         return l;
     }
 
