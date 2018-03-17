@@ -8,12 +8,12 @@ function insertTextInChat(msg, sender, whisper){
 }
 
 function sendInputText(){
-    var dest = $("#players").val();
-    var msg = $("#inputField").val();
+    var dest = $("#chatPlayers").val();
+    var msg = $("#inputBox").val();
     var whisper = dest != "all";
     socket.emit('message', {'dest': dest, 'msg': msg});
     insertTextInChat(msg, sessionStorage.pseudo, whisper);
-    $("#inputField").val("");
+    $("#inputBox").val("");
 }
 
 $("#sendButton").on("click", function(){

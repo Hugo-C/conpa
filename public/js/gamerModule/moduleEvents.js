@@ -30,8 +30,8 @@ $("#displayList").on("click", function(){
     }
 });
 
-$("#privacy").on("click", function(){
-    var button = $("button#privacy");
+$("#setPrivacy").on("click", function(){
+    var button = $("button#setPrivacy");
     if(button.css('background-image').match(/.*\/img\/gamerModule\/private\.svg.*/)){
         button.css('background-image', 'url("/img/gamerModule/public.svg")');
     }else{
@@ -55,16 +55,16 @@ $("#notesArea").focusout(function(){
 });
 
 $("#inputBox").on("focus", function(){
-    var value = $("input#inputField").val();
+    var value = $("input#inputBox").val();
     if(value.match(/^Write your message here !/)){
-        $("input#inputField").val("");
+        $("input#inputBox").val("");
     }
 });
 
 $("#inputBox").focusout(function(){
-    var value = $("input#inputField").val();
+    var value = $("input#inputBox").val();
     var value = $.trim(value);
     if(value === ""){
-        $("input#inputField").val("Write your message here !");
+        $("input#inputBox").val("Write your message here !");
     }
 });
