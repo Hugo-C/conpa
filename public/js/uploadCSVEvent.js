@@ -1,8 +1,6 @@
 // Array of regex use to check csv conformity
 var modelCSV = [/nom jeu,langue(,(famille [1-5]),info sup \2){5}/g,
                   /(.*[A-Za-z].*,){2}(.*[A-Za-z].*,.*,){4}(.*[A-Za-z].*,.*)/g,
-                  /,(,logo,){5}/g,
-                  /,(,.*,){5}/g,
                   /,(,cartes famille [1-5],){5}/g,
                   /,,(.*[A-Za-z].*,.*,){4}(.*[A-Za-z].*,.*)/g];
 
@@ -35,6 +33,7 @@ function getAsText(fileToRead){
     reader.readAsText(fileToRead);
     // handle errors load
     reader.onload = function(){
+        console.log(fileToRead);
         loadHandler(event, fileToRead);
     };
     reader.onerror = errorHandler;
@@ -82,10 +81,12 @@ function processData(csv){
  * @param {string array} row : csv lines array
  */
 function checkConformity(row){
+    console.log(row);
     if(row.length < modelCSV.length) return false; // csv count less lines than the model
     success = true; // csv conformity state
     test = 0; // line to be tested
     while(test < modelCSV.length && success){
+        console.log(modelCSV[test] + ' match with ' + row[test]);
         success = modelCSV[test].test(row[test]);
         test++;
     }
