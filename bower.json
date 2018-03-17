@@ -24,6 +24,6 @@
     "tests"
   ],
   "dependencies": {
-    "js-md5": "md5#^0.7.3"
+    "md5": "md5#^0.7.3"
   }
 }
