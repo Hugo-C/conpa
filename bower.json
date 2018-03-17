@@ -1,0 +1,29 @@
+{
+  "name": "conpa",
+  "description": "Conpa est un jeu de création et réflexion sur l’usage du numérique",
+  "main": "app.js",
+  "authors": [
+    "Narboux Kelly",
+    "Le Bras Clément",
+    "Aimonier-Davat Julien",
+    "Ferreira Yvain",
+    "Chastel Hugo"
+
+  ],
+  "license": "none",
+  "keywords": [
+    "nodejs"
+  ],
+  "homepage": "https://github.com/Hugo-C/conpa",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "js-md5": "md5#^0.7.3"
+  }
+}
