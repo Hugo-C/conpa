@@ -38,28 +38,6 @@ router.get('/', function(req, res){
     });
 });
 
-/*
-router.post('/updateCardGame', function(req, res){
-    var params = querystring.parse(url.parse(req.url).query);
-    if('cardGame' in params && 'update' in params){
-        var cardGamePath = "./upload/" + params['cardGame'];
-        console.log(cardGamePath);
-        if(params['update'] == 'yes'){
-            console.log("overwrite data");
-            importCSV.importFromCsv(cardGamePath, false);
-        }else{
-            console.log("no update !");
-            fs.unlinkSync(cardGamePath);
-        }
-        //db.importCardGame(req.body);
-        res.writeHead(200);
-    }else{
-        res.writeHead(500);
-    }
-    res.send();
-})
-*/
-
 router.post('/updateCardGame', urlencodedParser, function(req, res){
     var update = req.body.update;
     var cardGamePath = "./upload/" + req.body.csv;
@@ -109,10 +87,6 @@ function checkIfCardGameExists(csvPath, cardGameExistsCallback){
 function generateRandomCsvFileName(){
     return Math.random().toString(36).substr(2, 16) + '.csv';
 }
-/*
-router.post('/uploadCSV', urlencodedParser, function(req, res){
-    console.log(req.body.csv);
-});*/
 
 router.post('/uploadCSV', function (req, res) {
     upload(req, res, function (err) {

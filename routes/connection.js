@@ -56,20 +56,9 @@ router.post('/login', urlencodedParser, function(req, res, next){
         });
     }
 
-    // prevents multi account open at the same time
-    function checkIfAlreadyConnect(){
-        db.isConnected(username, function(connected){
-            if(connected){
-                res.send('ALREADY_CONNECT');
-            }else{
-                checkPassword();
-            }
-        });
-    }
-
     db.userExists(username, function(exists){
         if(exists){
-            checkIfAlreadyConnect();
+            checkPassword();
         }else{
             res.send('NO_ACCOUNT');
         }
