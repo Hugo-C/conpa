@@ -7,6 +7,12 @@ var $login_form = $('.login');
 var $login_username = $('.login > div > input[name="username"]');
 var $login_password = $('.login > div > input[name="password"]');
 
+function removeAllAlerts(){
+  $('.error_username').text('');
+  $('.error_email').text('');
+  $('.error_login').text('');
+}
+
 function showInvalidRegisterFields(){
     if(!$register_username[0].checkValidity()){
         $register_username.addClass('invalid');
@@ -20,6 +26,7 @@ function showInvalidRegisterFields(){
 }
 
 function processRegisterAnswer(response){
+    removeAllAlerts();
     switch (response) {
       case 'DUP_PSEUDO':
         $('.error_username').text('pseudo not available');
@@ -65,6 +72,7 @@ function showInvalidLoginFields(){
 }
 
 function processLoginAnswer(response){
+    removeAllAlerts();
     switch (response) {
       case 'NO_ACCOUNT':
           $('.error_login').text('No account');

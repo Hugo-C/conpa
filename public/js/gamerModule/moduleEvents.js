@@ -73,3 +73,16 @@ $("#inputBox").focusout(function(){
         $("input#inputBox").val("Write your message here !");
     }
 });
+
+$("#color").on("click", function(){
+    $("#svgMenu").css('display', 'none');
+    $("#colorMenu").css('display', 'block');
+});
+
+$("#colorMenu button").on("click", function(){
+    var selectedColor = $(this).val();
+    $("#colorMenu").css('display', 'none');
+    $("#svgMenu").css('display', 'block');
+    $("#color").val(selectedColor);
+    $("#color").css('background-color', 'url("/img/gamerModule/' + selectedColor + '.jpg")');
+});

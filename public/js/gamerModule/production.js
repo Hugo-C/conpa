@@ -99,6 +99,13 @@ function onKeydown(event){
   }
 }
 
+$("#colorMenu button").on("click", function(){
+  var selectedColor = $(this).val();
+  if(selectedItem != null){
+    selectedItem.rect.attr('fill', selectedColor);
+  }
+});
+
 draw.on('mousedown', onMouseDown);
 draw.on('mousemove', onMouseMove);
 draw.on('mouseup', onMouseUp);

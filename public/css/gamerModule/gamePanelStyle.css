@@ -171,7 +171,7 @@ button#displayList {
   background-size: contain;
 }
 
-div#svgMenu {
+.menu {
   width: 7%;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -179,11 +179,31 @@ div#svgMenu {
   background-color: lightgrey;
 }
 
-button#bouton {
+div#svgMenu {
+  display: block;
+}
+
+div#colorMenu {
+  display: none;
+}
+
+div.menu > button {
   height: 10%;
   padding: 0;
-  background-image: url("/img/gamerModule/text.png");
 }
+
+div#svgMenu > button {
+  margin-bottom: 5%;
+}
+
+button#bouton { background-image: url("/img/gamerModule/text.png"); }
+button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
+button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
+button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
+button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
+button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
+button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
+button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
 
 div#production {
   width: 92%;

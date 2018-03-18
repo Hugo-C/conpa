@@ -163,4 +163,8 @@ module.exports = function(io, socket){
       }
   });
 
+  socket.on('cardPicked', function(data){
+    socket.broadcast.to(socket.room).emit('cardPicked', data);
+  });
+
 }

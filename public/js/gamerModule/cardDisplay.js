@@ -32,10 +32,19 @@ function displayNewCard(family){
     } else {
         let cardPick = cards[family][Math.floor(Math.random() * cards[family].length)];
         removeFromArray(cards[family], cardPick);  // we don't want to pick it again
-        cardTextNode.nodeValue = cardPick;
+        cardTextNode.nodeValue = cardPick; // display the card
+        shareMyCard(family, cardPick);
     }
     return true;
 }
+
+function shareMyCard(family, card){
+  socket.emit('cardPicked', {'family': family, 'cardContent': card});
+}
+
+socket.on('cardPicked', function(data){
+  cardTextNode.nodeValue = data['cardContent'];
+})
 
 /**
  * display a card picked by another player
