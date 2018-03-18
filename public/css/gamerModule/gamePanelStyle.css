@@ -277,6 +277,9 @@ button#undo {
 
 .insideforeign {
   display: inline-block;
+
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .myTextArea {
