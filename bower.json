@@ -8,7 +8,6 @@
     "Aimonier-Davat Julien",
     "Ferreira Yvain",
     "Chastel Hugo"
-
   ],
   "license": "none",
   "keywords": [
@@ -25,6 +24,8 @@
   ],
   "dependencies": {
     "md5": "md5#^0.7.3",
-    "js-md5": "md5#^0.7.3"
+    "js-md5": "md5#^0.7.3",
+    "crypto-js": "^3.1.9",
+    "svg.js": "^2.6.4"
   }
 }
