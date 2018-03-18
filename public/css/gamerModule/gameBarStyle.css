@@ -44,6 +44,14 @@ div#playerCardRow {
   height: 35%;
 }
 
+p#cardContent{
+  margin: auto;
+  overflow: auto;
+  font-size:110%;
+  font-family: courier, serif;
+  text-align: center;
+}
+
 div#timerBoxRow {
   height: 5%;
 }

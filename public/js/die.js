@@ -82,7 +82,8 @@ function slowDice() {
     } else {
         stopDice();  // stop the dice properly
         //console.log(box.rotation);  // TODO call display card based on the die rotation
-        //displayCard(1);
+        let res = Math.floor(Math.random() * 7 + 1);
+        displayNewCard(res);
     }
 }
 
