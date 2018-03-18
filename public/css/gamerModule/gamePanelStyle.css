@@ -185,7 +185,7 @@ button#bouton {
   background-image: url("/img/gamerModule/text.png");
 }
 
-svg#production {
+div#production {
   width: 92%;
 }
 
@@ -277,9 +277,6 @@ button#undo {
 
 .insideforeign {
   display: inline-block;
-
-  width: 100% !important;
-  height: 100% !important;
 }
 
 .myTextArea {

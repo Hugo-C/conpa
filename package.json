@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "body-parser": "~1.18.2",
+    "bower": "1.8.0",
     "cookie-parser": "~1.4.3",
     "crypto-js": "^3.1.9-1",
     "csv": "^2.0.0",
@@ -26,7 +27,8 @@
     "should": "^13.2.1",
     "socket.io": "^2.0.4",
     "sqlstring": "^2.3.0",
-    "bower": "1.8.0"
+    "svg.draggy.js": "^1.1.1",
+    "svg.js": "^2.6.4"
   },
   "devDependencies": {
     "jsdoc": "^3.5.5"

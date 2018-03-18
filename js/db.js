@@ -1,8 +1,8 @@
 var mysql = require('mysql');
 var keys = require('./dbConstants');
 
-var PRODUCTION_DB = 'sql11227234'; // name of the production database
-var TEST_DB = 'sql11227234'; // name of the test database
+var PRODUCTION_DB = 'conpaV2'; // name of the production database
+var TEST_DB = 'conpaV2'; // name of the test database
 
 exports.MODE_TEST = 'mode_test';
 exports.MODE_PRODUCTION = 'mode_production';
@@ -20,9 +20,10 @@ var state = {
  */
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
-        host: 'sql11.freemysqlhosting.net',  //sql11.freemysqlhosting.net
-        user: 'sql11227234',  //sql11227234
-        password: 'BhGnLZyDNC',  //BhGnLZyDNC
+        host: '78.240.16.90',
+        user: 'julien',
+        port: '50000',
+        password: 'StimpflingMysql73100',
         database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
     });
     state.mode = mode;

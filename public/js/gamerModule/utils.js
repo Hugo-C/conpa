@@ -1,10 +1,3 @@
-bodyJQ.keydown(function(event){
-    if(event.keyCode === 46 && rectSelect !== null){
-        rectSelect.myRemove();
-        rectSelect = null;
-    }
-});
-
 /**
  * Paste a string as a new Element
  * @param x {String} : x location of the new element
