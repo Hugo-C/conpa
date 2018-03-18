@@ -9,12 +9,14 @@ var importCSV = require('../js/importCSV');
 var exportCSV = require('../js/exportCSV');
 var db = require('../js/db');
 var keys = require('../js/dbConstants');
+var bodyParser = require('body-parser');
+var urlencodedParser = bodyParser.urlencoded({ extended: true });
 var parse = require('csv-parse/lib/sync');
 var fs = require('fs');
 
 // give card game editor web page
 router.get('/', function(req, res){
-  
+
     db.getCardGames(function(err, result){
         if(err){
             console.log(err);
@@ -36,6 +38,7 @@ router.get('/', function(req, res){
     });
 });
 
+/*
 router.post('/updateCardGame', function(req, res){
     var params = querystring.parse(url.parse(req.url).query);
     if('cardGame' in params && 'update' in params){
@@ -55,6 +58,21 @@ router.post('/updateCardGame', function(req, res){
     }
     res.send();
 })
+*/
+
+router.post('/updateCardGame', urlencodedParser, function(req, res){
+    var update = req.body.update;
+    var cardGamePath = "./upload/" + req.body.csv;
+    if(update == 'yes'){
+        console.log("overwrite data");
+        importCSV.importFromCsv(cardGamePath, false);
+    }else{
+        console.log("no update !");
+        fs.unlinkSync(cardGamePath);
+    }
+    res.writeHead(200);
+    res.send();
+});
 
 /**
  * Check if a card game (with csv format) already exists in the database
@@ -65,7 +83,7 @@ router.post('/updateCardGame', function(req, res){
 function checkIfCardGameExists(csvPath, cardGameExistsCallback){
     fs.readFile(csvPath, function(err, data) {
         var records = parse(data, {columns: true}); // data of the file
-        console.log(records);
+        //console.log(records);
         if(records.length > 0) // file is not empty
             db.cardGameExists(records[0]['nom jeu'], records[0]['langue'], function(exists){
                 cardGameExistsCallback(exists, records);
@@ -91,6 +109,10 @@ function checkIfCardGameExists(csvPath, cardGameExistsCallback){
 function generateRandomCsvFileName(){
     return Math.random().toString(36).substr(2, 16) + '.csv';
 }
+/*
+router.post('/uploadCSV', urlencodedParser, function(req, res){
+    console.log(req.body.csv);
+});*/
 
 router.post('/uploadCSV', function (req, res) {
     upload(req, res, function (err) {

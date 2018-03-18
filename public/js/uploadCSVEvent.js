@@ -29,13 +29,15 @@ function handleFiles(files){
  */
 function getAsText(fileToRead){
     var reader = new FileReader();
-    // read file into memory as UTF-8
-    reader.readAsText(fileToRead);
-    // handle errors load
-    reader.onload = function(){
-        console.log(fileToRead);
-        loadHandler(event, fileToRead);
-    };
+
+    reader.onload = (function(f) {
+            return function(e) {
+                console.log(e.target.result);
+                loadHandler(e, fileToRead);
+            };
+        })(fileToRead);
+        reader.readAsText(fileToRead);
+
     reader.onerror = errorHandler;
 }
 
@@ -50,6 +52,7 @@ function getAsText(fileToRead){
 function loadHandler(event, fileToRead){
     var csv = event.target.result;
     csv = processData(csv); // retrieves each csv lines
+
     if(checkConformity(csv)){
         uploadCSV(fileToRead);
     }else{
@@ -108,6 +111,7 @@ function errorHandler(event){
  * the user to overwrite old card game version.
  */
 function uploadCSV(csvFile){
+
     var formData = new FormData();
     formData.append("uploadCSV", csvFile);
 
@@ -118,16 +122,21 @@ function uploadCSV(csvFile){
         if(request.status == 200) console.log("import successful");
         else if(request.status == 256){
             console.log("already have this game");
-            console.log(request.responseText);
             var updateCardGame = confirm("This card game already exists !\nWould you overwrite it ?");
-            var req;
-            if(updateCardGame)
-                req = "/editor/updateCardGame?cardGame=" + request.responseText + "&update=yes";
-            else
-                req = "/editor/updateCardGame?cardGame=" + request.responseText + "&update=no";
-            var updateRequest = new XMLHttpRequest();
-            updateRequest.open("post", req, true);
-            updateRequest.send();
+
+            $.ajax({
+              type: 'POST',
+              url: '/editor/updateCardGame',
+              data: { update: updateCardGame ? "yes" : "no",
+                      csv: request.responseText},
+              error: function(){
+                 alert("Request Failed");
+              },
+              success: function(response){
+                  console.log(response);
+              }
+            });
+
         }
     }
 
