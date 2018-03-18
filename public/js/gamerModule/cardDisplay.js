@@ -32,6 +32,7 @@ function displayNewCard(family){
     } else {
         let cardPick = cards[family][Math.floor(Math.random() * cards[family].length)];
         removeFromArray(cards[family], cardPick);  // we don't want to pick it again
+        triggerCssAnimation();
         cardTextNode.nodeValue = cardPick; // display the card
         shareMyCard(family, cardPick);
     }
@@ -43,15 +44,22 @@ function shareMyCard(family, card){
 }
 
 socket.on('cardPicked', function(data){
-  cardTextNode.nodeValue = data['cardContent'];
-})
+    displayCard(data['cardContent']);
+});
 
 /**
  * display a card picked by another player
  * @param text {String} : the text of the card picked
  */
 function displayCard(text){
+    triggerCssAnimation();
     cardTextNode.nodeValue = text;
+}
+
+function triggerCssAnimation(){
+    cardContent.id = "fakeId";
+    void cardContent.offsetWidth;
+    cardContent.id = "cardContent";
 }
 
 
