@@ -17,7 +17,8 @@ function insertTextInChat(msg, sender, whisper){
 /* sends our message to the server */
 function sendInputText(){
     var dest = $("#chatPlayers").val();
-    var msg = $("#inputBox").val();
+    var inputText = $("#inputBox").val();
+    var msg = inputText.match(/^Write your message here !/) ? "" : inputText;
     var whisper = dest != "all";
     socket.emit('message', {'dest': dest, 'msg': msg});
     insertTextInChat(msg, sessionStorage.pseudo, whisper);

@@ -1,9 +1,12 @@
 var dimHeight = $('div#production').height();
 var dimWidth = $('div#production').width();
 
-var draw = SVG('production').size(dimWidth, dimHeight);
+var draw = SVG('production').size('200%', '200%');
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
+
+var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': 'white', 'purple': 'purple', 'brown': 'brown'};
+var selectedColor = colors['red'];
 
 var rectCreate = false;
 var creatingRect = null;
@@ -23,7 +26,7 @@ function onMouseDown(evt){
   var coord = cursorPoint(evt);
   if($('#bouton').is(":focus")) {
     rectCreate = true;
-    creatingRect = new Rectangle(coord.x, coord.y, 1, 1, '#B9121B', draw);
+    creatingRect = new Rectangle(coord.x, coord.y, 1, 1, selectedColor, draw);
   }else if(selectedItem != null){
     move = true;
     dx = coord.x - selectedItem.rect.attr('x');
@@ -37,7 +40,7 @@ function onMouseMove(evt){
   if(rectCreate && creatingRect != null){
     var rectX = creatingRect.rect.attr('x');
     var rectY = creatingRect.rect.attr('y');
-    if(evt.clientX >= rectX && evt.clientY >= rectY){
+    if(coord.x >= rectX && coord.y >= rectY){
       creatingRect.rect.attr('width', coord.x - rectX);
       creatingRect.rect.attr('height', coord.y - rectY);
     }
@@ -100,9 +103,10 @@ function onKeydown(event){
 }
 
 $("#colorMenu button").on("click", function(){
-  var selectedColor = $(this).val();
+  var color = $(this).val();
+  selectedColor = colors[color];
   if(selectedItem != null){
-    selectedItem.rect.attr('fill', selectedColor);
+    selectedItem.rect.attr('fill', colors[color]);
   }
 });
 

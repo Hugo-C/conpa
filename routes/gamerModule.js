@@ -5,8 +5,6 @@ var url = require('url');
 var db = require('../js/db');
 
 
-
-
 router.get('/cards', function(req, res, next) {
     console.log("on m'a demandé des cartes");
     let response = {};
