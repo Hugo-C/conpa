@@ -18,11 +18,6 @@ button#bouton:focus {
   background-image: url("/img/gamerModule/textC.png");
 }
 
-/*TODO
-  button#colorButton:focus {
-  background-image: url("/img/gamerModule/Red2.png");
-}*/
-
 button#exit:hover {
   background-image: url('/img/gamerModule/exitOnHover.svg');
 }
@@ -77,4 +72,8 @@ button#cardHelp:hover {
 
 button#cardHelp:active {
   background-image: url("/img/gamerModule/infoSupOnClick.png");
+}
+
+foreignObject > textarea {
+  outline: 0;
 }

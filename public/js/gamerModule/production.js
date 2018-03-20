@@ -1,7 +1,8 @@
 var dimHeight = $('div#production').height();
 var dimWidth = $('div#production').width();
 
-var draw = SVG('production').size('200%', '200%');
+var draw = SVG('production').size(dimWidth, dimHeight);
+var master = draw.group();
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
 
@@ -17,9 +18,17 @@ var move = false;
 var dx = null;
 var dy = null;
 
+var panning = false;
+var xTranslate = 0;
+var yTranslate = 0;
+let xTranslateTmp = xTranslate;
+let yTranslateTmp = yTranslate;
+var clickX, clickY;
+
 // Get point in global SVG space
 function cursorPoint(evt){
-    pt.x = evt.clientX; pt.y = evt.clientY;
+    pt.x = evt.clientX - xTranslate;
+    pt.y = evt.clientY - yTranslate;
     return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
@@ -27,12 +36,15 @@ function onMouseDown(evt){
   var coord = cursorPoint(evt);
   if($('#bouton').is(":focus")) {
     rectCreate = true;
-    creatingRect = new Rectangle(coord.x, coord.y, 1, 1, selectedColor, draw);
+    creatingRect = new Rectangle(coord.x, coord.y, 1, 1, selectedColor, master);
   }else if(selectedItem != null){
     move = true;
     dx = coord.x - selectedItem.rect.attr('x');
     dy = coord.y - selectedItem.rect.attr('y');
-    console.log("start moving");
+  }else if(!rectCreate){
+    panning = true;
+    clickX = coord.x;
+    clickY = coord.y;
   }
 }
 
@@ -53,6 +65,12 @@ function onMouseMove(evt){
       selectedItem.text.setAttribute('y', coord.y - dy);
     }
     selectedItem.refreshAttachedLinks();
+  }else if(panning){
+    xTranslateTmp += coord.x - clickX;
+    yTranslateTmp += coord.y - clickY;
+    clickX = coord.x;
+    clickY = coord.y;
+    master.attr("transform", "translate(" + xTranslateTmp + "," + yTranslateTmp + ")");
   }
 }
 
@@ -65,41 +83,38 @@ function onMouseUp(evt){
     move = false;
     dx = null;
     dy = null;
+  }else if(panning){
+    // we store the translation done by panning
+    xTranslate = xTranslateTmp;
+    yTranslate = yTranslateTmp;
+    panning = false;
   }
 }
 
 function onClick(evt){
-
   var coord = cursorPoint(evt);
   var item = getElementAtCoordinates(coord.x, coord.y);
 
   if(item != null){
     lastSelectedItem = selectedItem;
+    if(lastSelectedItem != null) lastSelectedItem.unselect(); // hide the selection border to don't have two rectangle with it
     selectedItem = item;
-  }else{
+    selectedItem.select(); // display the selection border
+  }else if(selectedItem != null){
     lastSelectedItem = selectedItem;
+    selectedItem.unselect();
     selectedItem = null;
   }
 
   if(lastSelectedItem != null && selectedItem != null){
     selectedItem.linkRect(lastSelectedItem);
   }
-  
+
   if(selectedLink != null){
-	selectedLink.line.opacity(1);
-    selectedLink.line.attr({"stroke-width":STROKE_WIDTH});
+    selectedLink.line.opacity(1);
+    selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
     selectedLink = null;
   }
-}
-
-function onDblClick(evt){
-
-  var coord = cursorPoint(evt);
-  selectedLink = getLinkAtCoordinates(coord.x, coord.y);
-  if(selectedLink != null){
-	  selectedLink.line.opacity(1.5);
-	  selectedLink.line.attr({"stroke-width":STROKE_WIDTH*2});
-	}
 }
 
 function getElementAtCoordinates(x, y){
@@ -112,23 +127,31 @@ function getElementAtCoordinates(x, y){
   return res;
 }
 
+function onDblClick(evt){
+  var coord = cursorPoint(evt);
+  selectedLink = getLinkAtCoordinates(coord.x, coord.y);
+  if(selectedLink != null){
+    selectedLink.line.opacity(1.5);
+    selectedLink.line.attr({"stroke-width": STROKE_WIDTH * 2});
+  }
+}
+
 function getLinkAtCoordinates(x, y){
   var res = null;
   var x1, y1, x2, y2, xpt, ypt;
   for(var index in myLinks){
-	x1 = parseInt(myLinks[index].line.attr("x1"));
-	y1 = parseInt(myLinks[index].line.attr("y1"));
-	x2 = parseInt(myLinks[index].line.attr("x2"));
-	y2 = parseInt(myLinks[index].line.attr("y2"));
-	xpt = parseInt(x);
-	ypt = parseInt(y);
+  	x1 = parseInt(myLinks[index].line.attr("x1"));
+  	y1 = parseInt(myLinks[index].line.attr("y1"));
+  	x2 = parseInt(myLinks[index].line.attr("x2"));
+  	y2 = parseInt(myLinks[index].line.attr("y2"));
+  	xpt = parseInt(x);
+  	ypt = parseInt(y);
     if(isInside(x1, y1, x2, y2, xpt, ypt)){
       res = myLinks[index];
     }
   }
   return res;
 }
-
 
 /*  functions used for getLinkAtCoordinates  */
 
@@ -146,15 +169,14 @@ function isInside(x1, y1, x2, y2, x, y){
 
 /*    */
 
-
 function onKeydown(event){
   if(event.keyCode === 46){
 	  if(selectedItem !== null){
-		selectedItem.myRemove();
-		selectedItem = null;
+  		selectedItem.myRemove();
+  		selectedItem = null;
 	  }else if(selectedLink !== null){
-		selectedLink.myRemove();
-		selectedLink = null;
+  		selectedLink.myRemove();
+  		selectedLink = null;
 	  }
   }
 }

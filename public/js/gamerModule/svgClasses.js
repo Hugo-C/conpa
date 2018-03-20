@@ -15,7 +15,7 @@ class Rectangle {
    */
   constructor(x, y, width, height, fill, parent){
     this.parent = parent;
-    this.rect = draw.rect(width, height);
+    this.rect = parent.rect(width, height);
     this.rect.attr({
       x: x,
       y: y,
@@ -30,7 +30,7 @@ class Rectangle {
    * Associate a textarea with the rectangle
    */
   addTextArea(){
-    var group = draw.group(); // use to "bind" the rectangle and the textArea
+    var group = this.parent.group(); // use to "bind" the rectangle and the textArea
 
     // this tag allow to use html tags in the svg
     var htmlCompatibilyTag = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
@@ -44,6 +44,8 @@ class Rectangle {
     text.style.height = "100%"; // match parent
     text.style.width = "100%"; // match parent
     text.style.resize = "none";
+    text.style.border = "none";
+    text.style.padding = "5px";
     text.style.backgroundColor = "transparent";
 
     htmlCompatibilyTag.appendChild(text);
@@ -51,6 +53,20 @@ class Rectangle {
     document.getElementById(group.attr('id')).appendChild(htmlCompatibilyTag);
 
     this.text = htmlCompatibilyTag;
+  }
+
+ /*
+  * Display the selection border
+  */
+  select() {
+      this.rect.animate().stroke({'color': 'black', 'width': 5});
+  }
+
+ /*
+  * Hide the selection border
+  */
+  unselect() {
+      this.rect.animate().stroke({'width': 0});
   }
 
   /**
@@ -71,7 +87,7 @@ class Rectangle {
    */
   linkRect(e){
     if(!this.isLinkedTo(e)){
-      var link = new Link(this, e);
+      var link = new Link(this, e, this.parent);
       this.addLink(link);
       e.addLink(link);
     }
@@ -140,15 +156,15 @@ class Link {
      * @param {Rectangle} e2 : second element to link
      * @param {SVGSVGElement | SVGGElement} parent : the parent svg Element
      */
-    constructor(e1, e2) {
+    constructor(e1, e2, parent) {
         this.e1 = e1;
         this.e2 = e2;
 
         let pos1 = e1.center();
         let pos2 = e2.center();
-        this.line = draw.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
+        this.line = parent.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
         this.line.back();
-		myLinks.push(this);
+        myLinks.push(this);
     }
 
     /**
@@ -158,7 +174,7 @@ class Link {
         this.line.remove();
         this.e1.removeLink(this);
         this.e2.removeLink(this);
-		removeFromArray(myLinks, this);
+        removeFromArray(myLinks, this);
     }
 
     /**
