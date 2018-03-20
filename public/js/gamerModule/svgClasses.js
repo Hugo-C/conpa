@@ -1,6 +1,7 @@
-const STROKE_WIDTH = "10";
+const STROKE_WIDTH = "5";
 
 var myElements = []; // list all elements in the svg
+var myLinks = []; // list all links in the svg
 
 class Rectangle {
 
@@ -147,6 +148,7 @@ class Link {
         let pos2 = e2.center();
         this.line = draw.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
         this.line.back();
+		myLinks.push(this);
     }
 
     /**
@@ -156,6 +158,7 @@ class Link {
         this.line.remove();
         this.e1.removeLink(this);
         this.e2.removeLink(this);
+		removeFromArray(myLinks, this);
     }
 
     /**
