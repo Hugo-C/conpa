@@ -86,3 +86,8 @@ $("#colorMenu button").on("click", function(){
     $("#color").val(selectedColor);
     $("#color").css('background-color', 'url("/img/gamerModule/' + selectedColor + '.jpg")');
 });
+
+$("#startDice").on("click", function(){
+    initScene();
+    lancer();
+});
