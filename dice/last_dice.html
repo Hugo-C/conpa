@@ -20,7 +20,7 @@
         Physijs.scripts.ammo = 'js/ammo.js';
 
         var initScene, render, loader, box_geometry, box, material,
-            renderer, scene, ground_material, ground,
+            renderer, scene, ground_material, ground, ground1, ground2, ground3, ground4,
             initEventHandling, camera, intersect_plane,
             selected = null, mouse_position = new THREE.Vector3, block_offset = new THREE.Vector3, _v3 = new THREE.Vector3;
 
@@ -49,7 +49,7 @@
             );
 
             camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
-            camera.position.set( 60, 50, 60 );
+            camera.position.set( 0, 100, 0 );
             camera.lookAt( scene.position );
             scene.add( camera );
 
@@ -57,11 +57,30 @@
             loader = new THREE.TextureLoader();
 
             // Ground
-            ground_material = Physijs.createMaterial(new THREE.MeshBasicMaterial({color: 0x0}), 0.8, 0.3);
+            ground_material = Physijs.createMaterial(new THREE.MeshBasicMaterial({transparent: true}), 0.8, 0.3);
 
             ground = new Physijs.BoxMesh(new THREE.BoxGeometry(1000, 0.5, 1000), ground_material, 0 );
-            ground.depthWrite = false;
             scene.add( ground );
+
+            ground1 = new Physijs.BoxMesh(new THREE.PlaneGeometry(200, 200, 200, 200), ground_material);
+            ground1.position.set(0,0,-60);
+            ground1.rotation.set(.5,0,0);
+            scene.add( ground1 );
+
+            ground2 = new Physijs.BoxMesh(new THREE.PlaneGeometry(200, 200, 200, 200), ground_material);
+            ground2.position.set(0,0,60);
+            ground2.rotation.set(-0.5,0,0);
+            scene.add( ground2 );
+
+            ground3 = new Physijs.BoxMesh(new THREE.PlaneGeometry(200, 200, 200, 200), ground_material);
+            ground3.position.set(-28,0,0);
+            ground3.rotation.set(0,1.57,0);
+            scene.add( ground3 );
+
+            ground4 = new Physijs.BoxMesh(new THREE.PlaneGeometry(200, 200, 200, 200), ground_material);
+            ground4.position.set(25,0,0);
+            ground4.rotation.set(0,1.57,0);
+            scene.add( ground4 );
 
             box_geometry = new THREE.BoxGeometry( 9, 9, 9 );
 
@@ -79,7 +98,7 @@
             box = new Physijs.BoxMesh( box_geometry, material);
             box.collisions = 0;
 
-            box.position.set(-8, 25, 8);
+            box.position.set(0, 40, 0);
 
             box.rotation.set(
                 Math.random() * Math.PI,
