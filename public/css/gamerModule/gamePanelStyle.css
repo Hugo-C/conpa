@@ -207,6 +207,7 @@ button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
 
 div#production {
   width: 92%;
+  overflow: scroll;
 }
 
 /* ****************************** */
