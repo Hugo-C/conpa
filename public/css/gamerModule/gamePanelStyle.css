@@ -4,7 +4,7 @@ body, html {
 }
 
 body {
-  padding: 5px;
+  /*padding: 5px;*/
 }
 
 button {
@@ -33,13 +33,14 @@ button {
   border: 2px solid black;
 }
 
-#content {
+#gameContent {
   height: 100%;
   width: 100%;
-  padding: 0;
+  padding: 5px;
+  display: none; /* <------ invisible */
 }
 
-#content > div {
+#gamePanel {
   height: 100%;
 }
 
@@ -89,11 +90,21 @@ button {
   justify-content: center;
 }
 
-#gamePanel > :nth-child(1) > :nth-child(3) > span {
-  font-size: 2vw;
-  font-weight: bold;
-  color: black;
+#gamePanel > :nth-child(1) > :nth-child(5) { /* TODO create a class for flex container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gamePanel > :nth-child(1) > div > span {
+  font-size: 1.2vw;
   font-family: fantasy sans-serif;
+  color: black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-height: inherit;
+  line-height: 1.4vw;
 }
 
 #gamePanel > :nth-child(1) > :nth-child(4) {
@@ -185,6 +196,10 @@ div#svgMenu {
 
 div#colorMenu {
   display: none;
+  background-image: url('/img/gamerModule/palette.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 div.menu > button {
@@ -197,13 +212,21 @@ div#svgMenu > button {
 }
 
 button#bouton { background-image: url("/img/gamerModule/text.png"); }
-button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
-button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
-button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
-button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
-button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
-button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
-button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
+div#colorMenu > button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
+div#colorMenu > button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
+div#colorMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
+div#colorMenu > button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
+div#colorMenu > button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
+div#colorMenu > button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
+div#colorMenu > button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
+
+div#svgMenu > button[value="red"] { background-image: url("/img/gamerModule/redPencil.png"); }
+div#svgMenu > button[value="green"] { background-image: url("/img/gamerModule/greenPencil.png"); }
+div#svgMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellowPencil.png"); }
+div#svgMenu > button[value="blue"] { background-image: url("/img/gamerModule/bluePencil.png"); }
+div#svgMenu > button[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
+div#svgMenu > button[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
+div#svgMenu > button[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
 
 div#production {
   width: 92%;
