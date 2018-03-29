@@ -22,7 +22,7 @@
         var initScene, render, loader, box_geometry, box, material,
             renderer, scene, ground_material, ground, ground1, ground2, ground3, ground4,
             initEventHandling, camera, intersect_plane,
-            selected = null, mouse_position = new THREE.Vector3, block_offset = new THREE.Vector3, _v3 = new THREE.Vector3;
+            selected = null, mouse_position = new THREE.Vector3, block_offset = new THREE.Vector3, v3 = new THREE.Vector3;
 
         initScene = function() {
             renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -38,11 +38,11 @@
                 function() {
                     if ( selected !== null ) {
 
-                        _v3.copy( mouse_position ).add( block_offset ).sub( selected.position ).multiplyScalar( 5 );
-                        _v3.y = 0;
-                        selected.setLinearVelocity( _v3 );
+                        v3.copy( mouse_position ).add( block_offset ).sub( selected.position ).multiplyScalar( 5 );
+                        v3.y = 0;
+                        selected.setLinearVelocity( v3 );
 
-                        box.applyCentralImpulse( _v3 );
+                        box.applyCentralImpulse( v3 );
                     }
                     scene.simulate( undefined, 1 );
                 }
@@ -126,7 +126,7 @@
         };
 
         initEventHandling = (function() {
-            var _vector = new THREE.Vector3,
+            var vector = new THREE.Vector3,
                 handleMouseDown, handleMouseMove, handleMouseUp;
             var raycaster = new THREE.Raycaster();
 
@@ -141,11 +141,11 @@
                 if ( intersects.length > 0 ) {
                     selected = intersects[ 0 ].object;
 
-                    _vector.set( 0, 0, 0 );
-                    selected_block.setAngularFactor( _vector );
-                    selected_block.setAngularVelocity( _vector );
-                    selected_block.setLinearFactor( _vector );
-                    selected_block.setLinearVelocity( _vector );
+                    vector.set( 0, 0, 0 );
+                    selected_block.setAngularFactor( vector );
+                    selected_block.setAngularVelocity( vector );
+                    selected_block.setLinearFactor( vector );
+                    selected_block.setLinearVelocity( vector );
                     mouse_position.copy( intersections[0].point );
                     block_offset.subVectors( selected_block.position, mouse_position );
 
@@ -159,13 +159,13 @@
 
                 if ( selected !== null ) {
 
-                    _vector.set(
+                    vector.set(
                         ( evt.clientX / window.innerWidth ) * 2 - 1,
                         -( evt.clientY / window.innerHeight ) * 2 + 1, 1
                     );
-                    _vector.unproject( camera );
+                    vector.unproject( camera );
 
-                    ray = new THREE.Raycaster( camera.position, _vector.sub( camera.position ).normalize() );
+                    ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
                     intersection = ray.intersectObject( intersect_plane );
                     mouse_position.copy( intersection[0].point );
                 }

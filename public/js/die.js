@@ -60,16 +60,47 @@ render = function () {
     renderer.render(scene, camera);
 };
 
-function deleteScene(){
+function numeroFace(arrayV){
+    var i = 0;
+    var cpt;
+    var foundV = false;
+    var listV = [[4,5,6,7], [0,1,2,3], [2,3,6,7], [0,1,4,5], [1,3,4,6], [0,2,5,7]];
+    while (i < 6 && !foundV){
+        cpt = 0;
+        for (var j = 0; j < 4; j++){
+            if (listV[i][j] == arrayV[j]) cpt++;
+        }
+        if (cpt === 4) foundV = true;
+        i++;
+    }
+    return i;
+}
+
+function deleteScene() {
+
+    var verticesList = [];
+    for (var vertexIndex = 0; vertexIndex < box.geometry.vertices.length; vertexIndex++){
+
+        var localVertex = box.geometry.vertices[vertexIndex].clone();
+        var globalVertex = box.matrix.multiplyVector3(localVertex);
+        var directionVector = globalVertex.sub( box.position );
+
+        var ray = new THREE.Raycaster( box.position, directionVector.clone().normalize() );
+        var collisionResults = ray.intersectObject( ground );
+        if ( collisionResults.length > 0)
+        {
+            verticesList.push(vertexIndex);
+        }
+    }
+    console.log("dice : " + numeroFace(verticesList));
+    displayNewCard(numeroFace(verticesList));
     divDie.removeChild(divDie.lastChild);
 }
 
 function handleDie() {
     if(box.position.y < 6.3) {
-        let res = Math.floor(Math.random() * 7 + 1);
-        displayNewCard(res);
         clearInterval(diceLoop);
-        setTimeout(deleteScene, 2000);
+        setTimeout(deleteScene, 1500);
     }
 }
 
@@ -92,6 +123,3 @@ function lancer() {
     scene.simulate();
     diceLoop = setInterval(handleDie, 100);
 }
-
-//window.onload = initScene;
-//initScene();
