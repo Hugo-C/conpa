@@ -104,7 +104,7 @@ function handleDie() {
     }
 }
 
-function lancer() {
+function throwDie() {
     box.position.set(8, 55, 8);
     box.rotation.set(
         Math.random() * Math.PI,

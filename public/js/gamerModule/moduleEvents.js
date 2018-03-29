@@ -89,5 +89,5 @@ $("#colorMenu button").on("click", function(){
 
 $("#startDice").on("click", function(){
     initScene();
-    lancer();
+    throwDie();
 });
