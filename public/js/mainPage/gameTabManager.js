@@ -41,8 +41,8 @@ $('#serverList').on('click', 'tbody tr', function(){
 $("#create").on("click", function(){
     $(".serverList").css("display", "none");
     $(".serverManager").css("display", "block");
-    $(".wrapper").css('height', '70%');
-    $(".wrapper").css('width', '50%');
+    $("#gameTab").css('height', '70%');
+    $("#gameTab").css('width', '50%');
     removeAllAlerts(); // in case of player have already try to create a server and he has been errors
 });
 
@@ -50,8 +50,8 @@ $("#create").on("click", function(){
 $("#cancel").on("click", function(){
     $(".serverList").css("display", "block");
     $(".serverManager").css("display", "none");
-    $(".wrapper").css('height', '100%');
-    $(".wrapper").css('width', '100%');
+    $("#gameTab").css('height', '100%');
+    $("#gameTab").css('width', '100%');
 });
 
 /** Clear all alerts */
@@ -72,6 +72,11 @@ function checkServerCreationForm(serverData){
     var timersErrorDisplayer = $('span.error_timers');
     removeAllAlerts();
     var conform = true;
+
+    if(serverData['server']['name'] == ""){
+        placesErrorDisplayer.text("Server name can't be empty");
+        conform = false;
+    }
 
     if(serverData['server']['places'] <= 0){
         placesErrorDisplayer.text("server can't have less than 1 places");
@@ -103,6 +108,7 @@ $("#validate").on("click", function(){
     var appropriationTime = parseInt($('input#appropriation')[0].value);
     var places = parseInt($('input#places')[0].value);
     var globalTimer = parseInt($('input#globalTimer')[0].value);
+
     var data = {'role': role,
                 'server': {'name': serverName,
                            'places': places,

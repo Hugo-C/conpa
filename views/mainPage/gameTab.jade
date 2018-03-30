@@ -1,4 +1,4 @@
-div(class="wrapper formWrapperStyle rowFlexContainer col-lg-12 col-md-12")
+div#gameTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12")
   div(class="serverList active col-lg-12 col-md-12")
     div(class="header rowFlexContainer ow")
       h3(class="col-lg-12 col-md-12") Server list
@@ -32,7 +32,7 @@ div(class="wrapper formWrapperStyle rowFlexContainer col-lg-12 col-md-12")
         div(class="col-lg-12 col-md-12")
           input#name(type="text" class="myCustomInput col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4")
           input#role(type="button" value="player" class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
-          input#places(type="number" class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
+          input#places(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
       div(class="row")    
         div(class="col-lg-12 col-md-12")
           span(class="error_timers col-lg-offset-1 col-md-offset-1")
@@ -41,9 +41,9 @@ div(class="wrapper formWrapperStyle rowFlexContainer col-lg-12 col-md-12")
           label(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2") Appropriation time
           label(class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3") Global Timer
         div(class="col-lg-12 col-md-12")
-          input#indivTimer(type="number" class="myCustomInput col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
-          input#appropriation(type="number" class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
-          input#globalTimer(type="number" class="myCustomInput col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
+          input#indivTimer(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
+          input#appropriation(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
+          input#globalTimer(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
     div(class="formBottomStyle bottom row")
       div(class="rowFlexContainer col-lg-offset-7 col-lg-4 col-md-offset-7 col-md-4")
         button#cancel(class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Cancel
