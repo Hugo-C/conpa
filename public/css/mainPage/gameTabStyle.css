@@ -1,9 +1,9 @@
-.wrapper {
+#gameTab {
   height: 100%;
   padding: 0;
 }
 
-.wrapper > div {
+#gameTab > div {
   padding: 0;
 }
 
