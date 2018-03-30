@@ -13,6 +13,10 @@ div#gameBar > div > div:nth-child(6) > div > :first-child > button {
   background-repeat: no-repeat;
 }
 
+img#cardFamilyLogo {
+  padding: 0px;
+}
+
 button#cardHelp {
   background-image: url("/img/gamerModule/infoSup.png");
 }

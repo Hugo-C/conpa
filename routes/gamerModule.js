@@ -2,12 +2,15 @@ var express = require('express');
 var router = express.Router();
 var querystring = require('querystring');
 var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({ extended: true });
 var url = require('url');
 var db = require('../js/db');
+var keys = require('../js/dbConstants');
 
 
-router.get('/cards', function(req, res, next) {
+/**
+ * Return a Json of cards of the specified cardGame
+ */
+router.get('/cards', function(req, res) {
     console.log("on m'a demandé des cartes");
     let response = {};
     let nbFamilyTreated = 0;
@@ -20,33 +23,37 @@ router.get('/cards', function(req, res, next) {
 
     let processFamilies = function (err, data) {
         nbFamilyToTreat = data.length;
+        let id = keys.CFT_KEY_ID;
         for(let family of data){
-            response[family["id"]] = [];
-            //console.log("je bosse");
-            //console.log(data);
-            //console.log(family);
-            //console.log(family["id"]);
-            db.getFamilyCards(family["id"], stackCard.bind(this, family["id"]));
+            response[family[id]] = {"cards": [], "name": family[keys.CFT_KEY_NAME], "logo": family[keys.CFT_KEY_LOGO]};
+            db.getFamilyCards(family[id], stackCard.bind(this, family[id]));
         }
     };
 
     let stackCard = function(family, err, data){
         for(let i = 0; i < data.length; i++){
-            //console.log(response);
-            response[family].push(data[i]["content"]);
+            response[family]["cards"].push(data[i]["content"]);
         }
         nbFamilyTreated ++;
         if(nbFamilyTreated === nbFamilyToTreat){
-            //console.log("MY RES : ");
-            //console.log(response);
+            // we want the response's key to be families names and not id
+            let familyId = Object.keys(response);
+            for(let i = 0; i < familyId.length; i++){
+                let name = response[familyId[i]]["name"];
+                response[name] = response[familyId[i]];
+                delete response[familyId[i]];
+            }
             res.send(response);
         }
     };
-
-    db.getCardGame(params["cardGame"], params["language"], processCardGame);
+    if(params["cardGame"] === undefined || params["language"] === undefined){
+        res.status(500).send({ error: "invalid parameters, please specify the cardGame value and language value" });
+    } else {
+        db.getCardGame(params["cardGame"], params["language"], processCardGame);
+    }
 });
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
     res.render('gamerModuleMainView');
 });
 
