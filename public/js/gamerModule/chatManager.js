@@ -1,4 +1,28 @@
 
+var playersList = null;
+
+/**
+ * Process the players message
+ * Displays the list of player in the tchat
+ *
+ * form of received data : array which contain the list of players's pseudo
+ */
+socket.on('players', function(players){
+    console.log(players);
+    playersList = players; //TODO : store this list somewhere else
+    var playerSelector = $('#chatPlayers');
+    playerSelector.children().remove();
+    playerSelector.append('<option value="all">general</option>');
+    for(var index in players){
+        if(players[index] != sessionStorage.pseudo){ // we not displays the pseudo of the current player
+            playerSelector.append($('<option>', {
+                value: players[index],
+                text : players[index]
+            }));
+        }
+    }
+});
+
 /**
  * Displays a message in the player tchat area
  *
@@ -39,7 +63,7 @@ $("#inputBox").on('keyup', function (e) {
  * Process tchat message on client side
  * Displays the received message
  *
- * form of accepted data :
+ * form of received data :
  * {'sender': [sender's pseudo], 'msg': [message body],
  *  'whisper': [boolean which indicates if message is public or private]}
  */

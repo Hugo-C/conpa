@@ -8,7 +8,9 @@ cardContent.appendChild(cardTextNode);
 
 /**
  * init variable cards with the deck
- * @param cardGame
+ *
+ * @param {string} cardGame : cardGame's name
+ * @param {string} language : cardGame's language
  */
 function initCards(cardGame, language){
     let client = new HttpClient();
@@ -21,7 +23,7 @@ function initCards(cardGame, language){
 
 /**
  * Pick a new card from the deck and display it
- * @param family {Number} : the family to pick from, if it's not available it'll pick from the closest family available
+ * @param {Integer} family : the family to pick from, if it's not available it'll pick from the closest family available
  * @return {boolean} : true if a card is pick, false if all cards from the family were already picked
  */
 function displayNewCard(family){
@@ -39,23 +41,39 @@ function displayNewCard(family){
     return true;
 }
 
+/**
+ * Sends the card you picked to the server
+ *
+ * @param {string} family : card's family
+ * @param {string} card : card's content
+ */
 function shareMyCard(family, card){
   socket.emit('cardPicked', {'family': family, 'cardContent': card});
 }
 
+/**
+ * Process "cardPicked" message
+ * This message is send by the server when a player have picked a new card
+ * When this message is received, we display the card on the game bar
+ *
+ * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
+ */
 socket.on('cardPicked', function(data){
     displayCard(data['cardContent']);
 });
 
 /**
  * display a card picked by another player
- * @param text {String} : the text of the card picked
+ * @param {String} text : the text of the card picked
  */
 function displayCard(text){
     triggerCssAnimation();
     cardTextNode.nodeValue = text;
 }
 
+/**
+ * Play an animation when we display a new card
+ */
 function triggerCssAnimation(){
     cardContent.id = "fakeId";
     void cardContent.offsetWidth;
@@ -63,4 +81,4 @@ function triggerCssAnimation(){
 }
 
 
-initCards("conpa", "fr");
+initCards("conpa", "fr"); //TODO: choose card game at the creation of the game server

@@ -73,9 +73,6 @@ button#skipButton {
   height: 100%;
   padding: 0;
   background-image: url("/img/gamerModule/skipButton.svg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 /* screen size lower than 800px, reduce space between components to

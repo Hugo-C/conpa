@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var querystring = require('querystring');
+var bodyParser = require('body-parser');
+var urlencodedParser = bodyParser.urlencoded({ extended: true });
 var url = require('url');
 var db = require('../js/db');
 
@@ -20,23 +22,23 @@ router.get('/cards', function(req, res, next) {
         nbFamilyToTreat = data.length;
         for(let family of data){
             response[family["id"]] = [];
-            console.log("je bosse");
-            console.log(data);
-            console.log(family);
-            console.log(family["id"]);
+            //console.log("je bosse");
+            //console.log(data);
+            //console.log(family);
+            //console.log(family["id"]);
             db.getFamilyCards(family["id"], stackCard.bind(this, family["id"]));
         }
     };
 
     let stackCard = function(family, err, data){
         for(let i = 0; i < data.length; i++){
-            console.log(response);
+            //console.log(response);
             response[family].push(data[i]["content"]);
         }
         nbFamilyTreated ++;
         if(nbFamilyTreated === nbFamilyToTreat){
-            console.log("MY RES : ");
-            console.log(response);
+            //console.log("MY RES : ");
+            //console.log(response);
             res.send(response);
         }
     };

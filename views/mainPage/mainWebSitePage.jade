@@ -6,13 +6,14 @@ html
     meta(charset="utf-8")
     link(href="/css/bootstrap.min.css" rel="stylesheet")
     link(href="/css/scrollBarStyle.css" rel="stylesheet")
+    link(href="/css/generalStyles.css" rel="stylesheet")
     link(href="/css/mainPage/style.css" rel="stylesheet")
     link(href="/css/mainPage/tabStyle.css" rel="stylesheet")
     link(href="/css/mainPage/gameTabStyle.css" rel="stylesheet")
   body
     div(class="defaultStyle container-fluid")
-      header(style="margin:0" class="row")
-        div(class="defaultStyle flexContainer col-lg-3 col-md-3")
+      header(style="margin:0" class="stretchedImage row")
+        div(class="defaultStyle rowFlexContainer col-lg-3 col-md-3")
           div(class="identityCard col-lg-10 col-md-10")
             div(class="defaultStyle col-lg-5 col-md-5")
               div(class="defaultStyle itemsCentered row")
@@ -26,9 +27,9 @@ html
                 button#disconnect(class="col-lg-offset-9 col-lg-2 col-md-offset-9 col-md-2")
         div(style="padding-right:20px" class="defaultStyle col-lg-9 col-md-9")
           div(class="header1 row")
-            div#title(class="col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") CONPA
+            div#title(class="rowFlexContainer col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") CONPA
             div#language(class="siteInfo col-lg-offset-2 col-lg-2 col-md-offset-2 col-md-2")
-            div#clock(class="siteInfo flexContainer col-lg-2 col-md-2")
+            div#clock(class="siteInfo rowFlexContainer col-lg-2 col-md-2")
           div(class="header2 row")
             div(style="height:100%" class="startPath col-lg-offset-4 col-md-offset-4")
           div(class="header3 row")
@@ -38,11 +39,11 @@ html
             div(style="height:100%" class="rightPath col-lg-3 col-md-3")
           div(class="header4 row")
             section(class="tabContainer col-lg-12 col-md-12")
-              div(class="tab draw flexContainer col-lg-3 col-md-3") Account
-              div(class="tab draw flexContainer col-lg-3 col-md-3") Editor
-              div(class="tab flexContainer col-lg-3 col-md-3") Historic
-              div(class="tab flexContainer col-lg-3 col-md-3") Game
-      div(class="pageContent row")
+              div(class="tab draw rowFlexContainer col-lg-3 col-md-3") Account
+              div(class="tab draw rowFlexContainer col-lg-3 col-md-3") Editor
+              div(class="tab rowFlexContainer col-lg-3 col-md-3") Historic
+              div(class="tab rowFlexContainer col-lg-3 col-md-3") Game
+      div(class="pageContent rowFlexContainer ow")
         include gameTab.jade
             
   script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")

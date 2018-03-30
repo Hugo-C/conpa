@@ -4,7 +4,7 @@ var socket = io();
 // registered the client on server
 socket.emit('pseudo', {'pseudo': sessionStorage.pseudo});
 
-/*
+/**
  * Process serverListUpdate message
  * Displays available servers in the html table
  */
@@ -12,7 +12,7 @@ socket.on('serverListUpdate', function(data){
     var serverList = $('#serverList').find('tbody');
     serverList.children().remove();
     for(var server in data){
-        serverList.append($('<tr>')
+        serverList.append($('<tr class=' + data[server]['name'] + '>')
                     .append($('<td>' + data[server]['name'] + '</td>'))
                     .append($('<td>' + data[server]['host'] + '</td>'))
                     .append($('<td>' + data[server]['animate'] + '</td>'))
@@ -21,50 +21,110 @@ socket.on('serverListUpdate', function(data){
       }
 });
 
-/* Process gameStart message
- * When this message is received, we move to the game module page
+/** Process gameStart message
+ *  When this message is received, we move to the game module page
  */
 socket.on('gameStart', function(data){
     console.log("GAME START !!!!");
     sessionStorage.server = data['server'];
+
     window.location = '/gamerModule';
 });
 
-// allows to select a row in the server list
+/** allows to select a row in the server list */
 $('#serverList').on('click', 'tbody tr', function(){
   $('#serverList tbody .selected').removeClass('selected');
   $(this).addClass('selected');
 });
 
-// displays game server creator window
+/** displays game server creator window */
 $("#create").on("click", function(){
     $(".serverList").css("display", "none");
     $(".serverManager").css("display", "block");
+    $(".wrapper").css('height', '70%');
+    $(".wrapper").css('width', '50%');
+    removeAllAlerts(); // in case of player have already try to create a server and he has been errors
 });
 
-// displays server list
+/** displays server list */
 $("#cancel").on("click", function(){
     $(".serverList").css("display", "block");
     $(".serverManager").css("display", "none");
+    $(".wrapper").css('height', '100%');
+    $(".wrapper").css('width', '100%');
 });
 
-// Creating player game server
+/** Clear all alerts */
+function removeAllAlerts(){
+    $('.error_places').text('');
+    $('.error_timers').text('');
+}
+
+/**
+ * Check if server parameters are valid
+ * This function is used to validate the server creation form
+ *
+ * @param {object} serverData : object containing all server parameters
+ * @return {boolean} : indicates if parameters are valid or not
+ */
+function checkServerCreationForm(serverData){
+    var placesErrorDisplayer = $('span.error_places');
+    var timersErrorDisplayer = $('span.error_timers');
+    removeAllAlerts();
+    var conform = true;
+
+    if(serverData['server']['places'] <= 0){
+        placesErrorDisplayer.text("server can't have less than 1 places");
+        conform = false;
+    }
+
+    if(serverData['server']['indivTimer'] <= 0 || serverData['server']['appropriation'] <= 0 || serverData['server']['globalTimer'] <= 0){
+        timersErrorDisplayer.text("timer can't be less than 0");
+        conform = false;
+    }else{
+
+        if(serverData['server']['appropriation'] > serverData['server']['indivTimer']){
+            timersErrorDisplayer.text("individual timer can't be less than the appropriation time");
+            conform = false;
+        }else if(serverData['server']['indivTimer'] > serverData['server']['globalTimer']){
+            timersErrorDisplayer.text("global timer can't be less than the individual timer");
+            conform = false;
+        }
+
+    }
+    return conform;
+}
+
+/** Creating player game server */
 $("#validate").on("click", function(){
     var serverName = $('input#name')[0].value;
     var role = $('input#role')[0].value;
-    var indivTimer = $('input#indivTimer')[0].value;
-    var places = $('input#places')[0].value;
-    var globalTimer = $('input#globalTimer')[0].value;
+    var indivTimer = parseInt($('input#indivTimer')[0].value);
+    var appropriationTime = parseInt($('input#appropriation')[0].value);
+    var places = parseInt($('input#places')[0].value);
+    var globalTimer = parseInt($('input#globalTimer')[0].value);
     var data = {'role': role,
                 'server': {'name': serverName,
                            'places': places,
                            'indivTimer': indivTimer,
+                           'appropriation': appropriationTime,
                            'globalTimer': globalTimer}};
 
-    socket.emit('createServer', data);
+    if(checkServerCreationForm(data)){
+        socket.emit('createServer', data);
+    }
 });
 
-// Joining the selected game server
+/** Proccess server response send after the creation of a new server */
+socket.on('serverCreated', function(data){
+    if(data['error']){
+        $('span.error_places').text(data['msg']);
+    }else{
+        $('#cancel').click(); // come back to the server list
+    }
+});
+
+/** Joining the selected game server */
 $("#join").on("click", function(){
     var selectedServer =  $('#serverList tbody .selected').children()[0];
     if(selectedServer != null){

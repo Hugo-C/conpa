@@ -35,7 +35,7 @@ function processRegisterAnswer(response){
         $('.error_email').text('email already used');
         break;
       case 'OK':
-        $('.register > div > .linkform').click();
+        $('.register > div > .linkform').click(); // redirection to the login form
         alert('registration successful');
         break;
     }

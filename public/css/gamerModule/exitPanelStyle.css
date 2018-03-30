@@ -1,0 +1,53 @@
+div#exitPanel {
+  height: 70%;
+  padding-left: 20px;
+  padding-right: 20px;
+  display: none; /* <------ invisible */
+}
+
+div#exitPanel > :first-child {
+  height: 30%;
+}
+
+div#exitPanel > :first-child > span {
+  font-size: 3vw;
+  font-weight: bold;
+  font-family: fantasy sans-serif;
+  color: black;
+}
+
+div#exitPanel > :nth-child(2) {
+  height: 45%;
+  overflow-x: scroll;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-color: black;
+}
+
+div#exitPanel > :nth-child(3) {
+  height: 5%;
+}
+
+div#exitPanel > :last-child {
+  height: 20%;
+}
+
+span#exitMessage {
+  font-size: 2vw;
+}
+
+/* Players displayer */
+
+div#exitPanel > :nth-child(2) > div {
+  height: 80%;
+  padding: 0;
+}
+
+.playerDisplayer {
+  margin-left: 20px;
+}
+
+button#validateExit,
+button#cancelExit {
+  display: none;
+}
