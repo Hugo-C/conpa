@@ -13,8 +13,35 @@ div#gameBar > div > div:nth-child(6) > div > :first-child > button {
   background-repeat: no-repeat;
 }
 
+div#familyLogoDiv {
+  width: 100%;
+  padding: 0;
+  display: none;
+}
+
+span#familyLogoText {
+  width: 110%;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.8s ease;
+
+  background-color: lightgray;
+  box-shadow: 0 0 5px 10px lightgray;
+
+  /* corners */
+  -moz-border-radius:10px 10px 10px 10px;  /* rounds corners for firefox */
+  border-radius:10px 10px 10px 10px;  /* rounds corners for other browsers */
+}
+
 img#cardFamilyLogo {
-  padding: 0px;
+  width: 100%;
+  padding: 0;
+  transition: all 0.8s ease;
 }
 
 button#cardHelp {
