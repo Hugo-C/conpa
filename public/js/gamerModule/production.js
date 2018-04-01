@@ -194,6 +194,12 @@ $("#colorMenu button").on("click", function(){
   }
 });
 
+function saveSvg(){
+    let save = document.getElementById("production").innerHTML;
+    console.log(save);
+    socket.emit('saveSvg', {"svg" : save});
+}
+
 draw.on('mousedown', onMouseDown);
 draw.on('mousemove', onMouseMove);
 draw.on('mouseup', onMouseUp);
