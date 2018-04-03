@@ -162,7 +162,10 @@ class Link {
     constructor(e1, e2, parent) {
         this.e1 = e1;
         this.e2 = e2;
+		this.parent = parent;
 
+		this.navigability = null;
+		this.angle = null;
         let pos1 = e1.center();
         let pos2 = e2.center();
         this.line = parent.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
@@ -191,10 +194,42 @@ class Link {
 
     /**
      * Check if the element 'e' is used by this link
-     * @param e {Element}
+     * @param {Element} e
      * @returns {boolean}
      */
     hasElement(e) {
         return (e === this.e1 || e === this.e2);
     }
+	
+	/**
+	* Associate a navigability to the link
+	* @param {boolean} toReverse 
+	*/
+    addNavigability(toReverse){
+	    this.removeNavigability();
+		
+		let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
+		let yCenter = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));
+		this.navigability = this.parent.polygon();
+		
+		if(toReverse){
+			this.angle += 180;
+		}else{
+			this.angle = Math.atan2(this.e2.rect.attr('y') - this.e1.rect.attr('y'), this.e2.rect.attr('x') - this.e1.rect.attr('x')) * 180 / Math.PI;	// FCS3 expression
+		}
+		
+		this.navigability.attr({points: "" + (xCenter - 10) + "," + (yCenter - 10) + " " + (xCenter + 10) + "," + (yCenter) + " " + (xCenter - 10) + "," + (yCenter + 10)});
+		this.navigability.attr({style: "fill:black;stroke:black;stroke-width:1"});
+		this.navigability.attr({transform: "rotate(" + this.angle + " " + xCenter + " " + yCenter + ")"});
+	}
+   
+   /**
+	* Remove the navigability of the link
+	*/
+	removeNavigability(){
+		 if(this.navigability != null){
+		    this.navigability.remove();
+			this.angle = null;
+	    }
+	}
 }
