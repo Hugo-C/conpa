@@ -1,4 +1,4 @@
-const STROKE_WIDTH = "5";
+const STROKE_WIDTH = "4";
 
 var myElements = []; // list all elements in the svg
 var myLinks = []; // list all links in the svg
@@ -47,6 +47,7 @@ class Rectangle {
     text.style.border = "none";
     text.style.padding = "5px";
     text.style.backgroundColor = "transparent";
+    text.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
 
     htmlCompatibilyTag.appendChild(text);
     group.add(this.rect);

@@ -9,6 +9,7 @@ var pt = svg.createSVGPoint();
 var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': 'white', 'purple': 'purple', 'brown': '#5A3A22'};
 var selectedColor = colors['red'];
 
+// Rectangle manipulation variables
 var rectCreate = false;
 var creatingRect = null;
 var lastSelectedItem = null;
@@ -18,12 +19,18 @@ var move = false;
 var dx = null;
 var dy = null;
 
+// Panning variables
 var panning = false;
 var xTranslate = 0;
 var yTranslate = 0;
 let xTranslateTmp = xTranslate;
 let yTranslateTmp = yTranslate;
 var clickX, clickY;
+
+// Contextual menu variables
+var menu = $('#linkContextMenu');
+var menuState = 0;
+var active = "contextMenu--active";
 
 // resize the svg when page is resized
 window.onresize = function(evt){
@@ -44,14 +51,17 @@ function onMouseDown(evt){
   if($('#bouton').is(":focus")) {
     rectCreate = true;
     creatingRect = new Rectangle(coord.x, coord.y, 1, 1, selectedColor, master);
-  }else if(selectedItem != null){
-    move = true;
-    dx = coord.x - selectedItem.rect.attr('x');
-    dy = coord.y - selectedItem.rect.attr('y');
-  }else if(!rectCreate){
-    panning = true;
-    clickX = coord.x;
-    clickY = coord.y;
+  }else if($('#moveElement').hasClass('selected')){
+
+    if(selectedItem != null){
+      move = true;
+      dx = coord.x - selectedItem.rect.attr('x');
+      dy = coord.y - selectedItem.rect.attr('y');
+    }else if(!rectCreate){
+      panning = true;
+      clickX = coord.x;
+      clickY = coord.y;
+    }
   }
 }
 
@@ -119,7 +129,7 @@ function onClick(evt){
 
   if(selectedLink != null){
     selectedLink.line.opacity(1);
-    selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
+    //selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
     selectedLink = null;
   }
 }
@@ -134,15 +144,16 @@ function getElementAtCoordinates(x, y){
   return res;
 }
 
+/*
 function onDblClick(evt){
   var coord = cursorPoint(evt);
   selectedLink = getLinkAtCoordinates(coord.x, coord.y);
   if(selectedLink != null){
-    selectedLink.line.opacity(1.5);
-    selectedLink.line.attr({"stroke-width": STROKE_WIDTH * 2});
+    selectedLink.line.opacity(0.7);
+    //selectedLink.line.attr({"stroke-width": STROKE_WIDTH * 2});
   }
 }
-
+*/
 function getLinkAtCoordinates(x, y){
   var res = null;
   var x1, y1, x2, y2, xpt, ypt;
@@ -172,6 +183,159 @@ function isInside(x1, y1, x2, y2, x, y){
 
 /*    */
 
+// -----------------------------------------------------------------------------
+// --------------------- CONTEXTUAL MENU ---------------------------------------
+// -----------------------------------------------------------------------------
+
+function clickInsideElement( e ) {
+  var el = e.srcElement || e.target;
+
+    if ($('#production')[0].contains(el)){
+        return el;
+    }else{
+        return false;
+    }
+}
+
+function toggleMenuOn() {
+    if(menuState !== 1){
+      menuState = 1;
+      menu.addClass(active);
+    }
+}
+
+function toggleMenuOff() {
+    if(menuState !== 0){
+      menuState = 0;
+      menu.removeClass(active);
+    }
+}
+
+function positionMenu(e) {
+
+    var menuWidth = menu.get(0).offsetWidth + 4;
+    var menuHeight = menu.get(0).offsetHeight + 4;
+
+    var productionWidth = $('#production').get(0).offsetWidth;
+    var productionHeight = $('#production').get(0).offsetHeight;
+
+    var menuPositionX = e.clientX;
+    var menuPositionY = e.clientY;
+
+    menuPositionX -= (2 * menuWidth) / 3;
+    menuPositionY -= menuHeight / 5;
+
+    if((menuPositionX + menuWidth) > productionWidth){
+        menu.css('left', (menuPositionX - menuWidth) + "px");
+    }else{
+        menu.css('left', menuPositionX + "px");
+    }
+
+    if((menuPositionY + menuHeight) > productionHeight){
+        menu.css('top', (menuPositionY - menuHeight) + "px");
+    }else{
+        menu.css('top', menuPositionY + "px");
+    }
+}
+
+window.onresize = function(e) {
+    toggleMenuOff();
+};
+
+function documentClick(evt){
+    var button = evt.which || evt.button;
+    var inside = clickInsideElement(evt);
+    if ( button === 1 ) {
+        if(inside && selectedLink == null)
+            toggleMenuOff();
+        else if(!inside)
+            toggleMenuOff();
+    }
+}
+
+function openContextMenu(evt){
+
+    var coord = cursorPoint(evt);
+    selectedLink = getLinkAtCoordinates(coord.x, coord.y);
+
+    if(clickInsideElement(evt) && selectedLink != null){
+        evt.preventDefault();
+        toggleMenuOn();
+        positionMenu(evt);
+    }else{
+        toggleMenuOff();
+    }
+}
+
+// -----------------------------------------------------------------------------
+// ----------- CONTEXTUAL MENU BUTTONS EVENTS ----------------------------------
+// -----------------------------------------------------------------------------
+
+$('#removeLink').on('click', function(){
+    if(selectedLink != null){
+        selectedLink.myRemove();
+        selectedLink = null;
+    }
+});
+
+$('#dashLink').on('click', function(){
+    if(selectedLink != null){
+        selectedLink.line.stroke({dasharray: 10.10});
+    }
+});
+
+$('#linearLink').on('click', function(){
+    if(selectedLink != null){
+        selectedLink.line.stroke({dasharray: 0});
+    }
+});
+
+$('#increaseWidth').on('click', function(){
+    if(selectedLink != null){
+        var strokeWidth = selectedLink.line.attr('stroke-width');
+        strokeWidth += 2;
+        if(strokeWidth <= 20){
+            selectedLink.line.stroke({width: strokeWidth});
+        }
+    }
+});
+
+$('#decreaseWidth').on('click', function(){
+    if(selectedLink != null){
+        var strokeWidth = selectedLink.line.attr('stroke-width');
+        strokeWidth -= 2;
+        if(strokeWidth > 0){
+            selectedLink.line.stroke({width: strokeWidth});
+        }
+    }
+});
+
+$('#linkColor').on('click', function(){
+    $('.colorTool').css('display', 'block');
+    $('.mainTool').css('display', 'none');
+});
+
+$('button.colorTool').on('click', function(){
+    if(selectedLink != null){
+        selectedLink.line.stroke({color: colors[$(this).val()]});
+    }
+    $('.colorTool').css('display', 'none');
+    $('.mainTool').css('display', 'block');
+});
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+$("#colorMenu button").on("click", function(){
+  var color = $(this).val();
+  selectedColor = colors[color];
+  if(selectedItem != null){
+    selectedItem.rect.attr('fill', colors[color]);
+  }/*else if(selectedLink != null){
+	  selectedLink.line.stroke({color: colors[color]});
+  }*/
+});
+
 function onKeydown(event){
   if(event.keyCode === 46){
 	  if(selectedItem !== null){
@@ -184,19 +348,11 @@ function onKeydown(event){
   }
 }
 
-$("#colorMenu button").on("click", function(){
-  var color = $(this).val();
-  selectedColor = colors[color];
-  if(selectedItem != null){
-    selectedItem.rect.attr('fill', colors[color]);
-  }else if(selectedLink != null){
-	  selectedLink.line.stroke({color:colors[color]});
-  }
-});
-
 draw.on('mousedown', onMouseDown);
 draw.on('mousemove', onMouseMove);
 draw.on('mouseup', onMouseUp);
 draw.on('click', onClick);
-draw.on('dblclick', onDblClick);
+//draw.on('dblclick', onDblClick);
 draw.on('keydown', onKeydown);
+document.addEventListener('contextmenu', openContextMenu);
+document.addEventListener('click', documentClick);

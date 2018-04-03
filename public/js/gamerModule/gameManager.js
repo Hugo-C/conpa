@@ -92,6 +92,54 @@ $("#colorMenu button").on("click", function(){
     $("#color").css('background-color', 'url("/img/gamerModule/' + selectedColor + '.jpg")');
 });
 
+$("#moveElement").on("click", function(){
+    var moveImage = "/img/gamerModule/move.png";
+    var movingImage = "/img/gamerModule/moving.png";
+    if($(this).hasClass("selected")){
+        $(this).removeClass("selected");
+        $(this).css('background-image', 'url(' + moveImage + ')');
+    }else{
+        $(this).addClass("selected");
+        $(this).css('background-image', 'url(' + movingImage + ')');
+    }
+})
+
+function fullscreenProduction(){
+    $('#chatInfos').css('display', 'none');
+    $('#displayList').css('display', 'none');
+    $('#gamePanel > :nth-child(2)').css('height', '95%');
+    $('#productionList').css('display', 'none');
+    $('#productionArea').css('height', '100%');
+    $('#productionArea').css('width', '100%');
+    $('#production').css('width', '93%');
+}
+
+function exitFullscreenProduction(){
+    $('#chatInfos').css('display', 'block');
+    $('#displayList').css('display', 'block');
+    $('#gamePanel > :nth-child(2)').css('height', '');
+    $('#productionList').css('display', 'block');
+    $('#productionArea').css('height', '');
+    $('#productionArea').css('width', '');
+    $('#production').css('width', '92%');
+}
+
+$("#fullScreen").on("click", function(){
+    var fullscreen = "/img/gamerModule/fullscreen.png";
+    var notFullscreen = "/img/gamerModule/notFullscreen.png";
+    if($(this).hasClass('off')){
+        $(this).css('background-image', 'url("' + notFullscreen + '")');
+        $(this).removeClass('off');
+        $(this).addClass('on');
+        fullscreenProduction();
+    }else{
+        $(this).css('background-image', 'url("' + fullscreen + '")');
+        $(this).removeClass('on');
+        $(this).addClass('off');
+        exitFullscreenProduction();
+    }
+});
+
 $("#startDice").on("click", function(){
     initScene();
     throwDie();

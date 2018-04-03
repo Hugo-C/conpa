@@ -163,7 +163,7 @@ div#productionArea > button#displayList {
 
 div#colorMenu {
   display: none;
-  background-image: url('/img/gamerModule/palette.png');
+  background-color: grey;
 }
 
 div#svgMenu {
@@ -184,7 +184,7 @@ div.menu > button {
 }
 
 div#svgMenu > button {
-  margin-bottom: 5%;
+  margin-bottom: 15px;
 }
 
 button#bouton { background-image: url("/img/gamerModule/text.png"); }
@@ -203,6 +203,9 @@ div#svgMenu > button[value="blue"] { background-image: url("/img/gamerModule/blu
 div#svgMenu > button[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
 div#svgMenu > button[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
 div#svgMenu > button[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
+
+div#svgMenu > button#moveElement { background-image: url("/img/gamerModule/move.png"); }
+div#svgMenu > button#fullScreen { background-image: url("/img/gamerModule/fullscreen.png"); }
 
 div#production {
   width: 92%;
@@ -306,7 +309,7 @@ button#undo {
   pointer-events: none; "fix a chrome bug
 }
 
-canvas{
-  width: 100%;
-  height: 100%;
+#ruler {
+  visibility: hidden;
+  white-space: nowrap;
 }
