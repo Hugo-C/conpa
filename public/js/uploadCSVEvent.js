@@ -5,8 +5,15 @@ var modelCSV = [/nom jeu,langue(,(famille [1-5]),info sup \2){5}/g,
                   /,,(.*[A-Za-z].*,.*,){4}(.*[A-Za-z].*,.*)/g];
 
 
-$("#importToCSV").on("change", function(){
-    handleFiles(this.files);
+$("#valideImport").on("click", function(){
+    if($('#import')[0].files.length > 0){
+        handleFiles($('#import')[0].files);
+        $('#import').attr('type', ''); // reset input(type="file") content
+        $('#import').attr('type', 'file');
+        $('#importButton').text('No file chosen'); // no selected file
+    }else{
+        $('#importAlertMessage').text('No file selected');
+    }
 });
 
 /**
@@ -18,7 +25,7 @@ function handleFiles(files){
     if(window.FileReader){
         getAsText(files[0]);
     }else{
-        alert("FileReader are not supported in this browser");
+        $('#importAlertMessage').text("FileReader are not supported in this browser");
     }
 }
 
@@ -56,7 +63,7 @@ function loadHandler(event, fileToRead){
     if(checkConformity(csv)){
         uploadCSV(fileToRead);
     }else{
-        alert("CSV invalid");
+        $('#importAlertMessage').text('Invalid CSV file !');
     }
 }
 
@@ -118,28 +125,39 @@ function uploadCSV(csvFile){
     var request = new XMLHttpRequest();
 
     request.onload = function(){
-        console.log("request loaded");
-        if(request.status == 200) console.log("import successful");
-        else if(request.status == 256){
-            console.log("already have this game");
+
+        var regex = /\.csv$/;
+        if(request.responseText == 'OK'){
+            $('#importAlertMessage').text("import successful");
+        }else if(request.responseText != null && regex.test(request.responseText)){
+
             var updateCardGame = confirm("This card game already exists !\nWould you overwrite it ?");
 
             $.ajax({
-              type: 'POST',
-              url: '/editor/updateCardGame',
-              data: { update: updateCardGame ? "yes" : "no",
-                      csv: request.responseText},
-              error: function(){
-                 alert("Request Failed");
-              },
-              success: function(response){
-                  console.log(response);
-              }
+                type: 'POST',
+                url: '/updateCardGame',
+                data: {
+                    update: updateCardGame ? "yes" : "no",
+                    csv: request.responseText
+                },
+                error: function(){
+                   $('#importAlertMessage').text("Request failed");
+                },
+                success: function(response){
+                    if(response == 'OK'){
+                        $('#importAlertMessage').text("Import successful");
+                    }else if(response == 'NO UPDATE'){
+                        $('#importAlertMessage').text("Data has not been updated");
+                    }else{
+                        $('#importAlertMessage').text("Request failed");
+                    }
+                }
             });
-
+        }else{
+            $('#importAlertMessage').text("import has failed");
         }
     }
 
-    request.open("post", "/editor/uploadCSV", true);
+    request.open("post", "/importCardGame", true);
     request.send(formData);
 }

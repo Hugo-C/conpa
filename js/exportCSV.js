@@ -9,6 +9,16 @@ const CARDS_HEADER = 1;
 const CARD = 2;
 
 /**
+ * Generate random name for uploaded csv file
+ * Used to face file conflict between users
+ *
+ * @return {string} : random file name with csv extension
+ */
+function generateRandomCsvFileName(){
+    return Math.random().toString(36).substr(2, 16) + '.csv';
+}
+
+/**
  * Write records into csv file
  *
  * @param {object array} records : data to write in csv file
@@ -20,9 +30,11 @@ function finalizeWriting(records, familiesExport, onFileReady){
         if(!familiesExport[task]) return; // if all families cards have not been recovered, not write data
     }
 
-    var stream = fs.createWriteStream('./public/myCardGame.csv'); // writable stream to csv file
+    var csvFileName = generateRandomCsvFileName();
+
+    var stream = fs.createWriteStream('./public/' + csvFileName); // writable stream to csv file
     stream.on("finish", function(){
-        onFileReady(); // call alert function when file is ready
+        onFileReady(csvFileName); // call alert function when file is ready
     });
 
     csv.write(records, {headers:["nom jeu", "langue",

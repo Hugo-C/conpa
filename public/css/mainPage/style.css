@@ -23,18 +23,15 @@ header {
   padding: 0;
 }
 
-.itemsCentered {
-  display: flex;
-  align-items: center;
-}
-
 .row {
   margin: 0;
 }
 
 div#profilePicture {
   height: 80%;
+  padding: 0;
   border: 2px solid black;
+  background-image: url('/img/gamerModule/defaultProfileImage.jpg');
 }
 
 .userInfos {
@@ -55,7 +52,7 @@ div#profilePicture {
 }
 
 span#pseudoLabel {
-  font-weight: bold;
+  text-align: left;
 }
 
 button#disconnect {
@@ -72,11 +69,14 @@ div#title {
   height: 100%;
   border: 2px solid black;
   border-radius: 10px;
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
   font-size: 3.5vw;
-  font-weight: bold;
   letter-spacing: 5px;
   box-shadow: 0px 0px 2px #fff inset;
+}
+
+div#clock {
+  font-size: 1.2vw;
+  font-weight: normal;
 }
 
 .header1 {
@@ -96,6 +96,13 @@ div#title {
   height: 20%;
 }
 
+.header2 > div,
+.header3 > div {
+  border-color: #CB1D1D;
+  -webkit-transition: border-color 2s; /* Safari */
+  transition: border-color 2s;
+}
+
 .header4 {
   height: 25%;
 }
@@ -113,9 +120,7 @@ div#title {
 
 .tabContainer > div {
   background-color: rgba(0, 0, 0, 0.7);
-  font-weight: bold;
-  font-size: 2vw;
-  font-family: fantasy;
+  font-size: 1.9vw;
   color: #fff;
 }
 
@@ -137,10 +142,6 @@ div#title {
 .rightPath {
   border-top: 4px solid;
   border-right: 4px solid;
-}
-
-.pathActivated {
-  border-color: red;
 }
 
 .pageContent {

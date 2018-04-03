@@ -49,6 +49,7 @@ $("#exit").on("click", function(){
     $('#gamePanel > :nth-child(2)').css('display', 'none'); // hide productionArea panel
     $('#exitPanel').css('display', 'block'); // display exit panel
     initGUI(); // initialize exit panel
+    //convertSvgTagToSvgFile();
 });
 
 /**
@@ -65,7 +66,9 @@ $("#closeExitPanel").on("click", function(){
  * This button his used to leave the game alone
  */
 $("#leaveAlone").on("click", function(){
-    socket.emit('quitGame', {'pseudo': sessionStorage.pseudo, 'server': sessionStorage.server}); // inform server that we leave the game
+    socket.emit('quitGame', {'pseudo': sessionStorage.pseudo,
+                             'server': sessionStorage.server,
+                             'production': getInlineSvg()}); // inform server that we leave the game
     sessionStorage.server = null;
     window.location = '/'; // redirection to the main web page
 });
@@ -167,3 +170,9 @@ socket.on('stopGameProcessAborted', function(data){
 socket.on('gameEnd', function(data){
     $('#leaveAlone').click();
 });
+
+function getInlineSvg(){
+    let save = $('#production > svg').get(0).outerHTML;
+    console.log(save);
+    return save;
+}

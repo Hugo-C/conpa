@@ -1,0 +1,84 @@
+#historicTab {
+  height: 100%;
+  padding: 0;
+  display: none;
+  -webkit-transition: width 1s, height: 1s; /* Safari */
+  transition: width 1s, height 1s;
+}
+
+#historicTab > div {
+  padding: 0;
+}
+
+.partySheet {
+  height: 100%;
+  display: none;
+}
+
+.partySheet > .body {
+  padding-top: 2%;
+  padding-bottom: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.partySheet > .body > div:first-child {
+  height: 30%;
+}
+
+.partySheet > .body > div:first-child > div {
+  height: 100%;
+  padding: 0;
+}
+
+.partySheet > .body > div:first-child > div:first-child > div.row {
+  height: 50%;
+}
+
+.partySheet > .body > div:first-child > div:first-child > div.row > input {
+  height: 60%;
+}
+
+.partySheet > .body > div:first-child > div:first-child > div.row > label {
+  padding: 0;
+  font-size: 1.2vw;
+}
+
+.partySheet > .body > div:first-child > div:last-child > input {
+  height: 35%;
+}
+
+.partySheet > .body > div:first-child > div:last-child > label {
+  padding: 0;
+  font-size: 1.2vw;
+}
+
+.partySheet > .body > :last-child {
+  height: 70%;
+}
+
+.partySheet > .body > :last-child > div {
+  height: 90%;
+}
+
+div#myProduction {
+  padding: 0;
+  border: 2px solid black;
+  overflow: scroll;
+}
+
+div#myProduction > img {
+  padding: 0;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.partySheet > .body > :last-child > div:last-child > div.row {
+  height: 95%;
+  overflow-y: scroll;
+}
+
+input#partyDate {
+    display: none;
+}

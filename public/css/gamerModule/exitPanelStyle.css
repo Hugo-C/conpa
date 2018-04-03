@@ -32,6 +32,10 @@ div#exitPanel > :last-child {
   height: 20%;
 }
 
+div#exitPanel > :last-child > button {
+  height: 40%;
+}
+
 span#exitMessage {
   font-size: 2vw;
 }
