@@ -1,0 +1,33 @@
+.playerDisplayer {
+  height: 100%;
+  padding: 0;
+  max-width: 150px;
+  border: 3px solid #A4051A;
+}
+
+.playerDisplayer > div:first-child {
+  height: 80%;
+  border-bottom: 3px solid #A4051A;
+}
+
+.playerDisplayer > div:first-child > img {
+  height: 100%;
+  padding: 0;
+  border: none;
+  background-image: url('/img/gamerModule/defaultProfileImage.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.playerDisplayer > div:last-child {
+  height: 20%;
+}
+
+.playerDisplayer > div:last-child > div {
+  height: 100%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

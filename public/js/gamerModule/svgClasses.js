@@ -59,14 +59,14 @@ class Rectangle {
   * Display the selection border
   */
   select() {
-      this.rect.animate().stroke({'color': 'black', 'width': 2});
+      this.rect.animate(100).stroke({'color': 'black', 'width': 5});
   }
 
  /*
   * Hide the selection border
   */
   unselect() {
-      this.rect.animate().stroke({'width': 0});
+      this.rect.animate(100).stroke({'width': 0});
   }
 
   /**

@@ -6,7 +6,7 @@ div#gameBar {
   background-color: lightgrey;
 }
 
-div#barContent {
+div#gameBar > div {
   height: 100%;
   padding-bottom: 5%;
   padding-left: 0;
@@ -32,18 +32,18 @@ div.row {
   margin: 0;
 }
 
-div#turnBoxRow {
+div#gameBar > div > div:nth-child(2),
+div#gameBar > div > div:nth-child(8) {
   height: 5%;
 }
 
-div#questionBoxRow {
+div#gameBar > div > div:nth-child(4) {
   height: 10%;
 }
 
-div#playerCardRow {
+div#gameBar > div > div:nth-child(6) {
   height: 35%;
 }
-
 
 @keyframes textApparition {
   from {color: white;}
@@ -60,15 +60,11 @@ p#cardContent{
   animation-duration: 5s;
 }
 
-div#timerBoxRow {
-  height: 5%;
-}
-
-div#gameTimer {
+div#gameBar > div > div:nth-child(8) > div {
   margin-bottom: 5%;
 }
 
-div#timer {
+div#gameBar > div > div:nth-child(8) > div > div {
   height: 100%;
   padding: 0;
 }
@@ -77,15 +73,12 @@ button#skipButton {
   height: 100%;
   padding: 0;
   background-image: url("/img/gamerModule/skipButton.svg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 /* screen size lower than 800px, reduce space between components to
      gain missing space */
 @media screen and (max-height: 700px) {
-  div#diceBoxRow {
+  div#gameBar > div > div:nth-child(9) {
     height: 12%;
   }
 }
@@ -93,8 +86,7 @@ button#skipButton {
 /* screen size upper than 800px, possible to increase space between
      components to improved the readability */
 @media screen and (min-height: 700px) {
-  div#diceBoxRow {
+  div#gameBar > div > div:nth-child(9) {
     height: 15%;
   }
 }
-

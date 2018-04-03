@@ -4,7 +4,7 @@ body, html {
 }
 
 body {
-  padding: 5px;
+  /*padding: 5px;*/
 }
 
 button {
@@ -33,13 +33,14 @@ button {
   border: 2px solid black;
 }
 
-#content {
+#gameContent {
   height: 100%;
   width: 100%;
-  padding: 0;
+  padding: 5px;
+  display: none; /* <------ invisible */
 }
 
-#content > div {
+#gamePanel {
   height: 100%;
 }
 
@@ -57,9 +58,10 @@ button {
 
 #gamePanel > :nth-child(2) {
   height: 70%;
+  /*display: none;*/
 }
 
-#gamePanel > :nth-child(3) {
+div#chatInfos {
   height: 25%;
   border: none;
 }
@@ -69,10 +71,6 @@ button {
 #gamePanel > :nth-child(1) > :nth-child(1),
 #gamePanel > :nth-child(1) > :nth-child(2n) {
   border-right: 2px solid black;
-  background-size: cover;
-  background-origin:  content-box;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #gamePanel > :nth-child(1) > :nth-child(1) {
@@ -83,17 +81,15 @@ button {
   background-image: url('/img/gamerModule/player.svg');
 }
 
-#gamePanel > :nth-child(1) > :nth-child(3) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#gamePanel > :nth-child(1) > :nth-child(3) > span {
-  font-size: 2vw;
-  font-weight: bold;
-  color: black;
+#gamePanel > :nth-child(1) > div > span {
+  font-size: 1.2vw;
   font-family: fantasy sans-serif;
+  color: black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-height: inherit;
+  line-height: 1.4vw;
 }
 
 #gamePanel > :nth-child(1) > :nth-child(4) {
@@ -108,11 +104,6 @@ button {
   border-right: 2px solid black;
   background-color: lightgrey;
   display: block;
-}
-
-#gamePanel > :nth-child(2) > :last-child {
-  display: flex;
-  justify-content: flex-start;
 }
 
 #gamePanel > :nth-child(2) > :first-child > div {
@@ -136,9 +127,6 @@ button {
 #gamePanel > :nth-child(2) > :first-child > :nth-child(3) {
   height: 10%;
   background-color: grey;
-  align-items: center;
-  display: flex;
-  justify-content: center;
 }
 
 #gamePanel > :nth-child(2) > :first-child > :nth-child(3) > p,
@@ -150,9 +138,6 @@ button#getMyProduction {
 
 button#setPrivacy {
   background-image: url("/img/gamerModule/private.svg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 #gamePanel > :nth-child(2) > :first-child > :nth-child(3) > p {
@@ -161,7 +146,12 @@ button#setPrivacy {
   text-align: center;
 }
 
-button#displayList {
+div#productionArea {
+  display: flex;
+  justify-content: flex-start;
+}
+
+div#productionArea > button#displayList {
   width: 1%;
   border-right: 1px solid black;
   background-color: grey;
@@ -171,20 +161,21 @@ button#displayList {
   background-size: contain;
 }
 
-.menu {
-  width: 7%;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  border-right: 2px solid black;
-  background-color: lightgrey;
+div#colorMenu {
+  display: none;
+  background-image: url('/img/gamerModule/palette.png');
 }
 
 div#svgMenu {
   display: block;
 }
 
-div#colorMenu {
-  display: none;
+div.menu {
+  width: 7%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-right: 2px solid black;
+  background-color: lightgrey;
 }
 
 div.menu > button {
@@ -197,35 +188,43 @@ div#svgMenu > button {
 }
 
 button#bouton { background-image: url("/img/gamerModule/text.png"); }
-button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
-button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
-button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
-button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
-button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
-button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
-button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
+div#colorMenu > button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
+div#colorMenu > button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
+div#colorMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
+div#colorMenu > button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
+div#colorMenu > button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
+div#colorMenu > button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
+div#colorMenu > button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
+
+div#svgMenu > button[value="red"] { background-image: url("/img/gamerModule/redPencil.png"); }
+div#svgMenu > button[value="green"] { background-image: url("/img/gamerModule/greenPencil.png"); }
+div#svgMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellowPencil.png"); }
+div#svgMenu > button[value="blue"] { background-image: url("/img/gamerModule/bluePencil.png"); }
+div#svgMenu > button[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
+div#svgMenu > button[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
+div#svgMenu > button[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
 
 div#production {
   width: 92%;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 /* ****************************** */
 
-#gamePanel > :nth-child(3) > :first-child {
+#chatInfos > :first-child {
   border-right: 2px solid black;
 }
 
-#gamePanel > :nth-child(3) > :first-child > div {
+#chatInfos > :first-child > div {
   padding: 0;
 }
 
-#gamePanel > :nth-child(3) > :first-child > :first-child {
+#chatInfos > :first-child > :first-child {
   height: 88%;
   border-bottom: 2px solid black;
 }
 
-#gamePanel > :nth-child(3) > :first-child > :last-child {
+#chatInfos > :first-child > :last-child {
   height: 12%;
 }
 
@@ -255,7 +254,6 @@ select#chatPlayers {
 button#sendButton {
   border-left: 2px solid black;
   background-image: url("/img/gamerModule/sendButton.svg");
-  background-size: cover;
 }
 
 textarea#notesArea {
@@ -265,10 +263,7 @@ textarea#notesArea {
 
 div#menu {
   border-left: 1px solid black;
-  display: flex;
-  flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
 }
 
 button.notesTool {

@@ -6,15 +6,20 @@ html
     meta(charset="utf-8")
     link(href="/css/bootstrap.min.css" rel="stylesheet")
     link(href="/css/scrollBarStyle.css" rel="stylesheet")
+    link(href="/css/generalStyles.css" rel="stylesheet")
+    link(href="/css/gamerModule/generalGamerModuleStyles.css" rel="stylesheet")
     link(href="/css/gamerModule/gamePanelStyle.css" rel="stylesheet")
+    link(href="/css/gamerModule/exitPanelStyle.css" rel="stylesheet")
     link(href="/css/gamerModule/cssEventStyle.css" rel="stylesheet")
     link(href="/css/gamerModule/gameBarStyle.css" rel="stylesheet")
     link(href="/css/gamerModule/cardStyle.css" rel="stylesheet")
+    link(href="/css/gamerModule/questionPanel.css" rel="stylesheet")
   body
-    div#content(class="container-fluid")
-      div(class="row")
-        include gamePanel.jade
-        include gameBar.jade
+    div#gameContent(class="container-fluid")
+      include gamePanel.jade
+      include gameBar.jade
+    div#questionContent(class="container-fluid")
+      include questionPanel.jade
 
     //dice import
     script(src="js/lib/three.min.js")
@@ -25,13 +30,15 @@ html
     script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
     script(src="//code.jquery.com/jquery.min.js")
     script(src="/js/pagePrivileges.js")
-    script(src="/js/gamerModule/moduleEvents.js")
     script(src="/bower/svg.js/dist/svg.min.js")
+    script(src="/scripts/socket.io-client/dist/socket.io.js")
+    script(src="/js/gamerModule/questionTimeManager.js")
+    script(src="/js/gamerModule/gameManager.js")
+    script(src="/js/gamerModule/chatManager.js")
+    script(src="/js/gamerModule/exitGameManager.js")
     script(src="/js/gamerModule/utils.js")
+    script(src="/js/gamerModule/cardDisplay.js")
     script(src="/js/gamerModule/svgClasses.js")
     script(src="/js/gamerModule/production.js")
-    script(src="/scripts/socket.io-client/dist/socket.io.js")
-    script(src="/js/gamerModule/socketConnectionManager.js")
-    script(src="/js/gamerModule/chatManager.js")
-    script(src="/js/gamerModule/cardDisplay.js")
     script(src="js/die.js")
+    

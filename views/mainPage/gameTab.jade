@@ -1,6 +1,6 @@
-div(class="wrapper col-lg-12 col-md-12")
+div#gameTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12")
   div(class="serverList active col-lg-12 col-md-12")
-    div(class="header row")
+    div(class="header rowFlexContainer ow")
       h3(class="col-lg-12 col-md-12") Server list
     div(class="body row")
       div(class="col-lg-12 col-md-12")
@@ -13,32 +13,38 @@ div(class="wrapper col-lg-12 col-md-12")
               th Players
               th Status
           tbody
-    div(class="bottom row")
-      div(class="col-lg-offset-8 col-lg-4 col-md-offset-8 col-md-4")
-        button#create(class="switch col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Create
-        button#join(class="col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Join
+    div(class="formBottomStyle bottom row")
+      div(class="rowFlexContainer col-lg-offset-8 col-lg-4 col-md-offset-8 col-md-4")
+        button#create(class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Create
+        button#join(class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Join
   
-  div(class="serverManager col-lg-6 col-md-6")
-    div(class="header row")
+  div(class="serverManager col-lg-12 col-md-12")
+    div(class="header rowFlexContainer ow")
       h3(class="col-lg-12 col-md-12") Game Server Manager
     div(class="body row")
-      div(class="row")
+      div(class="columnFlexContainer row")
+        div(class="col-lg-12 col-md-12")
+          span(class="error_places col-lg-offset-1 col-md-offset-1")
         div(class="col-lg-12 col-md-12")
           label(class="col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4") Name
-          label(class="col-lg-offset-2 col-lg-4 col-md-offset-2 col-md-4") Animator
+          label(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2") Animator
+          label(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2") Player
         div(class="col-lg-12 col-md-12")
-          input#name(type="text" class="col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4")
-          input#role(type="button" value="player" class="col-lg-offset-2 col-lg-4 col-md-offset-2 col-md-4")
+          input#name(type="text" class="myCustomInput col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4")
+          input#role(type="button" value="player" class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
+          input#places(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
       div(class="row")    
         div(class="col-lg-12 col-md-12")
-          label(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2") Player
+          span(class="error_timers col-lg-offset-1 col-md-offset-1")
+        div(class="col-lg-12 col-md-12")
           label(class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3") Individual Timer
+          label(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2") Appropriation time
           label(class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3") Global Timer
         div(class="col-lg-12 col-md-12")
-          input#places(type="number" class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
-          input#indivTimer(type="number" class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
-          input#globalTimer(type="number" class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
-    div(class="bottom row")
-      div(class="col-lg-offset-7 col-lg-4 col-md-offset-7 col-md-4")
-        button#cancel(class="switch col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Cancel
-        button#validate(class="col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Validate
+          input#indivTimer(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
+          input#appropriation(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
+          input#globalTimer(type="number" value=0 class="myCustomInput col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3")
+    div(class="formBottomStyle bottom row")
+      div(class="rowFlexContainer col-lg-offset-7 col-lg-4 col-md-offset-7 col-md-4")
+        button#cancel(class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Cancel
+        button#validate(class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") Validate

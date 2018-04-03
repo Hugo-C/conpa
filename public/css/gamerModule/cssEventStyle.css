@@ -74,6 +74,16 @@ button#cardHelp:active {
   background-image: url("/img/gamerModule/infoSupOnClick.png");
 }
 
+div#familyLogoDiv:hover span{
+  opacity: 1;
+  font-size: 110%;
+}
+
+div#familyLogoDiv:hover img{
+  -webkit-filter: grayscale(100%) blur(3px);
+  filter: grayscale(100%) blur(3px);
+}
+
 foreignObject > textarea {
   outline: 0;
 }

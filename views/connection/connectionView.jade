@@ -5,28 +5,29 @@ html
   meta(charset="utf-8")
   link(href="/css/bootstrap.min.css" rel="stylesheet")
   link(href="/css/scrollBarStyle.css" rel="stylesheet")
+  link(href="/css/generalStyles.css" rel="stylesheet")
   link(href="/css/connection/connectionStyle.css" rel="stylesheet")
-body
-  div#form_wrapper(class="form_wrapper")
+body(class="rowFlexContainer")
+  div#form_wrapper(class="form_wrapper formWrapperStyle")
     form(class="register")
       h3 Register
       div
         label Username:
           span(class="error_username")
-        input(type="text" name="username" pattern="^[A-Za-z0-9]{4,}$" required)
+        input(type="text" class="myCustomInput" name="username" pattern="^[A-Za-z0-9]{4,}$" required)
       div
         label Email:
           span(class="error_email")
-        input(type="email" name="email" required)
+        input(type="email" class="myCustomInput" name="email" required)
       div
         label Password:
           span(class="error_password")
-        input(type="password" name="password" pattern="^[A-Za-z0-9]{8,}$" required)
-      div(class="bottom")
+        input(type="password" class="myCustomInput" name="password" pattern="^[A-Za-z0-9]{8,}$" required)
+      div(class="bottom formBottomStyle")
         div(class="remember")
           input(type="checkbox")
           span Send me updates
-        input(type="submit" value="Register")
+        input(type="submit" value="Register" class="myCustomButton")
         a(href="connection" rel="login" class="linkform") You have an account already? Log in here
         div(class="clear")
             
@@ -35,16 +36,16 @@ body
       div
         label Username:
           span(class="error_login") 
-        input(type="text" name="username" required)
+        input(type="text" class="myCustomInput" name="username" required)
       div
         label Password: 
           a(href="forgot_password.html" rel="forgot_password" class="forgot linkform") Forgot your password?
-        input(type="password" name="password" required)
-      div(class="bottom")
+        input(type="password" class="myCustomInput" name="password" required)
+      div(class="bottom formBottomStyle")
         div(class="remember")
           input(type="checkbox")
           span Keep me logged in
-        input(type="submit" value="Login")
+        input(type="submit" value="Login" class="myCustomButton")
         a(href="connection" rel="register" class="linkform") You don't have an account yet? Register here
         div(class="clear")
         
@@ -52,9 +53,9 @@ body
       h3 Forgot Password
       div
         label Username or Email:
-        input(type="text" name="email")
-      div(class="bottom")
-        input(type="submit" value="Send reminder")
+        input(type="text" class="myCustomInput" name="email")
+      div(class="bottom formBottomStyle")
+        input(type="submit" value="Send reminder" class="myCustomButton")
         a(href="connection" rel="login" class="linkform") Suddenly remebered? Log in here
         a(href="connection" rel="register" class="linkform") You don't have an account? Register here
         div(class="clear")

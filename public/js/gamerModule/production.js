@@ -1,7 +1,7 @@
 var dimHeight = $('div#production').height();
 var dimWidth = $('div#production').width();
 
-var draw = SVG('production').size(dimWidth, dimHeight);
+var draw = SVG('production').size('100%', '100%');
 var master = draw.group();
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
@@ -24,6 +24,13 @@ var yTranslate = 0;
 let xTranslateTmp = xTranslate;
 let yTranslateTmp = yTranslate;
 var clickX, clickY;
+
+// resize the svg when page is resized
+window.onresize = function(evt){
+  var dimHeight = $('div#production').height();
+  var dimWidth = $('div#production').width();
+  draw.attr({'height': dimHeight, 'width': dimWidth});
+}
 
 // Get point in global SVG space
 function cursorPoint(evt){
@@ -155,12 +162,8 @@ function getLinkAtCoordinates(x, y){
 
 /*  functions used for getLinkAtCoordinates  */
 
-function sqr(x){
-	return x * x;
-}
-
 function distance(x1, y1, x2, y2){
-	return Math.sqrt(sqr(x2 - x1) + sqr(y2 - y1));
+	return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
 }
 
 function isInside(x1, y1, x2, y2, x, y){
@@ -190,6 +193,12 @@ $("#colorMenu button").on("click", function(){
 	  selectedLink.line.stroke({color:colors[color]});
   }
 });
+
+function saveSvg(){
+    let save = document.getElementById("production").innerHTML;
+    console.log(save);
+    socket.emit('saveSvg', {"svg" : save});
+}
 
 draw.on('mousedown', onMouseDown);
 draw.on('mousemove', onMouseMove);

@@ -7,9 +7,6 @@ header {
   height: 20%;
   padding-top: 5px;
   background-image: url("/img/mainPage/header.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 .identityCard {
@@ -24,12 +21,6 @@ header {
   height: 100%;
   margin: 0;
   padding: 0;
-}
-
-.flexContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .itemsCentered {
@@ -79,9 +70,6 @@ button#disconnect {
 
 div#title {
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border: 2px solid black;
   border-radius: 10px;
   font-family: "Trebuchet MS", "Myriad Pro", sans-serif;

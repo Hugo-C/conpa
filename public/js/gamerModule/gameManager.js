@@ -1,3 +1,8 @@
+/**
+ * Executes command on text editor like textarea
+ *
+ * @param {string} cmd : command to execute
+ */
 function execNotesAreaCommand(cmd){
     document.getElementById("notesArea").select();
     document.execCommand(cmd);
@@ -20,11 +25,11 @@ $("#displayList").on("click", function(){
     var productionList = $("#gamePanel > :nth-child(2) > :first-child");
     var productionArea = $("#gamePanel > :nth-child(2) > :last-child");
     var displayButton = $("#displayList");
-    if(productionList.css('display') == 'none'){
+    if(productionList.css('display') == 'none'){ // if tool bar is hidden, we display it
         productionList.css('display', 'block');
         productionArea.css('width', '');
         displayButton.css('background-image', 'url("/img/gamerModule/hide.svg")');
-    }else{
+    }else{ // if tool bar is displayed, we hide it
         productionList.css('display', 'none');
         productionArea.css('width', '100%');
         displayButton.css('background-image', 'url("/img/gamerModule/display.svg")');
@@ -89,5 +94,5 @@ $("#colorMenu button").on("click", function(){
 
 $("#startDice").on("click", function(){
     initScene();
-    lancer();
+    throwDie();
 });
