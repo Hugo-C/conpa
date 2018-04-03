@@ -312,13 +312,13 @@ $('#decreaseWidth').on('click', function(){
 
 $('#navigability').on('click', function(){
     if(selectedLink != null){
-		selectedLink.addNavigability(0);
+		selectedLink.addNavigability(false);
     }
 });
 
 $('#reverseNavigability').on('click', function(){
     if(selectedLink != null){
-		selectedLink.addNavigability(180);
+		selectedLink.addNavigability(true);
     }
 });
 

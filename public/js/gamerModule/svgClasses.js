@@ -203,19 +203,19 @@ class Link {
 	
 	/**
 	* Associate a navigability to the link
-	* @param {number} dAngle 
+	* @param {boolean} toReverse 
 	*/
-    addNavigability(dAngle){
+    addNavigability(toReverse){
 	    this.removeNavigability();
 		
 		let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
 		let yCenter = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));
 		this.navigability = this.parent.polygon();
 		
-		if(dAngle != 0){
+		if(toReverse){
 			this.angle += 180;
 		}else{
-			this.angle = dAngle + Math.atan2(this.e2.rect.attr('y') - this.e1.rect.attr('y'), this.e2.rect.attr('x') - this.e1.rect.attr('x')) * 180 / Math.PI;
+			this.angle = Math.atan2(this.e2.rect.attr('y') - this.e1.rect.attr('y'), this.e2.rect.attr('x') - this.e1.rect.attr('x')) * 180 / Math.PI;	// FCS3 expression
 		}
 		
 		this.navigability.attr({points: "" + (xCenter - 10) + "," + (yCenter - 10) + " " + (xCenter + 10) + "," + (yCenter) + " " + (xCenter - 10) + "," + (yCenter + 10)});
