@@ -310,6 +310,24 @@ $('#decreaseWidth').on('click', function(){
     }
 });
 
+$('#navigability').on('click', function(){
+    if(selectedLink != null){
+		selectedLink.addNavigability(0);
+    }
+});
+
+$('#reverseNavigability').on('click', function(){
+    if(selectedLink != null){
+		selectedLink.addNavigability(180);
+    }
+});
+
+$('#removeNavigability').on('click', function(){
+    if(selectedLink != null){
+		selectedLink.removeNavigability();
+    }
+});
+
 $('#linkColor').on('click', function(){
     $('.colorTool').css('display', 'block');
     $('.mainTool').css('display', 'none');
