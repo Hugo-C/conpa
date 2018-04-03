@@ -89,6 +89,8 @@ class Rectangle {
   linkRect(e){
     if(!this.isLinkedTo(e)){
       var link = new Link(this, e, this.parent);
+	  link.line.stroke({color:"#333333"});
+	  link.line.opacity(0.7);
       this.addLink(link);
       e.addLink(link);
     }

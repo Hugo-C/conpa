@@ -6,7 +6,7 @@ var master = draw.group();
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
 
-var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': 'white', 'purple': 'purple', 'brown': '#5A3A22'};
+var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': '#DDDDDD', 'purple': 'purple', 'brown': '#5A3A22'};
 var selectedColor = colors['red'];
 
 // Rectangle manipulation variables
@@ -326,16 +326,6 @@ $('button.colorTool').on('click', function(){
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-$("#colorMenu button").on("click", function(){
-  var color = $(this).val();
-  selectedColor = colors[color];
-  if(selectedItem != null){
-    selectedItem.rect.attr('fill', colors[color]);
-  }/*else if(selectedLink != null){
-	  selectedLink.line.stroke({color: colors[color]});
-  }*/
-});
-
 function onKeydown(event){
   if(event.keyCode === 46){
 	  if(selectedItem !== null){
@@ -346,6 +336,20 @@ function onKeydown(event){
   		selectedLink = null;
 	  }
   }
+}
+
+$("#colorMenu button").on("click", function(){
+  var color = $(this).val();
+  selectedColor = colors[color];
+  if(selectedItem != null){
+    selectedItem.rect.attr('fill', colors[color]);
+  }
+});
+
+function saveSvg(){
+    let save = document.getElementById("production").innerHTML;
+    console.log(save);
+    socket.emit('saveSvg', {"svg" : save});
 }
 
 draw.on('mousedown', onMouseDown);

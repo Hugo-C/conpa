@@ -71,6 +71,8 @@ function displayCard(family, text, logo){
     //cardFamilyNode.nodeValue = family;
     cardTextNode.nodeValue = text;
     document.getElementById("cardFamilyLogo").src = LOGO_DIRECTORY + cards[family]["logo"];
+    document.getElementById("familyLogoDiv").style.display = 'inline-block';
+    document.getElementById("familyLogoText").textContent = family;
 }
 
 /**

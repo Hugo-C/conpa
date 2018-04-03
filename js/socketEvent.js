@@ -1,5 +1,9 @@
+var fs = require('fs');
+var path = require('path');
 var Player = require('./Player.js');
 var Game = require('./Game.js');
+
+const SVG_FILE = "../svg";
 
 var clients = {}; // keep a link between user's pseudo and socket's id
 var rooms = {}; // list of available servers (rooms)
@@ -263,4 +267,20 @@ module.exports = function(io, socket){
       }
   });
 
-}
+    /**
+     * Process "saveSvg" message on server side
+     * This message is send by client when he wants the server to save his production
+     *
+     * form of received data : {'svg': player's production as svg}
+     */
+    socket.on('saveSvg', function (data) {
+        fs.writeFile(path.join(SVG_FILE, "wow.svg"), data["svg"], function (err) {
+            if (err) {
+                console.log("error while saving a svg file, maybe you just need to create the directory 'svg' ?");
+                console.log(err);
+            } else {
+                console.log("A svg file was saved!");
+            }
+        });
+    });
+};

@@ -120,5 +120,4 @@ module.exports = class Game {
         }
         return counter;
     }
-
-}
+};
