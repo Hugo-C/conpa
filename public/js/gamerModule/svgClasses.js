@@ -59,7 +59,7 @@ class Rectangle {
   * Display the selection border
   */
   select() {
-      this.rect.animate().stroke({'color': 'black', 'width': 5});
+      this.rect.animate().stroke({'color': 'black', 'width': 2});
   }
 
  /*
@@ -88,6 +88,8 @@ class Rectangle {
   linkRect(e){
     if(!this.isLinkedTo(e)){
       var link = new Link(this, e, this.parent);
+	  link.line.stroke({color:"#333333"});
+	  link.line.opacity(0.7);
       this.addLink(link);
       e.addLink(link);
     }

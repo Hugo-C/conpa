@@ -6,7 +6,7 @@ var master = draw.group();
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
 
-var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': 'white', 'purple': 'purple', 'brown': '#5A3A22'};
+var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': '#DDDDDD', 'purple': 'purple', 'brown': '#5A3A22'};
 var selectedColor = colors['red'];
 
 var rectCreate = false;
@@ -111,7 +111,7 @@ function onClick(evt){
   }
 
   if(selectedLink != null){
-    selectedLink.line.opacity(1);
+    selectedLink.line.opacity(0.7);
     selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
     selectedLink = null;
   }
@@ -130,9 +130,9 @@ function getElementAtCoordinates(x, y){
 function onDblClick(evt){
   var coord = cursorPoint(evt);
   selectedLink = getLinkAtCoordinates(coord.x, coord.y);
-  if(selectedLink != null){
-    selectedLink.line.opacity(1.5);
-    selectedLink.line.attr({"stroke-width": STROKE_WIDTH * 2});
+  if(selectedLink != null && selectedItem == null){
+    selectedLink.line.opacity(1);
+    selectedLink.line.attr({"stroke-width": STROKE_WIDTH * 1.5});
   }
 }
 
