@@ -33,3 +33,18 @@ CREATE TABLE IF NOT EXISTS Users(
   status CHAR(1) DEFAULT 0,
   PRIMARY KEY(pseudo),
   UNIQUE INDEX uniq_email (email(190)));
+
+CREATE TABLE IF NOT EXISTS Party(
+  id INT UNSIGNED AUTO_INCREMENT,
+  server VARCHAR(30),
+  animator VARCHAR(30),
+  gameDate DATETIME,
+  PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS HasPlayedIn(
+  pseudo VARCHAR(20) NOT NULL,
+  idParty INT UNSIGNED NOT NULL,
+  question VARCHAR(255),
+  production TEXT,
+  FOREIGN KEY (pseudo) REFERENCES Users(pseudo),
+  FOREIGN KEY (idParty) REFERENCES Party(id));

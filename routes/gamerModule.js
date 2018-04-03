@@ -1,10 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var multer = require('multer');
+var upload = multer().single('uploadProduction');
 var querystring = require('querystring');
 var bodyParser = require('body-parser');
 var url = require('url');
 var db = require('../js/db');
 var keys = require('../js/dbConstants');
+var fs = require('fs');
 
 
 /**
@@ -55,6 +58,27 @@ router.get('/cards', function(req, res) {
 
 router.get('/', function(req, res) {
     res.render('gamerModuleMainView');
+});
+
+router.post('/uploadProduction', function(req, res){
+    upload(req, res, function(err){
+        if(err){
+            console.log(err);
+            res.send('ERROR');
+        }else{
+            var file = req.file;
+            var fileName = file.originalname;
+            var dest = "./upload/" + fileName;
+            fs.writeFile(dest, file.buffer, function(err){
+                if(err){
+                    console.log(err);
+                    res.send('ERROR');
+                }else{
+                    res.send('OK');
+                }
+            });
+        }
+    });
 });
 
 module.exports = router;

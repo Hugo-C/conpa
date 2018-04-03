@@ -248,6 +248,14 @@ exports.addCardGame = function(name, language, callback){
     });
 };
 
+/**
+ * Add a new player in the database
+ *
+ * @param {string} pseudo : pseudo of the new player to add
+ * @param {string} email : email of the new player to add
+ * @param {string} password : password of the new player to add
+ * @param {callback} callback : function called when the player has been added
+ */
 exports.registerUser = function(pseudo, email, password, callback){
     var sql = 'INSERT INTO ' + keys.USER_TABLE +
               ' (' + keys.UT_KEY_PSEUDO + ', ' + keys.UT_KEY_PASSWORD + ', ' + keys.UT_KEY_EMAIL + ')' +
@@ -259,6 +267,12 @@ exports.registerUser = function(pseudo, email, password, callback){
     });
 };
 
+/**
+ * Check if a user exists in the database
+ *
+ * @param {string} user : pseudo of the user that we search in the database
+ * @param {callback} callback : function called to send the answer of the research
+ */
 exports.userExists = function(user, callback){
     var sql = 'SELECT *' +
               ' FROM ' + keys.USER_TABLE +
@@ -272,6 +286,12 @@ exports.userExists = function(user, callback){
     });
 };
 
+/**
+ * Check if a user is currently connected
+ *
+ * @param {string} user : pseudo of the user for which we want to know if he's connected or not
+ * @param {callback} callback : function called to send the answer of the research
+ */
 exports.isConnected = function(user, callback){
     var sql = 'SELECT ' + keys.UT_CONNECT +
               ' FROM ' + keys.USER_TABLE +
@@ -285,6 +305,12 @@ exports.isConnected = function(user, callback){
     });
 };
 
+/**
+ * Retrieves the password of the given user
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to retrieve the password
+ * @param {callback} callback : function called to return the password
+ */
 exports.getPassword = function(pseudo, callback){
     var sql = 'SELECT ' + keys.UT_KEY_PASSWORD +
               ' FROM ' + keys.USER_TABLE +
@@ -297,24 +323,158 @@ exports.getPassword = function(pseudo, callback){
     });
 };
 
+/**
+ * Function used to connect a player (we move his status flag to 1)
+ *
+ * @param {string} pseudo : pseudo of the player that we want to be connected
+ * @param {callback} callback : function used to return errors
+ */
 exports.connectUser = function(pseudo, callback){
     var sql = 'UPDATE ' + keys.USER_TABLE +
               ' SET ' + keys.UT_CONNECT + ' = 1' +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-              var value = [pseudo];
+    var value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
         else callback(null);
     });
 };
 
+/**
+ * Function used to disconnect a player (we move his status flag to 0)
+ *
+ * @param {string} pseudo : pseudo of the player that we want to disconnect
+ * @param {callback} callback : function used to return errors
+ */
 exports.disconnectUser = function(pseudo, callback){
     var sql = 'UPDATE ' + keys.USER_TABLE +
               ' SET ' + keys.UT_CONNECT + ' = 0' +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-              var value = [pseudo];
+    var value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
         else callback(null);
+    });
+};
+
+/**
+ * Record a new party in the historic of parties
+ *
+ * @param {string} server : server's name of the party
+ * @param {string} animator : name of the party's animator
+ * (contains the string "no animator" if there has not had an animator in this party)
+ * @param {Date} date : date at which the party has been played
+ * @param {callback} callback : function used to return the id of the party
+ */
+exports.recordNewParty = function(server, animator, date, callback){
+    var sql = 'INSERT INTO ' + keys.PARTY_TABLE +
+              ' (' + keys.PT_KEY_SERVER + ', ' + keys.PT_KEY_ANIMATOR + ', ' + keys.PT_KEY_DATE + ')' +
+              ' VALUES (?, ?, ?);';
+    var values = [server, animator, date];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null, result.insertId);
+    });
+};
+
+/**
+ * Add a new player in a recording party
+ *
+ * @param {string} pseudo : pseudo of the player to add
+ * @param {integer} party : party'id in which we want to add the player
+ * @param {string} question : player's question during this party
+ * @param {callback} callback : function used to return errors
+ */
+exports.linkPlayerAndParty = function(pseudo, party, question, callback){
+    var sql = 'INSERT INTO ' + keys.HAS_PLAYED_IN_TABLE +
+              ' (' + keys.HPT_KEY_PSEUDO + ', ' + keys.HPT_KEY_PARTY + ', ' + keys.HPT_KEY_QUESTION + ')' +
+              ' VALUES (?, ?, ?);';
+    var values = [pseudo, party, question];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+};
+
+/**
+ * Record a player's production in the historic of the party
+ *
+ * @param {string} pseudo : player's pseudo for which we want recorded the production
+ * @param {integer} party : party's id in which player has played
+ * @param {blob} production : name of the player's production file on the server
+ * @param {callback} callback : function used to return errors
+ */
+exports.recordPlayerProduction = function(pseudo, party, production, callback){
+    var sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
+              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
+              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
+              ' AND ' + keys.HPT_KEY_PARTY + ' = ?;';
+    var values = [production, pseudo, party];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+};
+
+exports.getHistoricEntries = function(pseudo, callback){
+    var sql = 'SELECT ' + keys.PT_KEY_SERVER +
+              ', ' + keys.PT_KEY_ANIMATOR +
+              ', DATE_FORMAT(' + keys.PT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") AS ' + keys.PT_KEY_DATE +
+              ', ' + keys.HPT_KEY_QUESTION +
+              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
+              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+    var value = [pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+};
+
+exports.getPlayersInParty = function(party, date, callback){
+    var sql = 'SELECT ' + keys.HPT_KEY_PSEUDO +
+              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
+              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
+    var values = [party, date];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+};
+
+exports.getProduction = function(pseudo, party, date, callback){
+    var sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
+              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
+              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?' +
+              ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+    var values = [party, date, pseudo];
+    state.pool.query(sql, values, function(err, result){
+        console.log(result);
+        if(err) callback(err);
+        else callback(null, result[0][keys.HPT_KEY_PRODUCTION]);
+    });
+};
+
+exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
+    var sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
+              ', ' + keys.HPT_KEY_QUESTION +
+              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
+              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?' +
+              ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+              var values = [party, date, pseudo];
+    state.pool.query(sql, values, function(err, result){
+        console.log(result);
+        if(err) callback(err);
+        else callback(null, result);
     });
 };

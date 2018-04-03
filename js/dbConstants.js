@@ -20,3 +20,15 @@ exports.UT_KEY_PSEUDO = "pseudo";
 exports.UT_KEY_EMAIL = "email";
 exports.UT_KEY_PASSWORD = "password";
 exports.UT_CONNECT = "status";
+
+exports.PARTY_TABLE = "Party";
+exports.PT_KEY_ID = "id";
+exports.PT_KEY_SERVER = "server";
+exports.PT_KEY_ANIMATOR = "animator";
+exports.PT_KEY_DATE = "gameDate";
+
+exports.HAS_PLAYED_IN_TABLE = "HasPlayedIn";
+exports.HPT_KEY_PSEUDO = "pseudo";
+exports.HPT_KEY_PARTY = "idParty";
+exports.HPT_KEY_QUESTION = "question";
+exports.HPT_KEY_PRODUCTION = "production";

@@ -26,8 +26,15 @@
 
 .playerDisplayer > div:last-child > div {
   height: 100%;
-  background-color: white;
+  background-color: #e3e3e3;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.playerDisplayer > div:last-child > div > span{
+  text-align: center;
+  font-size: 1vw;
+  font-weight: bold;
+  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
 }

@@ -10,26 +10,27 @@ html
     link(href="/css/mainPage/style.css" rel="stylesheet")
     link(href="/css/mainPage/tabStyle.css" rel="stylesheet")
     link(href="/css/mainPage/gameTabStyle.css" rel="stylesheet")
+    link(href="/css/mainPage/historicTabStyle.css" rel="stylesheet")
+    link(href="/css/mainPage/editorTabStyle.css" rel="stylesheet")
   body
     div(class="defaultStyle container-fluid")
       header(style="margin:0" class="stretchedImage row")
         div(class="defaultStyle rowFlexContainer col-lg-3 col-md-3")
           div(class="identityCard col-lg-10 col-md-10")
             div(class="defaultStyle col-lg-5 col-md-5")
-              div(class="defaultStyle itemsCentered row")
-                div#profilePicture(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10")
+              div(class="defaultStyle centeredItems row")
+                div#profilePicture(class="stretchedImage col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10")
             div(class="userInfos col-lg-7 col-md-7")
               div(style="height: 25%" class="row")
-                span#pseudoLabel(class="col-lg-12 col-md-12") Pseudo
+                span#pseudoLabel(class="myCustomTitle col-lg-12 col-md-12") Pseudo
               div(style="height: 25%" class="row")
                 span#pseudo(class="col-lg-12 col-md-12")
               div(style="height: 40%" class="row")
                 button#disconnect(class="col-lg-offset-9 col-lg-2 col-md-offset-9 col-md-2")
         div(style="padding-right:20px" class="defaultStyle col-lg-9 col-md-9")
           div(class="header1 row")
-            div#title(class="rowFlexContainer col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") CONPA
-            div#language(class="siteInfo col-lg-offset-2 col-lg-2 col-md-offset-2 col-md-2")
-            div#clock(class="siteInfo rowFlexContainer col-lg-2 col-md-2")
+            div#title(class="rowFlexContainer myCustomTitle col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") CONPA
+            div#clock(class="siteInfo rowFlexContainer myCustomTitle col-lg-offset-4 col-lg-2 col-md-offset-4 col-md-2")
           div(class="header2 row")
             div(style="height:100%" class="startPath col-lg-offset-4 col-md-offset-4")
           div(class="header3 row")
@@ -39,19 +40,25 @@ html
             div(style="height:100%" class="rightPath col-lg-3 col-md-3")
           div(class="header4 row")
             section(class="tabContainer col-lg-12 col-md-12")
-              div(class="tab draw rowFlexContainer col-lg-3 col-md-3") Account
-              div(class="tab draw rowFlexContainer col-lg-3 col-md-3") Editor
-              div(class="tab rowFlexContainer col-lg-3 col-md-3") Historic
-              div(class="tab rowFlexContainer col-lg-3 col-md-3") Game
-      div(class="pageContent rowFlexContainer ow")
+              div#Account(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#01B90D") Account
+              div#Editor(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#EFD700") Editor
+              div#Historic(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#035EFB") Historic
+              div#Game(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#CB1D1D") Game
+      div(class="pageContent rowFlexContainer row")
         include gameTab.jade
+        include historicTab.jade
+        include editorTab.jade
             
   script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
   script(src="//code.jquery.com/jquery.min.js")
   script(src="/scripts/socket.io-client/dist/socket.io.js")
   script(src="/js/pagePrivileges.js")
   script(src="/js/mainPage/header.js")
+  script(src="/js/mainPage/tabManager.js")
   script(src="/js/mainPage/gameTabManager.js")
+  script(src="/js/mainPage/historicTabManager.js")
+  script(src="/js/mainPage/editorTabManager.js")
+  script(src="/js/uploadCSVEvent.js")
               
               
         

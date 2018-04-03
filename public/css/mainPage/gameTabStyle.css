@@ -1,14 +1,11 @@
 #gameTab {
   height: 100%;
   padding: 0;
+  -webkit-transition: width 1s, height 1s; /* Safari */
+  transition: width 1s, height 1s;
 }
 
 #gameTab > div {
-  padding: 0;
-}
-
-.serverList {
-  height: 100%;
   padding: 0;
 }
 
@@ -17,31 +14,8 @@
   display: none;
 }
 
-.header {
-  background-color:#444;
-  border-bottom:1px solid #ddd;
-}
-
-.serverList > .header {
-  height: 10%;
-}
-
 .serverManager > .header {
   height: 15%;
-}
-
-h3{
-  margin: 0;
-	color:#fff;
-	font-size:25px;
-}
-
-.body {
-  padding-top: 10px;
-}
-
-.serverList > .body {
-  height: 80%;
 }
 
 .serverManager > .body {
@@ -59,34 +33,30 @@ h3{
   height: 50%;
 }
 
-.body > div > :first-child {
-  margin-bottom: 10px;
+.serverManager > .body > div > :first-child {
+  height: 30%;
 }
 
-.body > div > div > span {
+.serverManager > .body > div > :nth-child(2),
+.serverManager > .body > div > :nth-child(3) {
+  height: 35%;
+}
+
+.serverManager > .body > div > div > input {
+  height: 80%;
+}
+
+.serverManager > .body > div > div > span {
   font-size: 1vw;
   color: red;
   font-weight: bold;
 }
 
-.body > div > div > label {
+.serverManager > .body > div > div > label {
   padding: 0;
   font-size: 1.1vw;
 }
 
-.serverList > .bottom {
-  height: 10%;
-}
-
 .serverManager > .bottom {
   height: 15%;
-}
-
-.bottom > div {
-  height: 100%;
-}
-
-.bottom > div > button {
-  height: 60%;
-	width: 150px;
 }

@@ -1,37 +1,75 @@
 const PLAYER_ROLE = 1;
 const ANIMATOR_ROLE = 2;
-
 const PROD_AREA_PUBLIC = 10;
 
 module.exports = class Player {
+
   constructor(pseudo, role){
-    this.pseudo = pseudo;
-    this.role = role;
-    this.question = '';
-    this.prodStatus = PROD_AREA_PUBLIC;
+      this.pseudo = pseudo;
+      this.role = role;
+      this.question = '';
+      this.prodStatus = PROD_AREA_PUBLIC;
   }
 
+  /**
+   * Return the pseudo of a player
+   * @return {string} : player's pseudo
+   */
   getPseudo(){
-    return this.pseudo;
+      return this.pseudo;
   }
 
+  /**
+   * Return the role of a player
+   * @return {integer} : player's role flag
+   */
   getRole(){
-    return this.role;
+      return this.role;
   }
 
+  /**
+   * Tests if a pseudo corresponding to his own pseudo
+   * @return {boolean} : true if pseudos are equals, false in the other case
+   */
   pseudoEquals(pseudo){
-    return this.pseudo == pseudo;
+      return this.pseudo == pseudo;
   }
 
+  /**
+   * Return the question of a player
+   * @return {string} : player's question
+   */
   getQuestion(){
-    return this.question;
+      return this.question;
   }
 
+  /**
+   * Update the question of a player
+   * @param {string} newQuestion : new version of the player's question
+   */
   setQuestion(newQuestion){
-    this.question = newQuestion;
+      this.question = newQuestion;
   }
 
+  /**
+   * Tests if a player is ready
+   * (a player is considered as ready if his question is different than the empty string)
+   */
   isReady(){
-    return this.question != ''; // player is ready when he has defined his question
+      return this.question != ''; // player is ready when he has defined his question
+  }
+
+  /**
+   * Tests if a player is an animator
+   * @return {boolean} : true if the player is an animator, false in the other case
+   */
+  isAnimator(){
+      return this.role == ANIMATOR_ROLE;
+  }
+
+  recordPlayer(database, party){
+      database.linkPlayerAndParty(this.pseudo, party, this.question, function(err){
+          if(err) console.log(err);
+      });
   }
 }

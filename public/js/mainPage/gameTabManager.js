@@ -7,6 +7,12 @@ socket.emit('pseudo', {'pseudo': sessionStorage.pseudo});
 /**
  * Process serverListUpdate message
  * Displays available servers in the html table
+ *
+ * form of received data : data is a list of dictionnaries
+ * dictionnaries are formed like that :
+ * {'name': server's name, 'host': player who have create the game server,
+ *  'animate': "yes" or "no", 'places': game server's capacity,
+ *  'status' : "waiting for players" or "in game"}
  */
 socket.on('serverListUpdate', function(data){
     var serverList = $('#serverList').find('tbody');
@@ -27,20 +33,23 @@ socket.on('serverListUpdate', function(data){
 socket.on('gameStart', function(data){
     console.log("GAME START !!!!");
     sessionStorage.server = data['server'];
-
     window.location = '/gamerModule';
 });
 
 /** allows to select a row in the server list */
 $('#serverList').on('click', 'tbody tr', function(){
-  $('#serverList tbody .selected').removeClass('selected');
-  $(this).addClass('selected');
+    $('#serverList tbody .selected').removeClass('selected');
+    $(this).addClass('selected');
 });
 
 /** displays game server creator window */
 $("#create").on("click", function(){
-    $(".serverList").css("display", "none");
-    $(".serverManager").css("display", "block");
+
+    $(".tabContent").css("display", "none");
+    $(".serverManager").animate({"display": "block"}, 1000, function(){
+        $(".serverManager").css("display", "block");
+    });
+
     $("#gameTab").css('height', '70%');
     $("#gameTab").css('width', '50%');
     removeAllAlerts(); // in case of player have already try to create a server and he has been errors
@@ -48,8 +57,12 @@ $("#create").on("click", function(){
 
 /** displays server list */
 $("#cancel").on("click", function(){
-    $(".serverList").css("display", "block");
+
     $(".serverManager").css("display", "none");
+    $(".tabContent").animate({"display": "block"}, 1000, function(){
+        $(".tabContent").css("display", "block");
+    });
+
     $("#gameTab").css('height', '100%');
     $("#gameTab").css('width', '100%');
 });

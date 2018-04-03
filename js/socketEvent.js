@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var Player = require('./Player.js');
 var Game = require('./Game.js');
+var db = require('../js/db');
 
 const SVG_FILE = "../svg";
 
@@ -35,6 +36,26 @@ function listAllServers(){
                 'status': roomData.getStatus()});
   }
   return data;
+}
+
+function recordGameServer(gameServer){
+    var animator = gameServer.getHost().isAnimator() ? gameServer.getHost().getPseudo() : "party without animator";
+    var date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
+    db.recordNewParty(gameServer.getName(), animator, date, function(err, partyId){
+        if(err){
+            console.log(err);
+        }else{
+            console.log(partyId);
+            gameServer.setHistoricId(partyId);
+            gameServer.addPlayersToPartyHistoric(db);
+        }
+    });
+}
+
+function recordProduction(pseudo, partyHistoricId, production){
+    db.recordPlayerProduction(partyHistoricId, pseudo, production, function(err){
+        if(err) console.log(err);
+    });
 }
 
 module.exports = function(io, socket){
@@ -159,12 +180,22 @@ module.exports = function(io, socket){
       socket.emit('initQuestionTime', rooms[socket.room].getPlayers());
   });
 
+  /**
+   * Process "recordMyQuestion" message
+   * Players send this message when they are defined their question
+   * When this message is received :
+   * - we send to all players the question of the player
+   * - if all players have defined their question, we starts the game
+   *
+   * form of received data : {'question': player's question}
+   */
   socket.on('recordMyQuestion', function(data){
       var server = rooms[socket.room];
       server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
-      if(server.nbPlayersReady() == server.getNbPlayer()){
+      if(server.nbPlayersReady() == server.getNbPlayer()){ // all questions are defined, we can starts the game
           io.to(socket.room).emit('allQuestionsDefined', getQuestionTimeState(server));
           io.to(socket.room).emit('players', server.getPlayers());
+          recordGameServer(server);
       }else{
           io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
       }
@@ -191,6 +222,7 @@ module.exports = function(io, socket){
 
       io.to(data['server']).emit('players', rooms[data['server']].getPlayers());
       io.sockets.emit('serverListUpdate', listAllServers());
+      recordProduction(rooms[data['server']].getHistoricId(), data['pseudo'], data['production']);
   });
 
   /**

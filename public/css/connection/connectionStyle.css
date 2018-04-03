@@ -59,6 +59,7 @@ span[class^="error"] {
 .form_wrapper input[type="password"]{
 	margin: 5px 30px 0px 30px;
   width:76%;
+  font-size: 20px;
 }
 
 .form_wrapper input.invalid:required:invalid, .form_wrapper input.invalid:invalid {
