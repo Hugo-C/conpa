@@ -1,5 +1,5 @@
-const GRAVATAR_URL = "https://www.gravatar.com/avatar/";
-const DEFAULT_IMG_URL = "https://a0.muscache.com/im/pictures/87d6d531-78e2-43d5-9ccc-6a34aeba880f.jpg?aki_policy=x_medium";
+const GRAVATAR_URL = "//www.gravatar.com/avatar/";
+const DEFAULT_IMG_URL = "//a0.muscache.com/im/pictures/87d6d531-78e2-43d5-9ccc-6a34aeba880f.jpg?aki_policy=x_medium";
 
 // display current time
 setInterval(function(){
