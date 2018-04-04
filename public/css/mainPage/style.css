@@ -27,11 +27,10 @@ header {
   margin: 0;
 }
 
-div#profilePicture {
+img#profilePicture {
   height: 80%;
   padding: 0;
   border: 2px solid black;
-  background-image: url('/img/gamerModule/defaultProfileImage.jpg');
 }
 
 .userInfos {

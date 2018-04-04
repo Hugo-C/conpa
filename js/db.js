@@ -324,6 +324,23 @@ exports.getPassword = function(pseudo, callback){
 };
 
 /**
+ * Retrieves the email address of the given user
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to retrieve the email
+ * @param {callback} callback : function called to return the email
+ */
+exports.getEmail = function(pseudo, callback){
+    let sql = 'SELECT ' + keys.UT_KEY_EMAIL +
+        ' FROM ' + keys.USER_TABLE +
+        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    let value = [pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else callback(null, result[0][keys.UT_KEY_EMAIL]);
+    });
+};
+
+/**
  * Function used to connect a player (we move his status flag to 1)
  *
  * @param {string} pseudo : pseudo of the player that we want to be connected
