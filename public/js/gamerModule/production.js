@@ -128,7 +128,6 @@ function onClick(evt){
   }
 
   if(selectedLink != null){
-    selectedLink.line.opacity(1);
     //selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
     selectedLink = null;
   }
@@ -144,16 +143,6 @@ function getElementAtCoordinates(x, y){
   return res;
 }
 
-/*
-function onDblClick(evt){
-  var coord = cursorPoint(evt);
-  selectedLink = getLinkAtCoordinates(coord.x, coord.y);
-  if(selectedLink != null){
-    selectedLink.line.opacity(0.7);
-    //selectedLink.line.attr({"stroke-width": STROKE_WIDTH * 2});
-  }
-}
-*/
 function getLinkAtCoordinates(x, y){
   var res = null;
   var x1, y1, x2, y2, xpt, ypt;

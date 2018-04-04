@@ -90,7 +90,6 @@ class Rectangle {
     if(!this.isLinkedTo(e)){
       var link = new Link(this, e, this.parent);
 	  link.line.stroke({color:"#333333"});
-	  link.line.opacity(0.7);
       this.addLink(link);
       e.addLink(link);
     }
@@ -206,21 +205,27 @@ class Link {
 	* @param {boolean} toReverse 
 	*/
     addNavigability(toReverse){
-	    this.removeNavigability();
+		if(!(toReverse && this.angle == null)){
+			if(this.navigability != null){
+				this.navigability.remove();
+			}
 		
-		let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
-		let yCenter = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));
-		this.navigability = this.parent.polygon();
-		
-		if(toReverse){
-			this.angle += 180;
-		}else{
-			this.angle = Math.atan2(this.e2.rect.attr('y') - this.e1.rect.attr('y'), this.e2.rect.attr('x') - this.e1.rect.attr('x')) * 180 / Math.PI;	// FCS3 expression
+			let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
+			let yCenter = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));
+			this.navigability = this.parent.polygon();
+			
+			if(toReverse){
+				this.angle += 180;
+			}else{
+				let pos1 = this.e1.center();
+				let pos2 = this.e2.center();
+				this.angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x) * 180 / Math.PI;	// FCS3 expression
+			}
+			
+			this.navigability.attr({points: "" + (xCenter - 10) + "," + (yCenter - 7) + " " + (xCenter + 10) + "," + (yCenter) + " " + (xCenter - 10) + "," + (yCenter + 7)});
+			this.navigability.attr({style: "fill:#333333;stroke:#333333;stroke-width:1"});
+			this.navigability.attr({transform: "rotate(" + this.angle + " " + xCenter + " " + yCenter + ")"});
 		}
-		
-		this.navigability.attr({points: "" + (xCenter - 10) + "," + (yCenter - 10) + " " + (xCenter + 10) + "," + (yCenter) + " " + (xCenter - 10) + "," + (yCenter + 10)});
-		this.navigability.attr({style: "fill:black;stroke:black;stroke-width:1"});
-		this.navigability.attr({transform: "rotate(" + this.angle + " " + xCenter + " " + yCenter + ")"});
 	}
    
    /**
