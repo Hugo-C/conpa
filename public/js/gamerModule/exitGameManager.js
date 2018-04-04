@@ -170,9 +170,3 @@ socket.on('stopGameProcessAborted', function(data){
 socket.on('gameEnd', function(data){
     $('#leaveAlone').click();
 });
-
-function getInlineSvg(){
-    let save = $('#production > svg').get(0).outerHTML;
-    console.log(save);
-    return save;
-}

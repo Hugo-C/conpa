@@ -353,6 +353,56 @@ $("#colorMenu button").on("click", function(){
   }
 });
 
+/**
+ * Extract the value of all textArea inside the parent element and put it inside the textArea tags
+ * @param parent {HTMLElement} : the parent of textareas to explicit
+ */
+function explicitTextAreaValues(parent){
+    for(let elt of parent.childNodes){
+        if (elt.nodeName === "TEXTAREA"){
+            // we remove precedent textNode
+            for(let old_text of elt.childNodes){
+                elt.removeChild(old_text);
+            }
+            // explicitly add the text inside itself
+            let text = document.createTextNode(elt.value);
+            elt.appendChild(text);
+        } else {
+            explicitTextAreaValues(elt);
+        }
+    }
+}
+
+/**
+ * Return the svg of the player's production including texts
+ * @return {string}
+ */
+function getInlineSvg(){
+    const regexForeignObject = /<foreignObject([\s\S]*?)<\/foreignObject>/mgi;
+    const regexTextArea = /<textarea[^>]+?>([\s\S]*?)<\/textarea>/mgi;
+    const regexText = /<text x="([0-9]+)[.]?[0-9]*" y="([0-9]+)[.]?[0-9]*"([\s\S]*?)<\/text>/mgi;
+
+    function handleReplaceString(match, p1) {
+        let res = p1.replace(regexTextArea, "$1");
+        return "<text" + res + "</text>";
+    }
+
+    function moveText(match, p1, p2, p3){
+        let x = parseInt(p1, 10) + 5;
+        let y= parseInt(p2, 10) + 15;
+        return '<text x="' + x + '" y="' + y + '"' + p3 + '</text>';
+    }
+
+    let mySvg = $('#production > svg').get(0);
+    explicitTextAreaValues(mySvg);
+    let svgSave = mySvg.outerHTML;
+
+    // save all textarea values by replacing foreignObject by native text svg
+    svgSave = svgSave.replace(regexForeignObject, handleReplaceString);
+    svgSave = svgSave.replace(regexText, moveText);
+    return svgSave;
+}
+
 draw.on('mousedown', onMouseDown);
 draw.on('mousemove', onMouseMove);
 draw.on('mouseup', onMouseUp);
