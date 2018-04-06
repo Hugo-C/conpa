@@ -1,9 +1,6 @@
 
-const WAITING_PLAYERS = "waiting for players";
-const IN_GAME = "in game";
-
 module.exports = class Game {
-    constructor(name, places, host, indivTimer, globalTimer){
+    constructor(name, places, host, indivTimer, globalTimer, status){
         this.name = name;
         this.places = places;
         this.host = host;
@@ -11,10 +8,11 @@ module.exports = class Game {
         this.players.push(host);
         this.indivTimer = indivTimer;
         this.globalTimer = globalTimer;
-        this.status = WAITING_PLAYERS;
+        this.status = status;
+        this.inactivePlayerChecker = null;
+        this.inactivePlayer = [];
         this.exitBuffer = []; // nobody wants quit the game
         this.partyHistoricId = null;
-        console.log(this.partyHistoricId);
     }
 
     /**
@@ -87,7 +85,7 @@ module.exports = class Game {
 
     /**
      * Return the node of the fifo list corresponding to the given pseudo
-     * @return {Node} : fifo's node corresponding to the given pseudo
+     * @return {Player} : player corresponding to the given pseudo
      */
     getPlayerNode(pseudo){
          var playerNode = null; // used to retrieve the player's node
@@ -99,6 +97,11 @@ module.exports = class Game {
             node = this.players.next(node); // get the next node of the current node
         }
         return playerNode;
+    }
+
+    getPlayer(pseudo){
+        var playerNode = this.getPlayerNode(pseudo);
+        return playerNode == null ? null : playerNode.value;
     }
 
     getHistoricId(){
@@ -115,11 +118,8 @@ module.exports = class Game {
         if(playerNode != null) playerNode.value.setQuestion(question);
     }
 
-    /**
-     * Change game server status to "IN GAME"
-     */
-    setStatusInGame(){
-        this.status = IN_GAME;
+    setStatus(newStatus){
+        this.status = newStatus;
     }
 
     setHistoricId(historicId){

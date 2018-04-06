@@ -269,51 +269,51 @@ $('#removeLink').on('click', function(){
 
 $('#dashLink').on('click', function(){
     if(selectedLink != null){
-        selectedLink.line.stroke({dasharray: 10.10});
+        selectedLink.setDasharray(10.10);
     }
 });
 
 $('#linearLink').on('click', function(){
     if(selectedLink != null){
-        selectedLink.line.stroke({dasharray: 0});
+        selectedLink.setDasharray(0);
     }
 });
 
 $('#increaseWidth').on('click', function(){
     if(selectedLink != null){
-        var strokeWidth = selectedLink.line.attr('stroke-width');
+        var strokeWidth = selectedLink.getWidth();
         strokeWidth += 2;
         if(strokeWidth <= 20){
-            selectedLink.line.stroke({width: strokeWidth});
+            selectedLink.setWidth(strokeWidth);
         }
     }
 });
 
 $('#decreaseWidth').on('click', function(){
     if(selectedLink != null){
-        var strokeWidth = selectedLink.line.attr('stroke-width');
+        var strokeWidth = selectedLink.getWidth();
         strokeWidth -= 2;
         if(strokeWidth > 0){
-            selectedLink.line.stroke({width: strokeWidth});
+            selectedLink.setWidth(strokeWidth);
         }
     }
 });
 
 $('#navigability').on('click', function(){
     if(selectedLink != null){
-		selectedLink.addNavigability(false);
+		    selectedLink.addNavigability(false);
     }
 });
 
 $('#reverseNavigability').on('click', function(){
     if(selectedLink != null){
-		selectedLink.addNavigability(true);
+		    selectedLink.addNavigability(true);
     }
 });
 
 $('#removeNavigability').on('click', function(){
     if(selectedLink != null){
-		selectedLink.removeNavigability();
+		    selectedLink.removeNavigability();
     }
 });
 
@@ -324,7 +324,7 @@ $('#linkColor').on('click', function(){
 
 $('button.colorTool').on('click', function(){
     if(selectedLink != null){
-        selectedLink.line.stroke({color: colors[$(this).val()]});
+        selectedLink.setColor(colors[$(this).val()]);
     }
     $('.colorTool').css('display', 'none');
     $('.mainTool').css('display', 'block');
@@ -334,23 +334,23 @@ $('button.colorTool').on('click', function(){
 // -----------------------------------------------------------------------------
 
 function onKeydown(event){
-  if(event.keyCode === 46){
-	  if(selectedItem !== null){
-  		selectedItem.myRemove();
-  		selectedItem = null;
-	  }else if(selectedLink !== null){
-  		selectedLink.myRemove();
-  		selectedLink = null;
-	  }
-  }
+    if(event.keyCode === 46){
+    	  if(selectedItem !== null){
+        		selectedItem.myRemove();
+        		selectedItem = null;
+    	  }else if(selectedLink !== null){
+        		selectedLink.myRemove();
+        		selectedLink = null;
+    	  }
+    }
 }
 
 $("#colorMenu button").on("click", function(){
-  var color = $(this).val();
-  selectedColor = colors[color];
-  if(selectedItem != null){
-    selectedItem.rect.attr('fill', colors[color]);
-  }
+    var color = $(this).val();
+    selectedColor = colors[color];
+    if(selectedItem != null){
+        selectedItem.rect.attr('fill', colors[color]);
+    }
 });
 
 /**
@@ -373,6 +373,88 @@ function explicitTextAreaValues(parent){
     }
 }
 
+String.prototype.visualLength = function(){
+    var ruler = $("#ruler")[0];
+    ruler.innerHTML = this;
+    return ruler.offsetWidth;
+}
+
+String.prototype.visualFontSize = function(){
+    var ruler = $("#ruler")[0];
+    ruler.innerHTML = this;
+    return ruler.offsetHeight;
+}
+
+function cutTextIntoLines(text, textWidth){
+    var words = text.split(/(\W+|\n)/);
+    var lines = [];
+    var currentLine = [];
+    var currentLineWidth = 0;
+
+    for(var index in words){
+        var word = words[index];
+
+        if((currentLineWidth + word.visualLength()) < textWidth){
+            if(word.includes('\n')){
+                var wordCut = word.split('\n', 2);
+                currentLine.push(wordCut[0]);
+                lines.push(currentLine);
+                currentLine = [wordCut[1]];
+                currentLineWidth = wordCut[1].visualLength();
+            }else{
+                currentLine.push(word);
+                currentLineWidth += word.visualLength();
+            }
+        }else{
+            lines.push(currentLine);
+            if(word.includes('\n')){
+                var wordCut = word.split('\n', 2);
+                currentLine = [wordCut[0]];
+                lines.push(currentLine);
+                currentLine = [wordCut[1]];
+                currentLineWidth = wordCut[1].visualLength();
+            }else{
+                currentLine = [word];
+                currentLineWidth = word.visualLength();
+            }
+        }
+    }
+
+    if(currentLine.length > 0){
+        lines.push(currentLine);
+    }
+
+    return lines;
+}
+
+function extractParam(param, paramsList){
+    var result = paramsList.match(param + '=\"([0-9.]+)\"');
+    return parseInt(result[1]);
+}
+
+function textareaToSVGText(params, text){
+    var x = extractParam('x', params);
+    var y = extractParam('y', params);
+    var height = extractParam('height', params);
+    var width = extractParam('width', params);
+    var lines = cutTextIntoLines(text, width - 10);
+    var lineHeight = 'd'.visualFontSize();
+    var result = "";
+    var index = 0;
+
+    while(index < lines.length && height > 0){
+        result += '<text x="' + x + '" y="' + y + '">';
+        for(var i = 0; i < lines[index].length; i++){
+            result += lines[index][i];
+        }
+        result += "</text>";
+        height -= lineHeight;
+        y += lineHeight;
+        index++;
+    }
+    return result;
+}
+
 /**
  * Return the svg of the player's production including texts
  * @return {string}
@@ -384,12 +466,13 @@ function getInlineSvg(){
 
     function handleReplaceString(match, p1) {
         let res = p1.replace(regexTextArea, "$1");
-        return "<text" + res + "</text>";
+        let tagContent = res.split('>', 2);
+        return textareaToSVGText(tagContent[0], tagContent[1]);
     }
 
     function moveText(match, p1, p2, p3){
         let x = parseInt(p1, 10) + 5;
-        let y= parseInt(p2, 10) + 15;
+        let y = parseInt(p2, 10) + 15;
         return '<text x="' + x + '" y="' + y + '"' + p3 + '</text>';
     }
 

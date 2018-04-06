@@ -134,6 +134,11 @@ table tr.selected {
   border: 1px solid #ddd;
 }
 
+table tr.joining {
+  background: #6715D1;
+  border: 1px solid #ddd;
+}
+
 table th, table td {
   padding: .625em;
   text-align: center;

@@ -1,3 +1,8 @@
+
+const WAITING_PLAYERS = "waiting for players";
+const QUESTION_TIME = "question time";
+const GAME_TIME = "game time";
+
 // connection with the server socket
 var socket = io();
 
@@ -24,22 +29,47 @@ socket.on('serverListUpdate', function(data){
                     .append($('<td>' + data[server]['animate'] + '</td>'))
                     .append($('<td>' + data[server]['places'] + '</td>'))
                     .append($('<td>' + data[server]['status'] + '</td>')));
-      }
+    }
+
+    if(sessionStorage.server != null && sessionStorage.unload == 'false'){
+        $('.' + sessionStorage.server).addClass('joining');
+    }
+
 });
 
-/** Process gameStart message
+/**
+ * Process "serverRemoved" message
+ * We receive this message when the server in which we are has been removed
+ */
+socket.on('serverRemoved', function(data){
+    console.log('my server has been removed');
+    sessionStorage.server = null;
+});
+
+/** Process "gameStart" message
  *  When this message is received, we move to the game module page
  */
 socket.on('gameStart', function(data){
     console.log("GAME START !!!!");
     sessionStorage.server = data['server'];
+    sessionStorage.unload = 'false';
     window.location = '/gamerModule';
 });
 
 /** allows to select a row in the server list */
 $('#serverList').on('click', 'tbody tr', function(){
     $('#serverList tbody .selected').removeClass('selected');
-    $(this).addClass('selected');
+    $(this).addClass('selected'); // selected class is used to know which server client want to join
+    if($(this).children()[0].innerHTML == sessionStorage.server
+    && $(this).children()[1].innerHTML == sessionStorage.pseudo
+    && $(this).children()[4].innerHTML == WAITING_PLAYERS){
+        $('#join').text('Remove'); // if it's his own server and if the game has not started, he can remove it
+    }else if($(this).children()[0].innerHTML == sessionStorage.server
+          && sessionStorage.unload == 'false'){
+        $('#join').text('Exit'); // if he's not in his server and if the game has not started, he can leave it
+    }else{
+        $('#join').text('Join'); // if he's in no server, he can join it
+    }
 });
 
 /** displays game server creator window */
@@ -96,7 +126,9 @@ function checkServerCreationForm(serverData){
         conform = false;
     }
 
-    if(serverData['server']['indivTimer'] <= 0 || serverData['server']['appropriation'] <= 0 || serverData['server']['globalTimer'] <= 0){
+    if(serverData['server']['indivTimer'] <= 0
+    || serverData['server']['appropriation'] <= 0
+    || serverData['server']['globalTimer'] <= 0){
         timersErrorDisplayer.text("timer can't be less than 0");
         conform = false;
     }else{
@@ -131,6 +163,8 @@ $("#validate").on("click", function(){
 
     if(checkServerCreationForm(data)){
         socket.emit('createServer', data);
+        sessionStorage.server = serverName;
+        sessionStorage.unload = 'false';
     }
 });
 
@@ -145,9 +179,33 @@ socket.on('serverCreated', function(data){
 
 /** Joining the selected game server */
 $("#join").on("click", function(){
-    var selectedServer =  $('#serverList tbody .selected').children()[0];
-    if(selectedServer != null){
-        console.log("joining server : " + selectedServer.innerHTML);
-        socket.emit('joinServer', {'server': selectedServer.innerHTML});
+    var selectedServer =  $('#serverList tbody .selected').children();
+    if(selectedServer != null){ // look at the onclick listener on "serverList" to have more details about the below code
+        if(selectedServer[0].innerHTML == sessionStorage.server
+        && selectedServer[1].innerHTML == sessionStorage.pseudo
+        && selectedServer[4].innerHTML == WAITING_PLAYERS){
+            socket.emit('removeServer', {'server': selectedServer[0].innerHTML});
+            sessionStorage.server = null;
+            $('#join').text('Join');
+        }else if(selectedServer[0].innerHTML == sessionStorage.server){
+            socket.emit('exitServer', {'server': selectedServer[0].innerHTML});
+            sessionStorage.server = null;
+            $('#join').text('Join');
+        }else{
+            socket.emit('joinServer', {'server': selectedServer[0].innerHTML});
+            sessionStorage.server = selectedServer[0].innerHTML;
+            sessionStorage.unload = 'false';
+        }
     }
+});
+
+$(window).on("load", function (evt) {
+    // If the client reload his page and is connected to a server, we
+    // reconnect his socket with his server
+    if(sessionStorage.server != null
+    && $('.' + sessionStorage.server) != null
+    && sessionStorage.unload == 'false'){
+        socket.emit('joinServer', {'server': sessionStorage.server});
+    }
+    $('#join').text('Join');
 });

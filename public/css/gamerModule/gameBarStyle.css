@@ -45,21 +45,6 @@ div#gameBar > div > div:nth-child(6) {
   height: 35%;
 }
 
-@keyframes textApparition {
-  from {color: white;}
-  to {color: black;}
-}
-
-p#cardContent{
-  margin: auto;
-  overflow: auto;
-  font-size:110%;
-  font-family: courier, serif;
-  text-align: center;
-  animation-name: textApparition;
-  animation-duration: 5s;
-}
-
 div#gameBar > div > div:nth-child(8) > div {
   margin-bottom: 5%;
 }

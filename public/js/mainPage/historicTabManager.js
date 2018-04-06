@@ -9,7 +9,7 @@
  */
 function displayHistoric(historic){
     var historicTable = $('#myHistoric').find('tbody');
-    historicTable.children().remove();
+    historicTable.children().remove(); // we will replace old data by the data we have received
     for(var entry in historic){
         historicTable.append($('<tr>')
                       .append($('<td>' + historic[entry]['name'] + '</td>'))
@@ -38,14 +38,41 @@ function refreshHistoric(){
     });
 }
 
-refreshHistoric();
+refreshHistoric(); // display historic on page load
 
-/** allows to select a row in the server list */
+/** allow to select a row in the server list */
 $('#myHistoric').on('click', 'tbody tr', function(){
     $('#myHistoric tbody .selected').removeClass('selected');
     $(this).addClass('selected');
 });
 
+/** allow to remove an entry in the player's historic */
+$('#deleteEntry').on('click', function(){
+    var selectedEntry = $('#myHistoric tbody .selected');
+    if(selectedEntry != null){
+        $.ajax({
+            type: 'POST',
+            url: '/removeHistoric',
+            data: {
+                username: sessionStorage.pseudo,
+                server: selectedEntry.children()[0].innerHTML,
+                date: selectedEntry.children()[2].innerHTML
+            },
+            error: function(){
+                console.log('removing has failed');
+            },
+            success: function(response){
+                if(response == 'OK'){
+                    refreshHistoric();
+                }else{
+                    console.log('removing has failed');
+                }
+            }
+        });
+    }
+});
+
+/** Display the list of players who have played in the same game as you */
 function displayPlayersList(players){
     var playersList = $('#partyPlayers').find('tbody');
     playersList.children().remove();
@@ -55,6 +82,7 @@ function displayPlayersList(players){
     }
 }
 
+/** Display a production in the production viewer */
 function displayProduction(production){
     var productionDisplayer = $('#myProduction > img');
     if(production == '' || production == null){
@@ -62,6 +90,7 @@ function displayProduction(production){
         productionDisplayer.css('height', '100%');
         productionDisplayer.css('width', '100%');
     }else{
+        // Building an svg image from the string which describe the production (svg format)
         var img = new Image();
         var blob = new Blob([production], {type: "image/svg+xml;charset=utf-8"});
         var urlCreator = window.URL || window.webkitURL;
@@ -73,7 +102,6 @@ function displayProduction(production){
 }
 
 function displayPartyDetails(data){
-
     $("#historicTab > .tabContent").css("display", "none");
     $(".partySheet").animate({"display": "block"}, 1000, function(){
         $(".partySheet").css("display", "block");
@@ -92,17 +120,15 @@ function displayPartyDetails(data){
 
 /** Joining the selected game server */
 $('#open').on('click', function(){
-    var selectedParty =  $('#myHistoric tbody .selected').children();
+    var selectedParty =  $('#myHistoric tbody .selected');
     if(selectedParty != null){
-        console.log(selectedParty[0].innerHTML);
-        console.log(selectedParty[2].innerHTML);
         $.ajax({
             type: 'POST',
             url: '/getDetails',
             data: {
                 username: sessionStorage.pseudo,
-                partyName: selectedParty[0].innerHTML,
-                partyDate: selectedParty[2].innerHTML
+                partyName: selectedParty.children()[0].innerHTML,
+                partyDate: selectedParty.children()[2].innerHTML
             },
             error: function(){
                 console.log("details retrieving has failed");
@@ -112,10 +138,10 @@ $('#open').on('click', function(){
                     console.log("details retrieving has failed");
                 }else{
                     console.log(response);
-                    response['server'] = selectedParty[0].innerHTML;
-                    response['animator'] = selectedParty[1].innerHTML;
-                    response['date'] = selectedParty[2].innerHTML;
-                    response['question'] = selectedParty[3].innerHTML;
+                    response['server'] = selectedParty.children()[0].innerHTML;
+                    response['animator'] = selectedParty.children()[1].innerHTML;
+                    response['date'] = selectedParty.children()[2].innerHTML;
+                    response['question'] = selectedParty.children()[3].innerHTML;
                     displayPartyDetails(response);
                 }
             }
@@ -123,11 +149,13 @@ $('#open').on('click', function(){
     }
 });
 
+/** Retrieve the url of the production */
 function getProductionImageUrl(){
     var productionUrl = $('#myProduction > img').css('background-image');
     return productionUrl.substring(5, productionUrl.length - 2);
 }
 
+/** Remove the image from the browser buffer */
 function freeProductionImage(){
     var productionUrl = getProductionImageUrl();
     if(productionUrl.match("blob")){
@@ -137,12 +165,13 @@ function freeProductionImage(){
     }
 }
 
+/** allow to download a production as an svg image */
 $('#download').on('click', function(){
     var productionUrl = getProductionImageUrl();
-    console.log(productionUrl);
     var partyName = $('#partyName').val();
     var partyDate = $('#partyDate').val();
-    var fileName = partyName + '(' + partyDate + ').svg';
+    var partyQuestion = $('#partyQuestion').val();
+    var fileName = partyName + '(' + partyDate + ')[' + partyQuestion + '].svg';
     if(productionUrl.match("blob")){
         var downloader = document.createElement("a");
         document.body.appendChild(downloader);
@@ -154,7 +183,6 @@ $('#download').on('click', function(){
 });
 
 $('#close').on('click', function(){
-
     $(".partySheet").css("display", "none");
     $("#historicTab > .tabContent").animate({"display": "block"}, 1000, function(){
         $("#historicTab > .tabContent").css("display", "block");

@@ -4,7 +4,7 @@ if(sessionStorage.pseudo){
     url: '/checkConnection',
     data: { username: sessionStorage.pseudo },
     error: function(){
-      alert("Request Failed");
+      console.log("Request Failed");
     },
     success: function(response){
       console.log(response);

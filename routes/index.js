@@ -48,6 +48,18 @@ router.post('/getHistoric', urlencodedParser, function(req, res){
     });
 });
 
+router.post('/removeHistoric', urlencodedParser, function(req, res){
+
+    db.removePlayerPartyHistoric(req.body.username, req.body.server, req.body.date, function(err){
+        if(err){
+            console.log(err);
+            res.send('ERROR');
+        }else{
+            res.send('OK');
+        }
+    })
+});
+
 router.post('/getDetails', urlencodedParser, function(req, res){
     var details = {'production': '', 'players': []};
 

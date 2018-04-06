@@ -414,6 +414,40 @@ exports.linkPlayerAndParty = function(pseudo, party, question, callback){
 };
 
 /**
+ * Remove an entry in the table hasPlayedIn
+ *
+ * @param {string} pseudo : pseudo of the player who wants to remove an entry of his historic
+ * @param {string} party : name of the party for which concerned by the process
+ * @param {date} date : date at which the party was played
+ * @param {callback} callback :  function used to return errors
+ */
+exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
+    var sql = 'SELECT ' + keys.PT_KEY_ID +
+              ' FROM ' + keys.PARTY_TABLE +
+              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
+    var values = [party, date];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else{
+            if(result.length == 0) callback(err);
+            else{
+                sql = 'DELETE FROM ' + keys.HAS_PLAYED_IN_TABLE +
+                      ' WHERE ' + keys.HPT_KEY_PARTY + ' = ?' +
+                      ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+                values = [result[0][keys.PT_KEY_ID], pseudo];
+                state.pool.query(sql, values, function(err, result){
+                    if(err) callback(err);
+                    else callback(null);
+                });
+            }
+        }
+    });
+}
+
+
+
+/**
  * Record a player's production in the historic of the party
  *
  * @param {string} pseudo : player's pseudo for which we want recorded the production

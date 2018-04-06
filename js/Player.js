@@ -1,3 +1,4 @@
+
 const PLAYER_ROLE = 1;
 const ANIMATOR_ROLE = 2;
 const PROD_AREA_PUBLIC = 10;
@@ -41,6 +42,10 @@ module.exports = class Player {
    */
   getQuestion(){
       return this.question;
+  }
+
+  getStatus(){
+      return this.status;
   }
 
   /**

@@ -14,13 +14,14 @@ div#gameBar > div > div:nth-child(6) > div > :first-child > button {
 }
 
 div#familyLogoDiv {
-  width: 100%;
   padding: 0;
+  height: 100%;
   display: none;
 }
 
 span#familyLogoText {
-  width: 110%;
+  padding: 0;
+  font-size: 0.5vw;
   text-align: center;
   position: absolute;
   top: 50%;
@@ -39,8 +40,12 @@ span#familyLogoText {
 }
 
 img#cardFamilyLogo {
-  width: 100%;
-  padding: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  height: 100%;
+  background-position: center;
+  background-size: contain;
+  background-origin: content-box;
   transition: all 0.8s ease;
 }
 
@@ -51,4 +56,19 @@ button#cardHelp {
 div#gameBar > div > div:nth-child(6) > div > :last-child {
   height: 80%;
   padding: 0;
+}
+
+@keyframes textApparition {
+  from {color: white;}
+  to {color: black;}
+}
+
+p#cardContent{
+  margin: auto;
+  overflow: auto;
+  font-size:1vw;
+  font-family: courier, serif;
+  text-align: center;
+  animation-name: textApparition;
+  animation-duration: 5s;
 }

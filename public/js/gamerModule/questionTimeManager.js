@@ -89,6 +89,7 @@ function addOnePlayer(player){
                           '<div class="col-lg-8 col-md-8 oval-thought-left" style="visibility: hidden"/>' +
                       '</div>' +
                   '</div>' +
+
                   '<div class="col-lg-2 col-md-2" style="visibility: hidden"/>' +
               '</div>';
     parentTag.append(html);
@@ -117,6 +118,7 @@ function actualizeNbReady(ready, total){
  * form of received data : list of the pseudo of the players in the game
  */
 socket.on('initQuestionTime', function(players){
+    $('#playersQuestion').empty();
     actualizeNbReady(0, players.length);
     if(players.length < 2){ // only one player in the game, we display it alone
         addOnePlayer(players[0]);

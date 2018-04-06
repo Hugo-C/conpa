@@ -48,3 +48,22 @@ CREATE TABLE IF NOT EXISTS HasPlayedIn(
   production TEXT,
   FOREIGN KEY (pseudo) REFERENCES Users(pseudo),
   FOREIGN KEY (idParty) REFERENCES Party(id));
+
+DELETE TRIGGER IF NOT EXISTS AfterDeleteHistoricEntry;
+
+DELIMITER |
+CREATE TRIGGER AfterDeleteHistoricEntry AFTER DELETE
+ON HasPlayedIn FOR EACH ROW
+BEGIN
+  DECLARE cpt INTEGER;
+
+  SELECT COUNT(*) INTO cpt
+  FROM HasPlayedIn
+  WHERE idParty = OLD.idParty;
+
+  IF cpt = 0 THEN
+    DELETE FROM Party
+    WHERE id = OLD.idParty;
+  END IF;
+END|
+DELIMITER ;

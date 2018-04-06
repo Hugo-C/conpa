@@ -5,6 +5,10 @@ var Game = require('./Game.js');
 var db = require('../js/db');
 
 const SVG_FILE = "../svg";
+const WAITING_PLAYERS = "waiting for players";
+const QUESTION_TIME = "question time";
+const GAME_TIME = "game time";
+
 
 var clients = {}; // keep a link between user's pseudo and socket's id
 var rooms = {}; // list of available servers (rooms)
@@ -38,6 +42,10 @@ function listAllServers(){
   return data;
 }
 
+/**
+ * Add a new entry in the party historic table
+ * @param {Game} gameServer : the game server to record
+ */
 function recordGameServer(gameServer){
     var animator = gameServer.getHost().isAnimator() ? gameServer.getHost().getPseudo() : "party without animator";
     var date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
@@ -52,6 +60,14 @@ function recordGameServer(gameServer){
     });
 }
 
+/**
+ * Add a new entry in the hasPlayedIn table
+ * Used to keep a track of the player's production do in a party
+ *
+ * @param {string} pseudo : player's pseudo
+ * @param {number} partyHistoricId : id which represents the party in the party historic table
+ * @param {string} production : a string which describe the svg production
+ */
 function recordProduction(pseudo, partyHistoricId, production){
     db.recordPlayerProduction(partyHistoricId, pseudo, production, function(err){
         if(err) console.log(err);
@@ -70,6 +86,7 @@ module.exports = function(io, socket){
   socket.on('pseudo', function(data){
       console.log('user ' + data['pseudo'] + ' is connected');
       clients[data["pseudo"]] = socket.id;
+      socket.room = null;
       io.sockets.emit('serverListUpdate', listAllServers());
   });
 
@@ -83,7 +100,7 @@ module.exports = function(io, socket){
 
     if(server.getNbPlayer() == server.getPlaces()){
       io.to(server.getName()).emit('gameStart', {'server': server.getName(), 'players': server.getPlayers()});
-      server.setStatusInGame();
+      server.setStatus(QUESTION_TIME);
       io.sockets.emit('serverListUpdate', listAllServers());
     }
   }
@@ -107,22 +124,48 @@ module.exports = function(io, socket){
       if(!(data["server"]["name"] in rooms)){
 
           var player = new Player(getPseudoWithId(socket.id), data["role"]);
-          var server = new Game(data["server"]["name"], data["server"]["places"], player, data["server"]["indivTimer"], data["server"]["globalTimer"]);
+          var server = new Game(data["server"]["name"], data["server"]["places"], player, data["server"]["indivTimer"], data["server"]["globalTimer"], WAITING_PLAYERS);
           rooms[data["server"]["name"]] = server;
           socket.room = data["server"]["name"];
           socket.join(socket.room);
 
           var newServer = {'name': data["server"]["name"],
-                      'host': getPseudoWithId(socket.id),
-                      'animate': data['role'] == 'player' ? 'No' : 'Yes',
-                      'places' : server.getNbPlayer() + ' / ' + server.getPlaces(),
-                      'status': server.getStatus()};
+                        'host': getPseudoWithId(socket.id),
+                        'animate': data['role'] == 'player' ? 'No' : 'Yes',
+                        'places' : server.getNbPlayer() + ' / ' + server.getPlaces(),
+                        'status': server.getStatus()};
 
           socket.emit('serverCreated', {'error': false, 'msg': null}); // informs the creator that server has been created successfully
           io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
           startGameOnServerFull(server.getName()); // try to start the game
+          server.inactivePlayerChecker = setInterval(inactivePlayerManager, 5000, server);
       }else{
           socket.emit('serverCreated', {'error': true, 'msg': 'server name not available'}); // informs the creator that the server's name is not available
+      }
+  });
+
+  /**
+   * Process "removeServer" message
+   * Players send this message when they want to remove a server they are created
+   * When this message is received, we remove from the server the given game server
+   *
+   * form of received data : {'server': server's name}
+   */
+  socket.on('removeServer', function(data){
+      var server = rooms[data["server"]];
+      // A player can only remove his own server if the game has not started
+      if(server != null && server.getStatus() == WAITING_PLAYERS
+      && server.getHost().getPseudo() == getPseudoWithId(socket.id)){
+
+          io.sockets.in(socket.room).emit('serverRemoved', null);
+          var players = server.getPlayers();
+          for(var index in players){
+              io.sockets.connected[clients[players[index]]].leave();
+          }
+
+          clearInterval(server.inactivePlayerChecker);
+          delete rooms[server.getName()];
+          io.sockets.emit('serverListUpdate', listAllServers());
       }
   });
 
@@ -140,26 +183,48 @@ module.exports = function(io, socket){
 
       var server = rooms[data["server"]];
 
-      if(server.getNbPlayer() < server.getPlaces() && !(server.isInServer(getPseudoWithId(socket.id)))){
-          var player = new Player(getPseudoWithId(socket.id), "player");
+      if(server != null){ // to prevent reception of bad data
+          if(server.getNbPlayer() < server.getPlaces() && !(server.isInServer(getPseudoWithId(socket.id))) && server.getStatus() == WAITING_PLAYERS){
+              var player = new Player(getPseudoWithId(socket.id), "player");
 
-          if(socket.room != null) rooms[socket.room].removePlayer(player);
-          server.addNewPlayer(player);
-          socket.room = server.getName();
-          socket.join(socket.room);
+              if(socket.room != null) rooms[socket.room].removePlayer(player);
+              server.addNewPlayer(player);
+              socket.room = server.getName();
+              socket.join(socket.room);
 
-          io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
-          startGameOnServerFull(server.getName()); // there is a new player, try to start the game
+              io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
+              startGameOnServerFull(server.getName()); // there is a new player, try to start the game
 
-      }else if(server.isInServer(getPseudoWithId(socket.id)) && socket.room == null){ // case of reconnection (if a player has lost his connection)
-          socket.room = server.getName();
-          socket.join(socket.room);
+          }else if(server.isInServer(getPseudoWithId(socket.id)) && socket.room == null){ // case of reconnection (if a player has lost his connection)
+              socket.room = server.getName();
+              socket.join(socket.room);
+          }
       }
   });
 
+  /**
+   * Return the current state of the question time
+   * - the number of players who have defined their questions
+   * - the questions of each players
+   */
   function getQuestionTimeState(server){
+      console.log("get question time state");
       return {'ready': server.nbPlayersReady(), 'playersQuestion': server.getPlayersQuestion()};
   }
+
+  /**
+   * Process "exitServer" message
+   * Players send this message when they want to leave a game server
+   * This message can only be send if the game has not started
+   */
+  socket.on('exitServer', function(data){
+
+      rooms[data['server']].removePlayerByPseudo(getPseudoWithId(socket.id));
+      socket.leave(data['server']);
+      socket.room = null;
+
+      io.sockets.emit('serverListUpdate', listAllServers());
+  });
 
  /**
    * Process joinGame message
@@ -170,14 +235,24 @@ module.exports = function(io, socket){
    *                          'pseudo': [player's pseudo]}
    */
   socket.on('joinGame', function(data){
-      console.log('player ' + data['pseudo'] + ' join the game' + data['server']);
 
-      socket.room = data['server'];
-      socket.join(socket.room);
-      clients[data['pseudo']] = socket.id;
+      var server = rooms[data['server']];
 
-      //io.to(socket.room).emit('playersQuestion', getQuestionTimeState(rooms[socket.room]));
-      socket.emit('initQuestionTime', rooms[socket.room].getPlayers());
+      if(server != null){
+          var player = server.getPlayer(data['pseudo']);
+          if(player != null){
+              socket.room = server.getName();
+              socket.join(socket.room);
+              clients[player.getPseudo()] = socket.id;
+
+              if(server.nbPlayersReady() == server.getNbPlayer()){
+                  socket.emit('allQuestionsDefined', getQuestionTimeState(server));
+              }else{
+                  socket.emit('initQuestionTime', server.getPlayers());
+                  socket.emit('actualizeQuestions', getQuestionTimeState(server));
+              }
+          }
+      }
   });
 
   /**
@@ -190,12 +265,17 @@ module.exports = function(io, socket){
    * form of received data : {'question': player's question}
    */
   socket.on('recordMyQuestion', function(data){
+
+      console.log(getPseudoWithId(socket.id));
+      console.log(socket.room);
+
       var server = rooms[socket.room];
       server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
       if(server.nbPlayersReady() == server.getNbPlayer()){ // all questions are defined, we can starts the game
           io.to(socket.room).emit('allQuestionsDefined', getQuestionTimeState(server));
           io.to(socket.room).emit('players', server.getPlayers());
           recordGameServer(server);
+          server.setStatus(GAME_TIME);
       }else{
           io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
       }
@@ -212,17 +292,22 @@ module.exports = function(io, socket){
    *                          'pseudo': [player's name]}
    */
   socket.on('quitGame', function(data){
-      console.log('player ' + data['pseudo'] + ' quit the game ' + data['server']);
 
-      rooms[data['server']].removePlayerByPseudo(data['pseudo']);
+      var server = rooms[data['server']];
+
+      server.removePlayerByPseudo(data['pseudo']);
       socket.leave(data['server']);
       socket.room = null;
+      recordProduction(server.getHistoricId(), data['pseudo'], data['production']);
 
-      console.log(rooms[data['server']].getPlayers());
+      if(server.getNbPlayer() == 0){
+          clearInterval(server.inactivePlayerChecker);
+          delete rooms[server.getName()]; // if server is empty, we detroy it
+      }else{
+          io.to(server.getName()).emit('players', server.getPlayers()); // informs players that a player has leave the game
+      }
 
-      io.to(data['server']).emit('players', rooms[data['server']].getPlayers());
       io.sockets.emit('serverListUpdate', listAllServers());
-      recordProduction(rooms[data['server']].getHistoricId(), data['pseudo'], data['production']);
   });
 
   /**
@@ -235,7 +320,6 @@ module.exports = function(io, socket){
    *                          'msg': [message body]}
    */
   socket.on('message', function(data){
-      console.log('message from ' + getPseudoWithId(socket.id) + ' to ' + data["dest"]);
       if(data["dest"] === "all"){
           rep = {"sender": getPseudoWithId(socket.id), "msg": data["msg"], "whisper": false};
           socket.broadcast.to(socket.room).emit('message', rep);
@@ -253,7 +337,7 @@ module.exports = function(io, socket){
    * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
    */
   socket.on('cardPicked', function(data){
-    socket.broadcast.to(socket.room).emit('cardPicked', data);
+      socket.broadcast.to(socket.room).emit('cardPicked', data);
   });
 
   /**
@@ -264,19 +348,14 @@ module.exports = function(io, socket){
    * form of received data : no data sends with this message !
    */
   socket.on('processStopGame', function(data){
-    console.log("A player wants stop the game");
-    var server = rooms[socket.room];
-    server.exitBuffer.push(getPseudoWithId(socket.id));
-    console.log("There is " + server.exitBuffer.length + " players in this room " + server.getNbPlayer());
-    if(server.exitBuffer.length == server.getNbPlayer()){
-        console.log("exit game");
-        io.to(server.getName()).emit('gameEnd', null); // only one player in the game, stoped the game
-    }else{
-        console.log("ask to everyone");
-        socket.broadcast.to(server.getName()).emit('stopGame?', server.exitBuffer); // ask to all players if they agree
-    }
+      var server = rooms[socket.room];
+      server.exitBuffer.push(getPseudoWithId(socket.id));
+      if(server.exitBuffer.length == server.getNbPlayer()){
+          io.sockets.in(server.getName()).emit('gameEnd', null); // only one player in the game, stoped the game
+      }else{
+          socket.broadcast.to(server.getName()).emit('stopGame?', server.exitBuffer); // ask to all players if they agree
+      }
   });
-
 
   /**
    * Process "stopGame" message on server side
@@ -289,7 +368,7 @@ module.exports = function(io, socket){
       if(data['exit']){
           server.exitBuffer.push(getPseudoWithId(socket.id));
           if(server.exitBuffer.length == server.getNbPlayer()){
-              io.to(server.getName()).emit('gameEnd', null); // all players have accepted to stop the game
+              io.sockets.in(server.getName()).emit('gameEnd', null); // all players have accepted to stop the game
           }else{
               io.to(server.getName()).emit('refreshExitPanel', server.exitBuffer); // another player have accepted to stop the game
           }
@@ -315,4 +394,63 @@ module.exports = function(io, socket){
             }
         });
     });
+
+    /**
+     * This function is used to manage unexpected disconnections
+     * When the server loose the connection with a player in the given game server,
+     * he is add to a list of inactive players.
+     * The player has then a short delay to reconnect his self
+     * If the player don't reconnect his self, he is removed from the game
+     *
+     * @param {Game} server : the game server for which this function works
+     */
+    function inactivePlayerManager(server){
+
+        console.log('I check if some players are inactive...');
+
+        for(var index in server.inactivePlayer){
+            if(io.sockets.connected[clients[server.inactivePlayer[index]]] == null
+            || io.sockets.connected[clients[server.inactivePlayer[index]]].room == null){
+
+                server.removePlayerByPseudo(server.inactivePlayer[index]);
+                console.log(server.inactivePlayer[index] + ' is removed');
+
+                // a player has been removed, we need to inform clients
+                if(server.getNbPlayer() == 0){
+                    clearInterval(server.inactivePlayerChecker);
+                    delete rooms[server.getName()]; // if server is empty, we detroy it
+                }else{
+                    console.log('updating server data');
+                    if(server.getStatus() == QUESTION_TIME){
+                        console.log('question time');
+                        if(server.nbPlayersReady() == server.getNbPlayer()){
+                            console.log('all questions are defined !');
+                            io.sockets.in(server.getName()).emit('allQuestionsDefined', getQuestionTimeState(server));
+                            io.sockets.in(server.getName()).emit('players', server.getPlayers());
+                        }else{
+                            console.log('updating question time');
+                            io.sockets.in(server.getName()).emit('initQuestionTime', server.getPlayers());
+                            io.sockets.in(server.getName()).emit('actualizeQuestions', getQuestionTimeState(server));
+                        }
+                    }else if(server.getStatus() == GAME_TIME){
+                        console.log('updating game time');
+                        io.sockets.in(server.getName()).emit('players', server.getPlayers()); // informs players that a player has leave the game
+                    }
+                }
+                io.sockets.emit('serverListUpdate', listAllServers());
+            }
+        }
+
+        server.inactivePlayer = [];
+
+        var players = server.getPlayers();
+        for(var index in players){
+            if(io.sockets.connected[clients[players[index]]] == null
+            || io.sockets.connected[clients[players[index]]].room == null){
+                server.inactivePlayer.push(players[index]);
+                console.log(players[index] + ' is inactive');
+            }
+        }
+    }
+
 };

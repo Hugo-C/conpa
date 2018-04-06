@@ -7,7 +7,7 @@
  */
 function displayCardGames(cardGames){
     var cardGamesTable = $('#myCardgames').find('tbody');
-    cardGamesTable.children().remove();
+    cardGamesTable.children().remove(); // we will replace old data by the data we have received
     for(var entry in cardGames){
         cardGamesTable.append($('<tr>')
                         .append($('<td>' + cardGames[entry]['name'] + '</td>'))
@@ -49,6 +49,7 @@ $('#exportCardGame').on('click', function(){
         var exportRequest = '/exportCardGame?name=' + selectedCardGame[0].innerHTML +
                             '&language=' + selectedCardGame[1].innerHTML;
 
+        // we use an "a" tag to download the file ("a" tag has a download property)
         var downloaderTag = document.createElement("a");
         document.body.appendChild(downloaderTag);
         downloaderTag.href = exportRequest;
@@ -58,6 +59,7 @@ $('#exportCardGame').on('click', function(){
     }
 });
 
+/** Display the form used to import a card game in the database */
 function displayImportPage(){
     $("#editorTab > .tabContent").css("display", "none");
     $(".importPage").animate({"display": "block"}, 1000, function(){
@@ -73,6 +75,7 @@ $('#importCardGame').on('click', function(){
     displayImportPage();
 });
 
+/** Display the main card game editor page */
 function displayCardGamePage(){
     $(".importPage").css("display", "none");
     $("#editorTab > .tabContent").animate({"display": "block"}, 1000, function(){
@@ -83,6 +86,7 @@ function displayCardGamePage(){
     $("#editorTab").css('width', '40%');
 }
 
+/** allow to come back to the main card game editor page */
 $('#cancelImport').on('click', function(){
     $('#import').attr('type', ''); // reset input(type="file") content
     $('#import').attr('type', 'file');
