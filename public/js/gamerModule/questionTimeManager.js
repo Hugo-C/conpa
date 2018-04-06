@@ -1,8 +1,26 @@
+const GRAVATAR_URL = "//www.gravatar.com/avatar/";
+const DEFAULT_IMG_URL = "//a0.muscache.com/im/pictures/87d6d531-78e2-43d5-9ccc-6a34aeba880f.jpg?aki_policy=x_medium";
+
 var socket = io();
 
 // informs the server that we have joined the game
 socket.emit('joinGame', {'pseudo': sessionStorage.pseudo,
                          'server': sessionStorage.server});
+
+function setPP(pseudo){
+    $.ajax({
+        type: 'POST',
+        url: '/users/email',
+        data: { username: pseudo },
+        error: function(){
+            console.log("Request Failed, cannot use gravatar PP");
+        },
+        success: function(response){
+            let picture_url = GRAVATAR_URL + md5(response["pp"]) + "?d=" + DEFAULT_IMG_URL;
+            $('#profil' + pseudo + ' > div > img').attr("src", picture_url);
+        }
+    });
+}
 
 // Display the questions guide
 $('#projector').on('click', function(){
@@ -125,9 +143,12 @@ socket.on('initQuestionTime', function(players){
     }else{ // more than one player
         for(var index = 0; index < players.length - 1; index += 2){
             addTwoPlayers(players[index], players[index + 1]); // we display two players in the same line while we can
+            setPP(players[index]);
+            setPP(players[index + 1]);
         }
         if(players.length % 3 == 0){
             addOnePlayer(players[players.length - 1]); // impair numbers of player, we display the last one alone
+            setPP(players[players.length - 1]);
         }
     }
 });

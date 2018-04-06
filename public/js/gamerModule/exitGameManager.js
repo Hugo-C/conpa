@@ -38,6 +38,7 @@ function initGUI(){
   $('#exitMessage').text(''); // remove old messages
   for(var index = 0; index < playersList.length; index++){
       parentTag.append(addPlayerBox(playersList[index]));
+      setPP(playersList[index]);
   }
 }
 
