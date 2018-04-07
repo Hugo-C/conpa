@@ -15,35 +15,35 @@ html
   body
     div(class="defaultStyle container-fluid")
       header(style="margin:0" class="stretchedImage row")
-        div(class="defaultStyle rowFlexContainer col-lg-3 col-md-3")
-          div(class="identityCard col-lg-10 col-md-10")
-            div(class="defaultStyle col-lg-5 col-md-5")
+        div(class="defaultStyle rowFlexContainer col-lg-3 col-md-3 col-sm-3")
+          div(class="identityCard col-lg-10 col-md-10 col-sm-10")
+            div(class="defaultStyle col-lg-5 col-md-5 col-sm-5")
               div(class="defaultStyle centeredItems row")
-                img#profilePicture(src="/img/gamerModule/defaultProfileImage.jpg" class="stretchedImage col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10")
-            div(class="userInfos col-lg-7 col-md-7")
+                img#profilePicture(src="/img/gamerModule/defaultProfileImage.jpg" class="stretchedImage col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10")
+            div(class="userInfos col-lg-7 col-md-7 col-sm-7")
               div(style="height: 25%" class="row")
-                span#pseudoLabel(class="myCustomTitle col-lg-12 col-md-12") Pseudo
+                span#pseudoLabel(class="myCustomTitle col-lg-12 col-md-12 col-sm-12") Pseudo
               div(style="height: 25%" class="row")
-                span#pseudo(class="col-lg-12 col-md-12")
+                span#pseudo(class="col-lg-12 col-md-12 col-sm-12")
               div(style="height: 40%" class="row")
-                button#disconnect(class="col-lg-offset-9 col-lg-2 col-md-offset-9 col-md-2")
-        div(style="padding-right:20px" class="defaultStyle col-lg-9 col-md-9")
+                button#disconnect(class="col-lg-offset-8 col-lg-2 col-md-offset-8 col-md-2 col-sm-offset-8 col-sm-2")
+        div(style="padding-right:20px" class="defaultStyle col-lg-9 col-md-9 col-sm-9")
           div(class="header1 row")
-            div#title(class="rowFlexContainer myCustomTitle col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5") CONPA
-            div#clock(class="siteInfo rowFlexContainer myCustomTitle col-lg-offset-4 col-lg-2 col-md-offset-4 col-md-2")
+            div#title(class="rowFlexContainer myCustomTitle col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5") CONPA
+            div#clock(class="siteInfo rowFlexContainer myCustomTitle col-lg-offset-4 col-lg-2 col-md-offset-4 col-md-2 col-sm-offset-4 col-sm-2")
           div(class="header2 row")
-            div(style="height:100%" class="startPath col-lg-offset-4 col-md-offset-4")
+            div(style="height:100%" class="startPath col-lg-offset-4 col-md-offset-4 col-sm-offset-4")
           div(class="header3 row")
-            div(style="height:100%" class="leftPath col-lg-offset-2 col-lg-2 col-md-offset-2 col-md-2")
-            div(style="height:100%" class="rightPath col-lg-1 col-md-1")
-            div(style="height:100%" class="rightPath col-lg-3 col-md-3")
-            div(style="height:100%" class="rightPath col-lg-3 col-md-3")
+            div(style="height:100%" class="leftPath col-lg-offset-2 col-lg-2 col-md-offset-2 col-md-2 col-sm-offset-2 col-sm-2")
+            div(style="height:100%" class="rightPath col-lg-1 col-md-1 col-sm-1")
+            div(style="height:100%" class="rightPath col-lg-3 col-md-3 col-sm-3")
+            div(style="height:100%" class="rightPath col-lg-3 col-md-3 col-sm-3")
           div(class="header4 row")
-            section(class="tabContainer col-lg-12 col-md-12")
-              div#Account(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#01B90D") Account
-              div#Editor(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#EFD700") Editor
-              div#Historic(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#035EFB") Historic
-              div#Game(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3" style="color:#CB1D1D") Game
+            section(class="tabContainer col-lg-12 col-md-12 col-sm-12")
+              div#Account(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#01B90D") Account
+              div#Editor(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#EFD700") Editor
+              div#Historic(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#035EFB") Historic
+              div#Game(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#CB1D1D") Game
       div(class="pageContent rowFlexContainer row")
         include gameTab.jade
         include historicTab.jade

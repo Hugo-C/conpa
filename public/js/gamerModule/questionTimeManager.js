@@ -140,6 +140,7 @@ socket.on('initQuestionTime', function(players){
     actualizeNbReady(0, players.length);
     if(players.length < 2){ // only one player in the game, we display it alone
         addOnePlayer(players[0]);
+        setPP(players[0]);
     }else{ // more than one player
         for(var index = 0; index < players.length - 1; index += 2){
             addTwoPlayers(players[index], players[index + 1]); // we display two players in the same line while we can

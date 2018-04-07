@@ -11,11 +11,13 @@ document.getElementById('cardContent').appendChild(cardTextNode);
  * @param language {String} : language of the cardGame
  */
 function initCards(cardGame, language){
-    let client = new HttpClient();
-    client.get("/gamerModule/cards?cardGame=" + cardGame + "&language=" + language, function(response) {
-        cards = JSON.parse(response);
-        console.log(cards);
-    });
+    if(sessionStorage.unload == 'false'){ // we retrieve card only the fist time, not at each reload of the page
+        let client = new HttpClient();
+        client.get("/gamerModule/cards?cardGame=" + cardGame + "&language=" + language, function(response) {
+            cards = JSON.parse(response);
+            //console.log(cards);
+        });
+    }
 }
 
 /**
@@ -34,7 +36,6 @@ function displayNewCard(family){
     } else {
         let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];
         removeFromArray(cards[family]["cards"], cardPick);  // we don't want to pick it again
-        displayCard(family, cardPick, cards[family]["logo"]);
         shareMyCard(family, cardPick);
     }
     return true;
@@ -46,7 +47,8 @@ function displayNewCard(family){
  * @param card {String} : the content of the card picked
  */
 function shareMyCard(family, card){
-  socket.emit('cardPicked', {'family': family, 'cardContent': card});
+  let question = $('#question').text();
+  socket.emit('cardPicked', {'family': family, 'cardContent': card, 'question': question});
 }
 
 /**
@@ -58,6 +60,7 @@ function shareMyCard(family, card){
  */
 socket.on('cardPicked', function(data){
     displayCard(data['family'], data['cardContent']);
+    $('#playerQuestion > span').text(data['question']);
 });
 
 /**
@@ -66,7 +69,7 @@ socket.on('cardPicked', function(data){
  * @param text {String} : the content of the card picked
  * @param logo {String} : the relative path to the family logo
  */
-function displayCard(family, text, logo){
+function displayCard(family, text){
     triggerCssAnimation(cardContent);
     //cardFamilyNode.nodeValue = family;
     cardTextNode.nodeValue = text;

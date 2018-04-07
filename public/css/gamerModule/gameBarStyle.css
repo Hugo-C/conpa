@@ -28,6 +28,11 @@ div.box {
   background-color: white;
 }
 
+div.box > span {
+  font-size: 1vw;
+  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+}
+
 div.row {
   margin: 0;
 }

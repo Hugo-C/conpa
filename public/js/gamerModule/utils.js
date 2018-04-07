@@ -28,7 +28,6 @@ function removeFromArray(array, e){
     return array;
 }
 
-
 /**
  * Handle http request
  */
