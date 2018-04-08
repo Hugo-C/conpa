@@ -222,7 +222,9 @@ class Link {
         let c2 = this.e2.center();
         this.line.plot(c1.x, c1.y, c2.x, c2.y);
 
-        this.addNavigability(false);
+        if(this.navigability != null){
+            this.addNavigability(false);
+        }
     }
 
     /**
