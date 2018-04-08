@@ -35,6 +35,7 @@ function displayNewCard(family){
         return false;
     } else {
         let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];
+        displayCard(family, cardPick);
         removeFromArray(cards[family]["cards"], cardPick);  // we don't want to pick it again
         shareMyCard(family, cardPick);
     }
@@ -67,7 +68,6 @@ socket.on('cardPicked', function(data){
  * Display a card and it's family with the specified text content
  * @param family {String} : the family of the card picked
  * @param text {String} : the content of the card picked
- * @param logo {String} : the relative path to the family logo
  */
 function displayCard(family, text){
     triggerCssAnimation(cardContent);

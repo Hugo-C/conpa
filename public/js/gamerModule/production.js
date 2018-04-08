@@ -1,7 +1,13 @@
 var dimHeight = $('div#production').height();
 var dimWidth = $('div#production').width();
 
-var draw = SVG('production').size('100%', '100%');
+var draw = SVG('production').size('100%', '100%').panZoom({
+    doPanning: false,
+    zoomFactor: 0.5,
+    zoomMin: 0.25,
+    zoomMax: 4,
+});
+
 var master = draw.group();
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
@@ -169,8 +175,6 @@ function distance(x1, y1, x2, y2){
 function isInside(x1, y1, x2, y2, x, y){
 	return Math.abs(distance(x1, y1, x, y) + distance(x, y, x2, y2) - distance(x1, y1, x2, y2)) < 1;
 }
-
-/*    */
 
 // -----------------------------------------------------------------------------
 // --------------------- CONTEXTUAL MENU ---------------------------------------
