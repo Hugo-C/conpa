@@ -98,11 +98,13 @@ $("#moveElement").on("click", function(){
     if($(this).hasClass("selected")){
         $(this).removeClass("selected");
         $(this).css('background-image', 'url(' + moveImage + ')');
+        doPanning = false;
     }else{
         $(this).addClass("selected");
         $(this).css('background-image', 'url(' + movingImage + ')');
+        doPanning = true;
     }
-})
+});
 
 function fullscreenProduction(){
     $('#chatInfos').css('display', 'none');

@@ -25,14 +25,6 @@ var move = false;
 var dx = null;
 var dy = null;
 
-// Panning variables
-var panning = false;
-var xTranslate = 0;
-var yTranslate = 0;
-let xTranslateTmp = xTranslate;
-let yTranslateTmp = yTranslate;
-var clickX, clickY;
-
 // Contextual menu variables
 var menu = $('#linkContextMenu');
 var menuState = 0;
@@ -40,140 +32,132 @@ var active = "contextMenu--active";
 
 // resize the svg when page is resized
 window.onresize = function(evt){
-  var dimHeight = $('div#production').height();
-  var dimWidth = $('div#production').width();
-  draw.attr({'height': dimHeight, 'width': dimWidth});
-}
+    var dimHeight = $('div#production').height();
+    var dimWidth = $('div#production').width();
+    draw.attr({'height': dimHeight, 'width': dimWidth});
+};
 
 // Get point in global SVG space
 function cursorPoint(evt){
-    pt.x = evt.clientX - xTranslate;
-    pt.y = evt.clientY - yTranslate;
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
     return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
 function onMouseDown(evt){
-  var coord = cursorPoint(evt);
-  if($('#bouton').is(":focus")) {
-    rectCreate = true;
-    creatingRect = new Rectangle(coord.x, coord.y, 1, 1, selectedColor, master);
-  }else if($('#moveElement').hasClass('selected')){
-
-    if(selectedItem != null){
-      move = true;
-      dx = coord.x - selectedItem.rect.attr('x');
-      dy = coord.y - selectedItem.rect.attr('y');
-    }else if(!rectCreate){
-      panning = true;
-      clickX = coord.x;
-      clickY = coord.y;
+    var coord = cursorPoint(evt);
+    if($('#bouton').is(":focus")) {
+        rectCreate = true;
+        doPanning = false;
+        let panningButton = $("#moveElement");  // to visualy indicate the panning state we change the button
+        panningButton.removeClass("selected");  // TODO make it consistent with gameManager.js
+        panningButton.css('background-image', 'url("/img/gamerModule/move.png")');
+        creatingRect = new Rectangle(coord.x, coord.y, 1, 1, selectedColor, master);
+    }else if($('#moveElement').hasClass('selected')){
+        if(selectedItem != null){
+            move = true;
+            doPanning = false;  // temporally disable the panning until the element is moved
+            dx = coord.x - selectedItem.rect.attr('x');
+            dy = coord.y - selectedItem.rect.attr('y');
+        }
     }
-  }
 }
 
 function onMouseMove(evt){
-  var coord = cursorPoint(evt);
-  if(rectCreate && creatingRect != null){
-    var rectX = creatingRect.rect.attr('x');
-    var rectY = creatingRect.rect.attr('y');
-    if(coord.x >= rectX && coord.y >= rectY){
-      creatingRect.rect.attr('width', coord.x - rectX);
-      creatingRect.rect.attr('height', coord.y - rectY);
+    var coord = cursorPoint(evt);
+    if(rectCreate && creatingRect != null){
+        var rectX = creatingRect.rect.attr('x');
+        var rectY = creatingRect.rect.attr('y');
+        if(coord.x >= rectX && coord.y >= rectY){
+            creatingRect.rect.attr('width', coord.x - rectX);
+            creatingRect.rect.attr('height', coord.y - rectY);
+        }
+    }else if(move){
+        selectedItem.rect.attr('x', coord.x - dx);
+        selectedItem.rect.attr('y', coord.y - dy);
+        if(selectedItem.text != null){
+            selectedItem.text.setAttribute('x', coord.x - dx);
+            selectedItem.text.setAttribute('y', coord.y - dy);
+        }
+        selectedItem.refreshAttachedLinks();
     }
-  }else if(move){
-    selectedItem.rect.attr('x', coord.x - dx);
-    selectedItem.rect.attr('y', coord.y - dy);
-    if(selectedItem.text != null){
-      selectedItem.text.setAttribute('x', coord.x - dx);
-      selectedItem.text.setAttribute('y', coord.y - dy);
-    }
-    selectedItem.refreshAttachedLinks();
-  }else if(panning){
-    xTranslateTmp += coord.x - clickX;
-    yTranslateTmp += coord.y - clickY;
-    clickX = coord.x;
-    clickY = coord.y;
-    master.attr("transform", "translate(" + xTranslateTmp + "," + yTranslateTmp + ")");
-  }
 }
 
 function onMouseUp(evt){
-  if(rectCreate && creatingRect != null){
-    creatingRect.addTextArea();
-    rectCreate = false;
-    creatingRect = null;
-  }else if(move){
-    move = false;
-    dx = null;
-    dy = null;
-  }else if(panning){
-    // we store the translation done by panning
-    xTranslate = xTranslateTmp;
-    yTranslate = yTranslateTmp;
-    panning = false;
-  }
+    if(rectCreate && creatingRect != null){
+        creatingRect.addTextArea();
+        rectCreate = false;
+        creatingRect = null;
+    }else if(move){
+        move = false;
+        doPanning = true;  // the panning is reestablished
+        dx = null;
+        dy = null;
+    }
 }
 
 function onClick(evt){
-  var coord = cursorPoint(evt);
-  var item = getElementAtCoordinates(coord.x, coord.y);
+    var coord = cursorPoint(evt);
+    var item = getElementAtCoordinates(coord.x, coord.y);
 
-  if(item != null){
-    lastSelectedItem = selectedItem;
-    if(lastSelectedItem != null) lastSelectedItem.unselect(); // hide the selection border to don't have two rectangle with it
-    selectedItem = item;
-    selectedItem.select(); // display the selection border
-  }else if(selectedItem != null){
-    lastSelectedItem = selectedItem;
-    selectedItem.unselect();
-    selectedItem = null;
-  }
+    if(item != null){
+        lastSelectedItem = selectedItem;
+        if (lastSelectedItem != null && lastSelectedItem !== item){
+            lastSelectedItem.unselect(); // hide the selection border to don't have two rectangle with it
+        }
+        selectedItem = item;
+        selectedItem.select(); // display the selection border
+    }else if(selectedItem != null){
+        lastSelectedItem = selectedItem;
+        selectedItem.unselect();
+        selectedItem = null;
+    }
 
-  if(lastSelectedItem != null && selectedItem != null){
-    selectedItem.linkRect(lastSelectedItem);
-  }
+    if(lastSelectedItem != null && selectedItem != null){
+        selectedItem.linkRect(lastSelectedItem);
+    }
 
-  if(selectedLink != null){
-    //selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
-    selectedLink = null;
-  }
+    if(selectedLink != null){
+        //selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
+        selectedLink = null;
+    }
 }
 
 function getElementAtCoordinates(x, y){
-  var res = null;
-  for(var index in myElements){
-    if(myElements[index].rect.inside(x, y)){
-      res = myElements[index];
+    var res = null;
+    for(var index in myElements){
+        if(myElements[index].rect.inside(x, y)){
+            res = myElements[index];
+        }
     }
-  }
-  return res;
+    return res;
 }
 
 function getLinkAtCoordinates(x, y){
-  var res = null;
-  var x1, y1, x2, y2, xpt, ypt;
-  for(var index in myLinks){
-  	x1 = parseInt(myLinks[index].line.attr("x1"));
-  	y1 = parseInt(myLinks[index].line.attr("y1"));
-  	x2 = parseInt(myLinks[index].line.attr("x2"));
-  	y2 = parseInt(myLinks[index].line.attr("y2"));
-  	xpt = parseInt(x);
-  	ypt = parseInt(y);
-    if(isInside(x1, y1, x2, y2, xpt, ypt)){
-      res = myLinks[index];
+    var res = null;
+    var x1, y1, x2, y2, xpt, ypt;
+    for(var index in myLinks){
+        x1 = parseInt(myLinks[index].line.attr("x1"));
+        y1 = parseInt(myLinks[index].line.attr("y1"));
+        x2 = parseInt(myLinks[index].line.attr("x2"));
+        y2 = parseInt(myLinks[index].line.attr("y2"));
+        xpt = parseInt(x);
+        ypt = parseInt(y);
+        if(isInside(x1, y1, x2, y2, xpt, ypt)){
+            res = myLinks[index];
+        }
     }
-  }
-  return res;
+    return res;
 }
 
 /*  functions used for getLinkAtCoordinates  */
 
 function distance(x1, y1, x2, y2){
-	return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+    return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
 }
 
 function isInside(x1, y1, x2, y2, x, y){
-	return Math.abs(distance(x1, y1, x, y) + distance(x, y, x2, y2) - distance(x1, y1, x2, y2)) < 1;
+    return Math.abs(distance(x1, y1, x, y) + distance(x, y, x2, y2) - distance(x1, y1, x2, y2)) < 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -181,7 +165,7 @@ function isInside(x1, y1, x2, y2, x, y){
 // -----------------------------------------------------------------------------
 
 function clickInsideElement( e ) {
-  var el = e.srcElement || e.target;
+    var el = e.srcElement || e.target;
 
     if ($('#production')[0].contains(el)){
         return el;
@@ -192,15 +176,15 @@ function clickInsideElement( e ) {
 
 function toggleMenuOn() {
     if(menuState !== 1){
-      menuState = 1;
-      menu.addClass(active);
+        menuState = 1;
+        menu.addClass(active);
     }
 }
 
 function toggleMenuOff() {
     if(menuState !== 0){
-      menuState = 0;
-      menu.removeClass(active);
+        menuState = 0;
+        menu.removeClass(active);
     }
 }
 
@@ -305,19 +289,19 @@ $('#decreaseWidth').on('click', function(){
 
 $('#navigability').on('click', function(){
     if(selectedLink != null){
-		    selectedLink.addNavigability(false);
+        selectedLink.addNavigability(false);
     }
 });
 
 $('#reverseNavigability').on('click', function(){
     if(selectedLink != null){
-		    selectedLink.addNavigability(true);
+        selectedLink.addNavigability(true);
     }
 });
 
 $('#removeNavigability').on('click', function(){
     if(selectedLink != null){
-		    selectedLink.removeNavigability();
+        selectedLink.removeNavigability();
     }
 });
 
@@ -339,13 +323,13 @@ $('button.colorTool').on('click', function(){
 
 function onKeydown(event){
     if(event.keyCode === 46){
-    	  if(selectedItem !== null){
-        		selectedItem.myRemove();
-        		selectedItem = null;
-    	  }else if(selectedLink !== null){
-        		selectedLink.myRemove();
-        		selectedLink = null;
-    	  }
+        if(selectedItem !== null){
+            selectedItem.myRemove();
+            selectedItem = null;
+        }else if(selectedLink !== null){
+            selectedLink.myRemove();
+            selectedLink = null;
+        }
     }
 }
 
@@ -381,13 +365,13 @@ String.prototype.visualLength = function(){
     var ruler = $("#ruler")[0];
     ruler.innerHTML = this;
     return ruler.offsetWidth;
-}
+};
 
 String.prototype.visualFontSize = function(){
     var ruler = $("#ruler")[0];
     ruler.innerHTML = this;
     return ruler.offsetHeight;
-}
+};
 
 function cutTextIntoLines(text, textWidth){
     var words = text.split(/(\W+|\n)/);

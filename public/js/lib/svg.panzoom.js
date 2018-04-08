@@ -9,6 +9,9 @@
 
 // beta version from :
 // https://github.com/cfreear/svg.panzoom.js/blob/21bde1efb70ac68e331688c8786d50e389ee8b25/dist/svg.panzoom.js
+
+var doPanning;  // allow to enable/disabled the panning
+
 ;(function() {
     "use strict";
 
@@ -49,7 +52,7 @@
             var zoomMax = options.zoomMax
             var doWheelZoom = options.doWheelZoom
             var doPinchZoom = options.doPinchZoom
-            var doPanning = options.doPanning
+            doPanning = options.doPanning
 
             var lastP, lastTouches, zoomInProgress = false
 
@@ -147,20 +150,22 @@
             }
 
             var panStart = function(ev) {
-                ev.preventDefault()
+                if(doPanning) {
+                    ev.preventDefault()
 
-                this.off('mousedown.panZoom', panStart)
+                    this.off('mousedown.panZoom', panStart)
 
-                lastTouches = normalizeEvent(ev)
+                    lastTouches = normalizeEvent(ev)
 
-                if(zoomInProgress) return
+                    if (zoomInProgress) return
 
-                this.fire('panStart', {event: ev})
+                    this.fire('panStart', {event: ev})
 
-                lastP = {x: lastTouches[0].clientX, y: lastTouches[0].clientY }
+                    lastP = {x: lastTouches[0].clientX, y: lastTouches[0].clientY}
 
-                SVG.on(document, 'mousemove.panZoom', panning, this)
-                SVG.on(document, 'mouseup.panZoom', panStop, this)
+                    SVG.on(document, 'mousemove.panZoom', panning, this)
+                    SVG.on(document, 'mouseup.panZoom', panStop, this)
+                }
             }
 
             var panStop = function(ev) {
@@ -190,7 +195,7 @@
 
             if (doWheelZoom) this.on('wheel.panZoom', wheelZoom)
             if (doPinchZoom) this.on('touchstart.panZoom', pinchZoomStart, this, {passive:false})
-            if (doPanning) this.on('mousedown.panZoom', panStart, this)
+            this.on('mousedown.panZoom', panStart, this)
 
             return this
 
