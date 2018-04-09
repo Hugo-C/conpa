@@ -46,7 +46,8 @@ class Rectangle {
       text.style.resize = "none";
       text.style.border = "none";
       text.style.padding = "5px";
-	  text.style.color = "#000000";
+	    text.style.color = "#000000";
+      text.style.overflow = "hidden";
       text.style.backgroundColor = "transparent";
       text.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
 
@@ -166,7 +167,7 @@ class Link {
 
     		this.navigability = null;
     		this.angle = null;
-			this.reversed = false;
+        this.reversed = false;
         let pos1 = e1.center();
         let pos2 = e2.center();
         this.line = parent.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
@@ -188,8 +189,8 @@ class Link {
      */
     setWidth(widthValue){
         this.line.stroke({width: widthValue});
-		if(this.navigability != null){
-			this.addNavigability(false);
+    		if(this.navigability != null){
+            this.addNavigability(false);
         }
     }
 
@@ -216,7 +217,7 @@ class Link {
      * Remove the link
      */
     myRemove() {
-		this.removeNavigability();
+		    this.removeNavigability();
         this.line.remove();
         this.e1.removeLink(this);
         this.e2.removeLink(this);
@@ -232,7 +233,7 @@ class Link {
         this.line.plot(c1.x, c1.y, c2.x, c2.y);
 
         if(this.navigability != null){
-			this.addNavigability();
+            this.addNavigability();
         }
     }
 
@@ -250,7 +251,7 @@ class Link {
   	*/
     addNavigability(){
       	if(this.navigability != null){
-      		this.navigability.remove();
+      		  this.navigability.remove();
       	}
 
       	let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
@@ -261,39 +262,39 @@ class Link {
        	let pos2 = this.e2.center();
         this.angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x) * 180 / Math.PI;
       	if(this.reversed){
-			this.angle += 180;
-		}
+			       this.angle += 180;
+        }
 
       	this.navigability.attr({points: "" + (xCenter - (4 + this.getWidth()*2)) + "," + (yCenter - (2 + this.getWidth()*2)) + " " + (xCenter + (4 + this.getWidth()*2)) + "," + (yCenter) + " " + (xCenter - (4 + this.getWidth()*2)) + "," + (yCenter + (2 + this.getWidth()*2))});
       	this.navigability.attr({transform: "rotate(" + this.angle + " " + xCenter + " " + yCenter + ")"});
-		this.setNavigabilityColor(this.line.attr('stroke'));
-		this.navigability.back();
+    		this.setNavigabilityColor(this.line.attr('stroke'));
+    		this.navigability.back();
     }
 
-	/**
+	 /**
   	* Remove the navigability of the link
   	*/
   	removeNavigability(){
         if(this.navigability != null){
             this.navigability.remove();
-			this.navigability = null;
+			      this.navigability = null;
             this.angle = null;
-			this.reversed = false;
+			      this.reversed = false;
         }
     }
-	
-	/**
+
+	 /**
   	* reverse the navigability of the link
   	*/
   	reverseNavigability(){
-		this.reversed = !this.reversed;
-	}
-	
-	/**
-	* change the value of color property of the navigability
+		    this.reversed = !this.reversed;
+    }
+
+	 /**
+	  * change the value of color property of the navigability
     * @param {string} colorValue : color's code ("#??????")
   	*/
   	setNavigabilityColor(colorValue){
-       this.navigability.attr({style: "fill:" + colorValue + ";stroke:" + colorValue});
+        this.navigability.attr({style: "fill:" + colorValue + ";stroke:" + colorValue});
     }
 }

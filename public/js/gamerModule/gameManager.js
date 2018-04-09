@@ -118,12 +118,15 @@ $("#displayList").on("click", function(){
     }
 });
 
+/** allow to change the privacy state of the production */
 $("#setPrivacy").on("click", function(){
     var button = $("button#setPrivacy");
     if(button.css('background-image').match(/.*\/img\/gamerModule\/private\.svg.*/)){
         button.css('background-image', 'url("/img/gamerModule/public.svg")');
+        button[0].value = 'public';
     }else{
         button.css('background-image', 'url("/img/gamerModule/private.svg")');
+        button[0].value = 'private';
     }
 });
 
