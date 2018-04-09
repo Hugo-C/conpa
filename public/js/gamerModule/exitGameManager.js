@@ -47,6 +47,7 @@ function initGUI(){
  * On click in this button, we display the exit panel
  */
 $("#exit").on("click", function(){
+    draw.zoom(1);
     $('#gamePanel > :nth-child(2)').css('display', 'none'); // hide productionArea panel
     $('#exitPanel').css('display', 'block'); // display exit panel
     initGUI(); // initialize exit panel
