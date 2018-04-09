@@ -12,7 +12,7 @@ var master = draw.group();
 var svg = document.querySelector('svg');
 var pt = svg.createSVGPoint();
 
-var colors = {'red': '#B9121B', 'green': 'green', 'yellow': 'yellow', 'blue': 'blue', 'white': '#DDDDDD', 'purple': 'purple', 'brown': '#5A3A22'};
+var colors = {'red': '#ED1723', 'green': '#0FB32D', 'yellow': '#FFEE24', 'blue': '#3344FF', 'white': '#D5D5D5', 'purple': '#A531FF', 'brown': '#8C5B35'};
 var selectedColor = colors['red'];
 
 // Rectangle manipulation variables
@@ -289,13 +289,14 @@ $('#decreaseWidth').on('click', function(){
 
 $('#navigability').on('click', function(){
     if(selectedLink != null){
-        selectedLink.addNavigability(false);
+        selectedLink.addNavigability();
     }
 });
 
 $('#reverseNavigability').on('click', function(){
-    if(selectedLink != null){
-        selectedLink.addNavigability(true);
+    if(selectedLink != null && selectedLink.navigability != null){
+        selectedLink.reverseNavigability();
+		selectedLink.addNavigability();
     }
 });
 
