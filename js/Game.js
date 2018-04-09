@@ -9,7 +9,8 @@ module.exports = class Game {
         this.indivTimer = indivTimer;
         this.globalTimer = globalTimer;
         this.status = status;
-        this.inactivePlayerChecker = null;
+        this.inactivePlayerManager = null;
+        this.productionSharingManager = null;
         this.inactivePlayer = [];
         this.exitBuffer = []; // nobody wants quit the game
         this.partyHistoricId = null;
@@ -85,7 +86,8 @@ module.exports = class Game {
 
     /**
      * Return the node of the fifo list corresponding to the given pseudo
-     * @return {Player} : player corresponding to the given pseudo
+     * @param {string} pseudo : pseudo of the desired player
+     * @return {FIFO Node} : player's node corresponding to the given pseudo
      */
     getPlayerNode(pseudo){
          var playerNode = null; // used to retrieve the player's node
@@ -99,11 +101,20 @@ module.exports = class Game {
         return playerNode;
     }
 
+    /**
+     * Return the instance of Player which corresponding to the given pseudo
+     * @param {string} pseudo : pseudo of the desired player
+     * @return {Player} : instance of Player
+     */
     getPlayer(pseudo){
         var playerNode = this.getPlayerNode(pseudo);
         return playerNode == null ? null : playerNode.value;
     }
 
+    /**
+     * Return the id of this party in the historic table
+     * @return {number} : historic id of this party
+     */
     getHistoricId(){
         return this.partyHistoricId;
     }
@@ -118,10 +129,20 @@ module.exports = class Game {
         if(playerNode != null) playerNode.value.setQuestion(question);
     }
 
+    /**
+     * Change the status of the party
+     * @param {string} status : new status of the party
+     */
     setStatus(newStatus){
         this.status = newStatus;
     }
 
+    /**
+     * Change the historic id of the party
+     * This function is called only one time when all players have defined their question
+     * Indeed there is no reason for which this id can change during the game
+     * @param {number} historicId : new id of the party in the historic table
+     */
     setHistoricId(historicId){
         this.partyHistoricId = historicId;
     }

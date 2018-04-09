@@ -118,7 +118,6 @@ function onClick(evt){
     }
 
     if(selectedLink != null){
-        //selectedLink.line.attr({"stroke-width": STROKE_WIDTH});
         selectedLink = null;
     }
 }
@@ -159,6 +158,26 @@ function distance(x1, y1, x2, y2){
 function isInside(x1, y1, x2, y2, x, y){
     return Math.abs(distance(x1, y1, x, y) + distance(x, y, x2, y2) - distance(x1, y1, x2, y2)) < 1;
 }
+
+function onKeydown(event){
+    if(event.keyCode === 46){
+        if(selectedItem !== null){
+            selectedItem.myRemove();
+            selectedItem = null;
+        }else if(selectedLink !== null){
+            selectedLink.myRemove();
+            selectedLink = null;
+        }
+    }
+}
+
+$("#colorMenu button").on("click", function(){
+    var color = $(this).val();
+    selectedColor = colors[color];
+    if(selectedItem != null){
+        selectedItem.rect.attr('fill', colors[color]);
+    }
+});
 
 // -----------------------------------------------------------------------------
 // --------------------- CONTEXTUAL MENU ---------------------------------------
@@ -320,31 +339,28 @@ $('button.colorTool').on('click', function(){
 });
 
 // -----------------------------------------------------------------------------
+// ------------------------- SVG LISTENERS -------------------------------------
 // -----------------------------------------------------------------------------
 
-function onKeydown(event){
-    if(event.keyCode === 46){
-        if(selectedItem !== null){
-            selectedItem.myRemove();
-            selectedItem = null;
-        }else if(selectedLink !== null){
-            selectedLink.myRemove();
-            selectedLink = null;
-        }
-    }
-}
+draw.on('mousedown', onMouseDown);
+draw.on('mousemove', onMouseMove);
+draw.on('mouseup', onMouseUp);
+draw.on('click', onClick);
+draw.on('keydown', onKeydown);
+document.addEventListener('contextmenu', openContextMenu);
+document.addEventListener('click', documentClick);
 
-$("#colorMenu button").on("click", function(){
-    var color = $(this).val();
-    selectedColor = colors[color];
-    if(selectedItem != null){
-        selectedItem.rect.attr('fill', colors[color]);
-    }
-});
+// -----------------------------------------------------------------------------
+// ----------------- Convert SVG to a string -----------------------------------
+// -----------------------------------------------------------------------------
+// We convert the svg to a string to display it as an image (later)
+// To display it as an image, we need to replace HTML and foreignObject tags
+// by SVG tags
+// -----------------------------------------------------------------------------
 
 /**
  * Extract the value of all textArea inside the parent element and put it inside the textArea tags
- * @param parent {HTMLElement} : the parent of textareas to explicit
+ * @param {HTMLElement} parent : the parent of textareas to explicit
  */
 function explicitTextAreaValues(parent){
     for(let elt of parent.childNodes){
@@ -417,7 +433,7 @@ function cutTextIntoLines(text, textWidth){
 }
 
 function extractParam(param, paramsList){
-    var result = paramsList.match(param + '=\"([0-9.]+)\"');
+    var result = paramsList.match(param + '=\"([-+]?[0-9.]+)\"'); // <-- repère
     return parseInt(result[1]);
 }
 
@@ -475,11 +491,76 @@ function getInlineSvg(){
     return svgSave;
 }
 
-draw.on('mousedown', onMouseDown);
-draw.on('mousemove', onMouseMove);
-draw.on('mouseup', onMouseUp);
-draw.on('click', onClick);
-//draw.on('dblclick', onDblClick);
-draw.on('keydown', onKeydown);
-document.addEventListener('contextmenu', openContextMenu);
-document.addEventListener('click', documentClick);
+// -----------------------------------------------------------------------------
+// ----- Retrieve data which are require to make a usable copy of the SVG ------
+// -----------------------------------------------------------------------------
+// These two functions stay here for the moment because they can change again !
+// (Maybe replace them by similar functions that work with svg ids)
+// If we don't find a better solution : TODO
+// ==> create functions inside Rectange and Link classes to convert
+//     a class object to a js object
+// -----------------------------------------------------------------------------
+
+function saveProduction(){
+    var production = {'rectangles' : [], 'links': []};
+    for(var index in myElements){
+        var data = {};
+        data['id'] = myElements[index].rect.attr('id');
+        data['x'] = myElements[index].rect.attr('x');
+        data['y'] = myElements[index].rect.attr('y');
+        data['width'] = myElements[index].rect.attr('width');
+        data['height'] = myElements[index].rect.attr('height');
+        data['fill'] = myElements[index].rect.attr('fill');
+        data['text'] = $(myElements[index].text).children().val();
+        production['rectangles'].push(data);
+    }
+
+    for(var index in myLinks){
+        var data = {};
+        data['idRect1'] = myLinks[index].e1.rect.attr('id');
+        data['idRect2'] = myLinks[index].e2.rect.attr('id');
+        data['strokeWidth'] = myLinks[index].line.attr('stroke-width');
+        data['strokeDasharray'] = myLinks[index].line.attr('stroke-dasharray');
+        data['fill'] = myLinks[index].line.attr('stroke');
+        data['navigability'] = myLinks[index].navigability != null;
+        data['navAngle'] = myLinks[index].angle;
+        production['links'].push(data);
+    }
+    return production;
+}
+
+function restoreProduction(data){
+    var buffer = {}; // keep a link between old ids and new objects (used to links rectangles)
+    var rectangles = data['rectangles'];
+    for(var index in rectangles){
+        var rect = new Rectangle(rectangles[index]['x'],
+                                 rectangles[index]['y'],
+                                 rectangles[index]['width'],
+                                 rectangles[index]['height'],
+                                 rectangles[index]['fill'],
+                                 master);
+        rect.addTextArea();
+        $(myElements[index].text).children().val(rectangles[index]['text']);
+        buffer[rectangles[index]['id']] = rect;
+    }
+
+    var links = data['links'];
+    for(var index in links){
+        buffer[links[index]['idRect1']].linkRect(buffer[links[index]['idRect2']]);
+        myLinks[index].line.attr({'stroke-width': links[index]['strokeWidth']});
+        myLinks[index].line.attr({'stroke-dasharray': links[index]['strokeDasharray']});
+        myLinks[index].line.attr({'stroke': links[index]['fill']});
+        if(links[index]['navigability']){
+            myLinks[index].addNavigability(false);
+            if(myLinks[index].angle != links[index]['navAngle']){
+                myLinks[index].addNavigability(true);
+            }
+        }
+    }
+}
+
+function clearSVG(){
+    myElements = [];
+    myLinks = [];
+    master['node'].innerHTML = "";
+}

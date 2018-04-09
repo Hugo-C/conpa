@@ -96,13 +96,13 @@ module.exports = function(io, socket){
    * @param {string} serverName : name of server which is concerned
    */
   function startGameOnServerFull(serverName){
-    var server = rooms[serverName];
+      var server = rooms[serverName];
 
-    if(server.getNbPlayer() == server.getPlaces()){
-      io.to(server.getName()).emit('gameStart', {'server': server.getName(), 'players': server.getPlayers()});
-      server.setStatus(QUESTION_TIME);
-      io.sockets.emit('serverListUpdate', listAllServers());
-    }
+      if(server.getNbPlayer() == server.getPlaces()){
+          io.to(server.getName()).emit('gameStart', {'server': server.getName(), 'players': server.getPlayers()});
+          server.setStatus(QUESTION_TIME);
+          io.sockets.emit('serverListUpdate', listAllServers());
+      }
   }
 
   /**
@@ -130,15 +130,15 @@ module.exports = function(io, socket){
           socket.join(socket.room);
 
           var newServer = {'name': data["server"]["name"],
-                        'host': getPseudoWithId(socket.id),
-                        'animate': data['role'] == 'player' ? 'No' : 'Yes',
-                        'places' : server.getNbPlayer() + ' / ' + server.getPlaces(),
-                        'status': server.getStatus()};
+                           'host': getPseudoWithId(socket.id),
+                           'animate': data['role'] == 'player' ? 'No' : 'Yes',
+                           'places' : server.getNbPlayer() + ' / ' + server.getPlaces(),
+                           'status': server.getStatus()};
 
           socket.emit('serverCreated', {'error': false, 'msg': null}); // informs the creator that server has been created successfully
           io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
           startGameOnServerFull(server.getName()); // try to start the game
-          server.inactivePlayerChecker = setInterval(inactivePlayerManager, 5000, server);
+          server.inactivePlayerManager = setInterval(inactivePlayerManager, 5000, server);
       }else{
           socket.emit('serverCreated', {'error': true, 'msg': 'server name not available'}); // informs the creator that the server's name is not available
       }
@@ -163,7 +163,7 @@ module.exports = function(io, socket){
               io.sockets.connected[clients[players[index]]].leave();
           }
 
-          clearInterval(server.inactivePlayerChecker);
+          clearInterval(server.inactivePlayerManager);
           delete rooms[server.getName()];
           io.sockets.emit('serverListUpdate', listAllServers());
       }
@@ -247,6 +247,7 @@ module.exports = function(io, socket){
 
               if(server.nbPlayersReady() == server.getNbPlayer()){
                   socket.emit('allQuestionsDefined', getQuestionTimeState(server));
+                  io.to(socket.room).emit('players', server.getPlayers());
               }else{
                   socket.emit('initQuestionTime', server.getPlayers());
                   socket.emit('actualizeQuestions', getQuestionTimeState(server));
@@ -276,6 +277,7 @@ module.exports = function(io, socket){
           io.to(socket.room).emit('players', server.getPlayers());
           recordGameServer(server);
           server.setStatus(GAME_TIME);
+          server.productionSharingManager = setInterval(productionSharingManager, 5000, server.getName());
       }else{
           io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
       }
@@ -301,7 +303,8 @@ module.exports = function(io, socket){
       recordProduction(server.getHistoricId(), data['pseudo'], data['production']);
 
       if(server.getNbPlayer() == 0){
-          clearInterval(server.inactivePlayerChecker);
+          clearInterval(server.inactivePlayerManager);
+          clearInterval(server.productionSharingManager);
           delete rooms[server.getName()]; // if server is empty, we detroy it
       }else{
           io.to(server.getName()).emit('players', server.getPlayers()); // informs players that a player has leave the game
@@ -337,7 +340,7 @@ module.exports = function(io, socket){
    * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
    */
   socket.on('cardPicked', function(data){
-      socket.broadcast.to(socket.room).emit('cardPicked', data);
+      io.sockets.in(socket.room).emit('cardPicked', data);
   });
 
   /**
@@ -395,6 +398,15 @@ module.exports = function(io, socket){
         });
     });
 
+    socket.on('shareMyProduction', function(data){
+        socket.broadcast.to(socket.room).emit('playersProduction', data);
+    });
+
+    function productionSharingManager(serverName){
+        console.log('retrieving all productions');
+        io.sockets.in(serverName).emit('shareYourProduction', null);
+    }
+
     /**
      * This function is used to manage unexpected disconnections
      * When the server loose the connection with a player in the given game server,
@@ -417,7 +429,8 @@ module.exports = function(io, socket){
 
                 // a player has been removed, we need to inform clients
                 if(server.getNbPlayer() == 0){
-                    clearInterval(server.inactivePlayerChecker);
+                    clearInterval(server.productionSharingManager);
+                    clearInterval(server.inactivePlayerManager);
                     delete rooms[server.getName()]; // if server is empty, we detroy it
                 }else{
                     console.log('updating server data');
@@ -427,6 +440,9 @@ module.exports = function(io, socket){
                             console.log('all questions are defined !');
                             io.sockets.in(server.getName()).emit('allQuestionsDefined', getQuestionTimeState(server));
                             io.sockets.in(server.getName()).emit('players', server.getPlayers());
+                            recordGameServer(server);
+                            server.setStatus(GAME_TIME);
+                            server.productionSharingManager = setInterval(productionSharingManager, 5000, server.getName());
                         }else{
                             console.log('updating question time');
                             io.sockets.in(server.getName()).emit('initQuestionTime', server.getPlayers());

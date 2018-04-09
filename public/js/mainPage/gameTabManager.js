@@ -116,6 +116,12 @@ function checkServerCreationForm(serverData){
     removeAllAlerts();
     var conform = true;
 
+    if(isNaN(serverData['server']['indivTimer']) || isNaN(serverData['server']['globalTimer'])
+    || isNaN(serverData['server']['appropriation']) || isNaN(serverData['server']['places'])){
+        placesErrorDisplayer.text("Fields can't be empty");
+        conform = false;
+    }
+
     if(serverData['server']['name'] == ""){
         placesErrorDisplayer.text("Server name can't be empty");
         conform = false;

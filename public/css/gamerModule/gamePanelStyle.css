@@ -100,40 +100,54 @@ div#chatInfos {
 
 /* ****************************** */
 
-#gamePanel > :nth-child(2) > :first-child {
+#productionList {
   border-right: 2px solid black;
   background-color: lightgrey;
   display: block;
 }
 
-#gamePanel > :nth-child(2) > :first-child > div {
+#productionList > div {
   border-bottom: 2px solid black;
 }
 
-#gamePanel > :nth-child(2) > :first-child > :nth-child(1),
-#gamePanel > :nth-child(2) > :first-child > :nth-child(2) {
+#productionList > :nth-child(1),
+#productionList > :nth-child(2) {
   height: 5%;
 }
 
-#gamePanel > :nth-child(2) > :first-child > :nth-child(1) {
+#productionList > :nth-child(1) {
   background-color: grey;
 }
 
-#gamePanel > :nth-child(2) > :first-child > :nth-child(2) {
+#productionList > :nth-child(2) {
   display: flex;
   align-items: center;
 }
 
-#gamePanel > :nth-child(2) > :first-child > :nth-child(3) {
+#productionList > :nth-child(3) {
   height: 10%;
   background-color: grey;
 }
 
-#gamePanel > :nth-child(2) > :first-child > :nth-child(3) > p,
-button#getMyProduction {
-  color: black;
-  font-size: 0.9vw;
+#productionList > :nth-child(3) > p,
+button#getMyProduction,
+#productionList > :nth-child(4) > button {
+  width: 100%;
+  font-size: 0.7vw;
   font-weight: bold;
+}
+
+#productionList > :nth-child(4) {
+  height: 80%;
+  overflow-y: auto;
+}
+
+#productionList > :nth-child(4) > button {
+  height: 10%;
+}
+
+button.selectedProduction {
+  background-color: #929AA2;
 }
 
 button#setPrivacy {

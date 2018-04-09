@@ -60,11 +60,11 @@
   opacity: 0;
   visibility: hidden;
 
-  -webkit-transition: opacity 3s ease-in;
-  -moz-transition: opacity 3s ease-in;
-  -o-transition: opacity 3s ease-in;
-  -ms-transition: opacity 3s ease-in;
-  transition: opacity 3s ease-in;
+  -webkit-transition: opacity 2s ease-in;
+  -moz-transition: opacity 2s ease-in;
+  -o-transition: opacity 2s ease-in;
+  -ms-transition: opacity 2s ease-in;
+  transition: opacity 2s ease-in;
 }
 
 #questionPanel > :nth-child(3) > div {

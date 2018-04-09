@@ -8,8 +8,12 @@ var playersList = null;
  * form of received data : array which contain the list of players's pseudo
  */
 socket.on('players', function(players){
+    actualizeChatPlayersList(players);
+});
+
+function actualizeChatPlayersList(players){
     console.log(players);
-    playersList = players; //TODO : store this list somewhere else
+    playersList = players;
     var playerSelector = $('#chatPlayers');
     playerSelector.children().remove();
     playerSelector.append('<option value="all">general</option>');
@@ -21,7 +25,7 @@ socket.on('players', function(players){
             }));
         }
     }
-});
+}
 
 /**
  * Displays a message in the player tchat area

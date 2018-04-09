@@ -169,5 +169,6 @@ socket.on('stopGameProcessAborted', function(data){
  * form of received data : no data is send with this message !
  */
 socket.on('gameEnd', function(data){
+    console.log("EXIT GAME");
     $('#leaveAlone').click();
 });

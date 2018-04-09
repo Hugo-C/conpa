@@ -1,19 +1,28 @@
-div#questionPanel(class="col-lg-12 col-md-12")
+div#questionPanel(class="col-lg-12 col-md-12 col-sm-12")
   div(class="rowFlexContainer row")
-    div(class="rowFlexContainer stretchedImage col-lg-6 col-md-6")
+    div(class="rowFlexContainer stretchedImage col-lg-6 col-md-6 col-sm-6")
       span(class="myCustomTitle") Choose your question
   div(class="rowFlexContainer stretchedImage row")
-    div#playersQuestion(class="col-lg-12 col-md-12")
-    div#guide(class="col-lg-6 col-md-6")
+    div#playersQuestion(class="col-lg-12 col-md-12 col-sm-12")
+    div#guide(class="col-lg-6 col-md-6 col-sm-6")
+      p(class="col-lg-12 col-md-12 col-sm-12")
+        | </br><b>La question doit être de la forme suivante :</b></br>
+        | "Comment X peut être Yé par Z, avec l'aide partielle ou totale du numérique ?"
+        | </br></br><b>Voici quelques exemples pour vous aider :</b></br>
+        | </br>- Comment des préparations (X) pourraient être en partie réutilisées (Y) par des élèves (Z), à des fins d’apprentissage ?</br>
+        | </br>- Comment faire en sorte que des règles de gestion de la classe (X) puissent être aisément rappelées et surtout prises en compte (Y) par les élèves (Z), notamment avec l’aide du numérique ?</br>
+        | </br>- Comment l’évaluation (X) par les pairs (Z) pourrait être réalisée (Y) par l’intermédiaire du numérique ?</br>
+        | </br>- Comment les évaluations formatives (X) de l’enseignant (Z) pourraient être consignées (Y) pour en garder des traces réflexives ?</br>
+        | </br>- Comment faire en sorte qu’un public d’étudiants hétérogène (informaticiens et statisticiens) (Z) d’un cours de statistiques (X) restent intéressés (Y) par le cours ?</br>
   div(class="row")
-    div(class="rowFlexContainer stretchedImage col-lg-12 col-md-12")
-      input#myQuestion(type="text" class="col-lg-4 col-md-4")
-      div(class="stretchedImage col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4")
-        button#projector(class="col-lg-offset-9 col-lg-1 col-md-offset-9 col-md-1")
-      div(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2")
+    div(class="rowFlexContainer stretchedImage col-lg-12 col-md-12 col-sm-12")
+      input#myQuestion(type="text" class="col-lg-4 col-md-4 col-sm-4")
+      div(class="stretchedImage col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
+        button#projector(class="col-lg-offset-9 col-lg-1 col-md-offset-9 col-md-1 col-sm-offset-9 col-sm-1")
+      div(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2")
         div(class="row")
-          button#validate(class="col-lg-6 col-md-6") VALIDATE
+          button#validate(class="col-lg-6 col-md-6 col-sm-6") VALIDATE
         div(class="rowFlexContainer row")
-          span#nbReady(class="col-lg-6 col-md-6")
-          span(class="col-lg-6 col-md-6") READY
+          span#nbReady(class="col-lg-6 col-md-6 col-sm-6")
+          span(class="col-lg-6 col-md-6 col-sm-6") READY
         

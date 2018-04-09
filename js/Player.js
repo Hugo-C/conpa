@@ -1,7 +1,6 @@
 
 const PLAYER_ROLE = 1;
 const ANIMATOR_ROLE = 2;
-const PROD_AREA_PUBLIC = 10;
 
 module.exports = class Player {
 
@@ -9,7 +8,6 @@ module.exports = class Player {
       this.pseudo = pseudo;
       this.role = role;
       this.question = '';
-      this.prodStatus = PROD_AREA_PUBLIC;
   }
 
   /**
