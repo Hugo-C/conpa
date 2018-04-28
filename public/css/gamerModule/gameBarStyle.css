@@ -26,6 +26,8 @@ div.box {
   padding: 0;
   border: 2px solid black;
   box-shadow: 6px 6px 8px grey;
+  -moz-box-shadow: 6px 6px 8px grey;
+	-webkit-box-shadow: 6px 6px 8px grey;
   background-color: white;
 }
 

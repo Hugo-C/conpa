@@ -1,16 +1,27 @@
 var $register_form = $('.register');
-var $register_username = $('.register > div > input[name="username"]');
-var $register_email = $('.register > div > input[name="email"]');
-var $register_password = $('.register > div > input[name="password"]');
+var $register_username = $('.register input[name="username"]');
+var $register_email = $('.register input[name="email"]');
+var $register_password = $('.register input[name="password"]');
 
 var $login_form = $('.login');
-var $login_username = $('.login > div > input[name="username"]');
-var $login_password = $('.login > div > input[name="password"]');
+var $login_username = $('.login input[name="username"]');
+var $login_password = $('.login input[name="password"]');
+
+function clearInput(type){
+    myInputs = $('input[type="' + type + '"]');
+    for(let index = 0; index < myInputs.length; index++){
+        myInputs[index].value = ''; // reset input(type="email") content
+    }
+}
 
 function removeAllAlerts(){
   $('.error_username').text('');
   $('.error_email').text('');
   $('.error_login').text('');
+  $('.myTooltip').css('display', 'none');
+  $('.invalid').removeClass('invalid');
+  clearInput('text');
+  clearInput('password');
 }
 
 function showInvalidRegisterFields(){
@@ -35,7 +46,7 @@ function processRegisterAnswer(response){
         $('.error_email').text('email already used');
         break;
       case 'OK':
-        $('.register > div > .linkform').click(); // redirection to the login form
+        $('.register .linkform').click(); // redirection to the login form
         alert('registration successful');
         break;
     }
@@ -108,5 +119,13 @@ $('input[value="Login"]').on('click', function(){
         });
     }else{
       showInvalidLoginFields();
+    }
+});
+
+$('form.register input').on('keyup', function(evt){
+    if(!$(this)[0].checkValidity()){
+        $($(this)['context']['nextSibling']).css('display', 'inline-block');
+    }else{
+        $($(this)['context']['nextSibling']).css('display', 'none');
     }
 });

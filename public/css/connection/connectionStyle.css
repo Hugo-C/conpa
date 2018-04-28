@@ -4,26 +4,83 @@ html, body {
 }
 
 .form_wrapper{
-	width:350px;
+  padding: 0;
+	width: 20%;
+  height: 50%;
+  -webkit-transition: width 1s, height 1s; /* Safari */
+  transition: width 1s, height 1s;
 }
 
 .form_wrapper h3{
-	padding:20px 30px 20px 30px;
+  width: 100%;
+  text-align: left;
+  padding-left: 10%;
   margin: 0;
-	background-color:#444;
 	color:#fff;
-	font-size:25px;
-	border-bottom:1px solid #ddd;
+	font-size:2vw;
+}
+
+.form_wrapper > form {
+  padding: 0;
+  width:100%;
+  height: 100%;
+}
+
+.row {
+  margin: 0;
 }
 
 form.login{
-	width:350px;
+  display: block;
 }
 form.register{
-	width:350px;
+  display: none;
 }
 form.forgot_password{
-	width:300px;
+  display: none;
+}
+
+form .formHeader {
+  height: 15%;
+  background-color:#444;
+  border-bottom:1px solid #ddd;
+}
+form .formContent {
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+
+form.login .formContent  {
+  height: 50%;
+}
+form.login >.formContent  > div {
+  height: 50%;
+}
+form.login .bottom {
+  height: 35%;
+}
+
+form.register .formContent  {
+  height: 60%;
+}
+form.register .formContent  > div {
+  height: 33%;
+}
+form.register .bottom {
+  height: 25%;
+}
+
+form.forgot_password .formHeader {
+  height: 25%;
+}
+form.forgot_password .formContent  {
+  height: 35%;
+}
+form.forgot_password .formContent > div {
+  height: 100%;
+}
+form.forgot_password .bottom {
+  height: 40%;
 }
 
 span[class^="error"] {
@@ -31,6 +88,23 @@ span[class^="error"] {
   font-size: 12px;
   color: red;
   font-weight: bold;
+}
+
+span.myTooltip {
+  position: fixed;
+  margin-left: 5px;
+  margin-top: 1.6em;
+  font-size: 0.8vw;
+  color: black;
+  display: inline-block;
+	padding: 2px 4px;
+	border: 2px solid black;
+	background-color: #BBE12E;
+	border-radius: 4px;
+  display: none;
+  -moz-box-shadow: 4px 4px 6px grey;
+	-webkit-box-shadow: 4px 4px 6px grey;
+	box-shadow: 4px 4px 6px grey;
 }
 
 .form_wrapper .column{
@@ -50,17 +124,18 @@ span[class^="error"] {
 
 .form_wrapper label{
 	display:block;
-	padding:10px 30px 0px 30px;
-	margin:10px 0px 0px 0px;
+  padding: 0;
 }
 
 .form_wrapper input[type="text"],
 .form_wrapper input[type="email"],
 .form_wrapper input[type="password"]{
-	margin: 5px 30px 0px 30px;
-  width:76%;
-  height: 40px;
-  font-size: 20px;
+  height: 40%;
+  font-size: 1vw;
+}
+.form_wrapper input[type="checkbox"] {
+  margin-right: 5px;
+  margin-top: 0;
 }
 
 .form_wrapper input.invalid:required:invalid, .form_wrapper input.invalid:invalid {
@@ -68,40 +143,64 @@ span[class^="error"] {
 }
 
 .form_wrapper .bottom{
-	margin-top:20px;
+  padding: 5%;
 }
 
 .form_wrapper .bottom a{
 	display:block;
 	clear:both;
-	padding:10px 30px;
 	text-align:right;
 	color:#ffa800;
 	text-shadow:1px 1px 1px #000;
-}
-.form_wrapper a.forgot{
-	float:right;
-	font-style:italic;
-	line-height:24px;
-	color:#ffa800;
-	text-shadow:1px 1px 1px #fff;
-}
-.form_wrapper a.forgot:hover{
-	color:#000;
-}
-
-.form_wrapper div.remember{
-	float:left;
-	width:140px;
-	margin:20px 0px 20px 30px;
-	font-size:11px;
-}
-.form_wrapper div.remember input{
-	float:left;
-	margin:2px 5px 0px 0px;
+  font-size: 0.7vw;
 }
 
 .form_wrapper input[type="submit"] {
-  width: 150px;
-  margin:15px 20px 10px 10px;
+  width: 50%;
+  font-size: 1vw;
+}
+
+.bottom > :nth-child(1) {
+  font-size: 0.8vw;
+}
+
+
+.login > .bottom > :nth-child(1) {
+  height: 20%;
+  margin-bottom: 3%;
+}
+.login > .bottom > :nth-child(2) {
+  height: 30%;
+  margin-bottom: 3%;
+}
+.login > .bottom > :nth-child(3) {
+  height: 15%;
+  margin-bottom: 3%;
+}
+.login > .bottom > :nth-child(4) {
+  height: 15%;
+}
+
+.register > .bottom > :nth-child(1) {
+  height: 20%;
+  margin-bottom: 3%;
+}
+.register > .bottom > :nth-child(2) {
+  height: 35%;
+  margin-bottom: 5%;
+}
+.register > .bottom > :nth-child(3) {
+  height: 20%;
+}
+
+.forgot_password > .bottom > :nth-child(1) {
+  height: 35%;
+  margin-bottom: 5%;
+}
+.forgot_password > .bottom > :nth-child(2) {
+  height: 20%;
+  margin-bottom: 3%;
+}
+.forgot_password > .bottom > :nth-child(3) {
+  height: 20%;
 }
