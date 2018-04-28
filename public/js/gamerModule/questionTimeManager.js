@@ -2,10 +2,21 @@ const GRAVATAR_URL = "//www.gravatar.com/avatar/";
 const DEFAULT_IMG_URL = "//a0.muscache.com/im/pictures/87d6d531-78e2-43d5-9ccc-6a34aeba880f.jpg?aki_policy=x_medium";
 
 var socket = io();
+displayQuestionPanel();
 
 // informs the server that we have joined the game
 socket.emit('joinGame', {'pseudo': sessionStorage.pseudo,
                          'server': sessionStorage.server});
+
+function displayQuestionPanel(){
+    $('#questionContent').css('display', 'block');
+    $('#gameContent').css('display', 'none');
+}
+
+function hideQuestionPanel(){
+    $('#questionContent').css('display', 'none');
+    $('#gameContent').css('display', 'block');
+}
 
 function setPP(pseudo){
     $.ajax({
@@ -135,22 +146,31 @@ function actualizeNbReady(ready, total){
  *
  * form of received data : list of the pseudo of the players in the game
  */
-socket.on('initQuestionTime', function(players){
+socket.on('initQuestionTime', function(data){
+    let players = data['players'];
+    console.log(players);
     $('#playersQuestion').empty();
     actualizeNbReady(0, players.length);
-    if(players.length < 2){ // only one player in the game, we display it alone
-        addOnePlayer(players[0]);
-        setPP(players[0]);
-    }else{ // more than one player
-        for(var index = 0; index < players.length - 1; index += 2){
-            addTwoPlayers(players[index], players[index + 1]); // we display two players in the same line while we can
-            setPP(players[index]);
-            setPP(players[index + 1]);
+
+    if(players.length > 0){
+        if(players.length < 2){ // only one player in the game, we display it alone
+            addOnePlayer(players[0]);
+            setPP(players[0]);
+        }else{ // more than one player
+            for(var index = 0; index < players.length - 1; index += 2){
+                addTwoPlayers(players[index], players[index + 1]); // we display two players in the same line while we can
+                setPP(players[index]);
+                setPP(players[index + 1]);
+            }
+            if(players.length % 3 == 0){
+                addOnePlayer(players[players.length - 1]); // impair numbers of player, we display the last one alone
+                setPP(players[players.length - 1]);
+            }
         }
-        if(players.length % 3 == 0){
-            addOnePlayer(players[players.length - 1]); // impair numbers of player, we display the last one alone
-            setPP(players[players.length - 1]);
-        }
+    }
+
+    if(sessionStorage.role == 'animator'){
+        $('#validate').css('display', 'none');
     }
 });
 
@@ -160,8 +180,10 @@ socket.on('initQuestionTime', function(players){
  */
 $('#validate').on('click', function(){
     var question = $('#myQuestion').val();
-    if(question != ''){
+    if(sessionStorage.role == 'player' && question != ''){
         socket.emit('recordMyQuestion', {'question': question});
+    }else if(sessionStorage.role == 'animator'){
+        socket.emit('animatorValidation', null);
     }
 });
 
@@ -205,6 +227,10 @@ socket.on('actualizeQuestions', function(data){
             actualizeBorderColor(playersQuestion[index]['player']);
         }
     }
+
+    if(data['ready'] == playersQuestion.length && sessionStorage.role == 'animator'){
+        $('#validate').css('display', 'block'); // TODO : create an animation instead of hide the button
+    }
 });
 
 /**
@@ -230,6 +256,7 @@ function displayMyQuestion(playersQuestion){
  *                           'playersQuestion': dictionnary of (player's pseudo, player's question) pair }
  */
 socket.on('allQuestionsDefined', function(data){
+    console.log('all questions defined');
     $('#questionContent').css('display', 'none'); // hide question page
     $('#gameContent').css('display', 'block'); // display gamer module page
     displayMyQuestion(data['playersQuestion']);

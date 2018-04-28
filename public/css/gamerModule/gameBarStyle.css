@@ -14,10 +14,11 @@ div#gameBar > div {
 }
 
 div.fieldLabel {
-  margin-top: 2%;
-  margin-bottom: 2%;
+  margin-top: 1%;
+  margin-bottom: 1%;
   color: black;
   font-size: 1.8vw;
+  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
 }
 
 div.box {
@@ -37,11 +38,6 @@ div.row {
   margin: 0;
 }
 
-div#gameBar > div > div:nth-child(2),
-div#gameBar > div > div:nth-child(8) {
-  height: 5%;
-}
-
 div#gameBar > div > div:nth-child(4) {
   height: 10%;
 }
@@ -50,33 +46,36 @@ div#gameBar > div > div:nth-child(6) {
   height: 35%;
 }
 
-div#gameBar > div > div:nth-child(8) > div {
-  margin-bottom: 5%;
+div#gameBar > div > div:nth-child(2) {
+  height: 5%;
 }
 
-div#gameBar > div > div:nth-child(8) > div > div {
+div#gameBar > div > div:nth-child(7) {
+  margin-top: 8%;
+  height: 28%;
+}
+
+div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child {
+  height: 80%;
+}
+
+div#gameBar > div > div:nth-child(7) > div.box > div.row:last-child {
+  height: 20%;
+}
+
+div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child > button {
+  height: 70%;
+  display: none;
+  position: absolute;
+  background-image: url('/img/gamerModule/dice.png');
+}
+
+div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child > svg {
   height: 100%;
+  width: 100%;
   padding: 0;
 }
 
-button#skipButton {
-  height: 100%;
-  padding: 0;
-  background-image: url("/img/gamerModule/skipButton.svg");
-}
-
-/* screen size lower than 800px, reduce space between components to
-     gain missing space */
-@media screen and (max-height: 700px) {
-  div#gameBar > div > div:nth-child(9) {
-    height: 12%;
-  }
-}
-
-/* screen size upper than 800px, possible to increase space between
-     components to improved the readability */
-@media screen and (min-height: 700px) {
-  div#gameBar > div > div:nth-child(9) {
-    height: 15%;
-  }
+div#gameBar > div > div:nth-child(7) > div.box > div.row:last-child > button {
+  height: 75%;
 }

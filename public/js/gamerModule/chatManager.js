@@ -7,7 +7,8 @@ var playersList = null;
  *
  * form of received data : array which contain the list of players's pseudo
  */
-socket.on('players', function(players){
+socket.on('chatPlayers', function(players){
+    console.log(players);
     actualizeChatPlayersList(players);
 });
 
@@ -32,24 +33,40 @@ function actualizeChatPlayersList(players){
  *
  * @param {string} msg : message to display
  * @param {string} sender : pseudo of the sender
- * @param {boolean} whisper : boolean which indicates if message is public or private
+ * @param {string} color : color of the text
  */
-function insertTextInChat(msg, sender, whisper){
+function insertTextInChat(msg, sender, color){
     var tchat = $("#messages");
-    var color = whisper ? "brown" : "black";
     var senderTag = '<span style="font-weight:bold; color:' + color + '">' + sender + ' : </span>';
     var msgTag = '<span style="font-weight:bold; color:' + color + '">' + msg + '</span>';
     tchat.append('<p style="margin:0;">' + senderTag + msgTag + '</p>');
 }
 
-/* sends our message to the server */
+/**
+ * Return the color of the message according to the addressee
+ *
+ * @param {string} dest : the addressee
+ * @return {string} : a color
+ */
+function getColor(dest){
+    switch (dest) {
+        case "all":
+            return "black";
+        case "system":
+            return "red";
+        default:
+            return "brown";
+    }
+}
+
+/** sends our message to the server */
 function sendInputText(){
     var dest = $("#chatPlayers").val();
     var inputText = $("#inputBox").val();
     var msg = inputText.match(/^Write your message here !/) ? "" : inputText;
     var whisper = dest != "all";
     socket.emit('message', {'dest': dest, 'msg': msg});
-    insertTextInChat(msg, sessionStorage.pseudo, whisper);
+    insertTextInChat(msg, sessionStorage.pseudo, getColor(dest));
     $("#inputBox").val(""); // clean the input field
 }
 
@@ -72,5 +89,5 @@ $("#inputBox").on('keyup', function (e) {
  *  'whisper': [boolean which indicates if message is public or private]}
  */
 socket.on('message', function(data){
-    insertTextInChat(data["msg"], data["sender"], data["whisper"]);
+    insertTextInChat(data["msg"], data["sender"], getColor(data["dest"]));
 });

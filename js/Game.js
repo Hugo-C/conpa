@@ -5,7 +5,8 @@ module.exports = class Game {
         this.places = places;
         this.host = host;
         this.players = require('fifo')();
-        this.players.push(host);
+        this.activePlayers = [];
+        this.activePlayers.push(host.getPseudo());
         this.indivTimer = indivTimer;
         this.globalTimer = globalTimer;
         this.status = status;
@@ -14,6 +15,10 @@ module.exports = class Game {
         this.inactivePlayer = [];
         this.exitBuffer = []; // nobody wants quit the game
         this.partyHistoricId = null;
+
+        if(!host.isAnimator()){
+            this.players.push(host);
+        }
     }
 
     /**
@@ -37,7 +42,7 @@ module.exports = class Game {
      * @return {integer} : number of players currently in the game
      */
     getNbPlayer(){
-        return this.players.length;
+        return this.activePlayers.length;
     }
 
     /**
@@ -49,8 +54,20 @@ module.exports = class Game {
     }
 
     /**
-     * Return the list of players pseudo who are in the game
-     * @return {string list} : players pseudo currently in the game
+     * Return the name of the animator
+     * @return {string} : if there is an animator : his name
+     *                    else : the empty string
+     */
+    getAnimatorPseudo(){
+        if(this.host.isAnimator()){
+            return this.host.getPseudo();
+        }else{
+            return "";
+        }
+    }
+
+    /**
+     * Return the list of all players pseudo (only players, not animator)
      */
     getPlayers(){
         var result = []; // used to store players pseudo
@@ -58,6 +75,14 @@ module.exports = class Game {
             result.push(node.value.getPseudo());
         }
         return result;
+    }
+
+    /**
+     * Return the list of all players pseudo (players + animator)
+     * @return {string list} : players pseudo currently in the game
+     */
+    getActivePlayers(){
+        return this.activePlayers;
     }
 
     /**
@@ -85,14 +110,31 @@ module.exports = class Game {
     }
 
     /**
+     * Check if all players have defined their question
+     * @return {Boolean}
+     */
+    isAllQuestionsDefined(){
+        if(this.host.isAnimator()){
+            console.log("nb players ready : " + this.nbPlayersReady());
+            console.log("nb of players : " + this.players.length);
+            console.log("Is anim ready : " + this.host.isReady());
+            return this.nbPlayersReady() == this.players.length && this.host.isReady();
+        }else{
+            console.log("nb players ready : " + this.nbPlayersReady());
+            console.log("nb of players : " + this.getNbPlayer());
+            return this.nbPlayersReady() == this.getNbPlayer();
+        }
+    }
+
+    /**
      * Return the node of the fifo list corresponding to the given pseudo
      * @param {string} pseudo : pseudo of the desired player
      * @return {FIFO Node} : player's node corresponding to the given pseudo
      */
     getPlayerNode(pseudo){
-         var playerNode = null; // used to retrieve the player's node
-         var node = this.players.node; // fist node of the fifo
-         while(node && playerNode == null){
+        var playerNode = null; // used to retrieve the player's node
+        var node = this.players.node; // fist node of the fifo
+        while(node && playerNode == null){
             if(node.value.pseudoEquals(pseudo)){
                 playerNode = node;
             }
@@ -107,8 +149,12 @@ module.exports = class Game {
      * @return {Player} : instance of Player
      */
     getPlayer(pseudo){
-        var playerNode = this.getPlayerNode(pseudo);
-        return playerNode == null ? null : playerNode.value;
+        if(this.host.pseudoEquals(pseudo)){
+            return this.host;
+        }else{
+            var playerNode = this.getPlayerNode(pseudo);
+            return playerNode == null ? null : playerNode.value;
+        }
     }
 
     /**
@@ -120,6 +166,39 @@ module.exports = class Game {
     }
 
     /**
+     * Move the next player to the top of the list
+     */
+    newTurn(){
+        if(this.players.length > 0){
+            this.players.bump(this.players.node);
+        }
+    }
+
+    /**
+     * Return the pseudo of the player for whom it's the turn
+     * @return {string} : a player's pseudo
+     */
+    getCurrentPlayer(){
+        if(this.players.length > 0){
+            return this.players.first().getPseudo();
+        }else{
+            return "";
+        }
+    }
+
+    /**
+     * Return the pseudo of the player who will played to the next turn
+     * @return {string} : a player's pseudo
+     */
+    getNextPlayer(){
+        if(this.players.length > 1){
+            return this.players.next(this.players.node).value.getPseudo();
+        }else{
+            return this.getCurrentPlayer();
+        }
+    }
+
+    /**
      * Update the question of a player
      * @param {string} pseudo : player's pseudo for which we want to update the question
      * @param {string} question : player's question
@@ -127,6 +206,10 @@ module.exports = class Game {
     recordPlayerQuestion(pseudo, question){
         var playerNode = this.getPlayerNode(pseudo);
         if(playerNode != null) playerNode.value.setQuestion(question);
+    }
+
+    setAnimReady(){
+        this.host.setIsAnimReady(true);
     }
 
     /**
@@ -153,6 +236,7 @@ module.exports = class Game {
      */
     addNewPlayer(player){
         this.players.push(player);
+        this.activePlayers.push(player.getPseudo());
     }
 
     /**
@@ -163,6 +247,13 @@ module.exports = class Game {
         return this.getPlayerNode(playerPseudo) != null;
     }
 
+    removePlayerFromActivePlayersList(pseudo){
+        let index = this.activePlayers.indexOf(pseudo);
+        if (index > -1) {
+            this.activePlayers.splice(index, 1);
+        }
+    }
+
     /**
      * Remove a player from this game server
      * @param {Player} player : player to remove from this game server
@@ -170,6 +261,7 @@ module.exports = class Game {
     removePlayer(player){
         var playerNode = this.getPlayerNode(player.getPseudo());
         if(playerNode != null) this.players.remove(playerNode);
+        this.removePlayerFromActivePlayersList(player.getPseudo());
     }
 
     /**
@@ -179,6 +271,7 @@ module.exports = class Game {
     removePlayerByPseudo(pseudo){
         var playerNode = this.getPlayerNode(pseudo);
         if(playerNode != null) this.players.remove(playerNode);
+        this.removePlayerFromActivePlayersList(pseudo);
     }
 
     /**
@@ -201,5 +294,6 @@ module.exports = class Game {
         for(var node = this.players.node; node; node = this.players.next(node)){
             node.value.recordPlayer(database, this.partyHistoricId);
         }
+        if(this.host.isAnimator()) this.host.recordPlayer(database, this.partyHistoricId);
     }
 }

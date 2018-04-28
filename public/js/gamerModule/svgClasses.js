@@ -13,9 +13,9 @@ class Rectangle {
    * @param {integer} height : rectangle's height
    * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
    */
-  constructor(x, y, width, height, fill, parent){
-      this.parent = parent;
-      this.rect = parent.rect(width, height);
+  constructor(x, y, width, height, fill, prod){
+      this.prod = prod;
+      this.rect = this.prod.master.rect(width, height);
       this.rect.attr({
         x: x,
         y: y,
@@ -23,14 +23,14 @@ class Rectangle {
       });
       this.text = null;
       this.links = [];
-      myElements.push(this);
+      this.prod.myElements.push(this);
   }
 
   /**
    * Associate a textarea with the rectangle
    */
   addTextArea(){
-      var group = this.parent.group(); // use to "bind" the rectangle and the textArea
+      var group = this.prod.master.group(); // use to "bind" the rectangle and the textArea
 
       // this tag allow to use html tags in the svg
       var htmlCompatibilyTag = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
@@ -58,16 +58,108 @@ class Rectangle {
       this.text = htmlCompatibilyTag;
   }
 
- /*
-  * Display the selection border
-  */
+  /**
+   * Return the id of the rectangle (used to identified each elements in the svg)
+   * @return {string} : id of the rectangle
+   */
+  getId(){
+      return this.rect.attr('id');
+  }
+
+  /**
+   * Return the x coordinate of the top left corner
+   * @return {float} : x coordinate of the top left corner
+   */
+  getX(){
+      return this.rect.attr('x');
+  }
+
+  /**
+   * Return the y coordinate of the top left corner
+   * @return {float} : y coordinate of the top left corner
+   */
+  getY(){
+      return this.rect.attr('y');
+  }
+
+  /**
+   * Return the height of the rectangle
+   * @return {float} : height of the rectangle
+   */
+  getHeight(){
+      return this.rect.attr('height');
+  }
+
+  /**
+   * Return the width of the rectangle
+   * @return {float} : width of the rectangle
+   */
+  getWidth(){
+      return this.rect.attr('width');
+  }
+
+  /**
+   * Return the fill color of the rectangle
+   * @return {string} : color code
+   */
+  getFillColor(){
+      return this.rect.attr('fill');
+  }
+
+  /**
+   * Update the x coordinate of the top left corner
+   * @param {float} x : x coordinate of the top left corner
+   */
+  setX(x){
+      this.rect.attr('x', x);
+      if(this.text != null)
+          this.text.setAttribute('x', x);
+  }
+
+  /**
+   * Update the y coordinate of the top left corner
+   * @param {float} y : y coordinate of the top left corner
+   */
+  setY(y){
+      this.rect.attr('y', y);
+      if(this.text != null)
+          this.text.setAttribute('y', y);
+  }
+
+  /**
+   * Update the height of the rectangle
+   * @param {float} height : height of the rectangle
+   */
+  setHeight(height){
+      this.rect.attr('height', height);
+  }
+
+  /**
+   * Update the width of the rectangle
+   * @param {float} width : width of the rectangle
+   */
+  setWidth(width){
+      this.rect.attr('width', width);
+  }
+
+  /**
+   * Update the fill color of the rectangle
+   * @param {string} color : color code (example : '#000000')
+   */
+  setFillColor(color){
+      this.rect.attr('fill', color);
+  }
+
+  /**
+   * Display the selection border
+   */
   select() {
       this.rect.animate(100).stroke({'color': 'black', 'width': 5});
   }
 
- /*
-  * Hide the selection border
-  */
+  /**
+   * Hide the selection border
+   */
   unselect() {
       this.rect.animate(100).stroke({'width': 0});
   }
@@ -84,13 +176,24 @@ class Rectangle {
   }
 
   /**
+   * Check if a point is inside the rectangle
+   *
+   * @param {float} x : x coordinate
+   * @param {float} y : y coordinate
+   * @return {Boolean}
+   */
+  isInside(x, y){
+      return this.rect.inside(x, y);
+  }
+
+  /**
    * Link two rect with a line
    *
    * @param {Rectangle} e : rectangle with which we want to create a link
    */
   linkRect(e){
       if(!this.isLinkedTo(e)){
-          var link = new Link(this, e, this.parent);
+          var link = new Link(this, e, this.prod);
   	      link.line.stroke({color:"#333333"});
           this.addLink(link);
           e.addLink(link);
@@ -139,7 +242,7 @@ class Rectangle {
           l = this.links.pop();
           l.myRemove();
       }
-      removeFromArray(myElements, this);
+      removeFromArray(this.prod.myElements, this);
   }
 
   /**
@@ -160,19 +263,68 @@ class Link {
      * @param {Rectangle} e2 : second element to link
      * @param {SVGSVGElement | SVGGElement} parent : the parent svg Element
      */
-    constructor(e1, e2, parent) {
+    constructor(e1, e2, prod) {
         this.e1 = e1;
         this.e2 = e2;
-		    this.parent = parent;
+		    this.prod = prod;
 
+        this.dasharray = 0;
     		this.navigability = null;
     		this.angle = null;
         this.reversed = false;
         let pos1 = e1.center();
         let pos2 = e2.center();
-        this.line = parent.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
+        this.line = prod.master.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
         this.line.back();
-        myLinks.push(this);
+        prod.myLinks.push(this);
+    }
+
+    /**
+     * Return the value of width property
+     * @return {number} : the value of width property
+     */
+    getWidth(){
+        return this.line.attr('stroke-width');
+    }
+
+    /**
+     * Return dasharray value of the link
+     * @return {float} : value of dasharray property of the link
+     */
+    getDasharray(){
+        return this.dasharray;
+    }
+
+    /**
+     * Return the link's color
+     * @return {string} : color code
+     */
+    getColor(){
+       return this.line.attr('stroke');
+    }
+
+    /**
+     * Return the id of the first rectangle with which we are linked
+     * @return {float} : id of a rectangle
+     */
+    getFirstRectId(){
+        return this.e1.getId();
+    }
+
+    /**
+     * Return the id of the second rectangle with which we are linked
+     * @return {float} : id of a rectangle
+     */
+    getSecondRectId(){
+        return this.e2.getId();
+    }
+
+    /**
+     * Return the navigability angle (used to know the navigability sense)
+     * @return {float} : navigability's angle
+     */
+    getNavigabilityAngle(){
+        return this.angle;
     }
 
     /**
@@ -180,6 +332,7 @@ class Link {
      * @param {float} dasharrayValue : new value for the dasharray property
      */
     setDasharray(dasharrayValue){
+        this.dasharray = dasharrayValue;
         this.line.stroke({dasharray: dasharrayValue});
     }
 
@@ -200,17 +353,35 @@ class Link {
      */
     setColor(colorValue){
         this.line.stroke({color: colorValue});
-		if(this.navigability != null){
-			this.setNavigabilityColor(colorValue);
+    		if(this.navigability != null){
+    			   this.setNavigabilityColor(colorValue);
         }
     }
 
-    /**
-     * Return the value of width property
-     * @return {number} : the value of width property
-     */
-    getWidth(){
-        return this.line.attr('stroke-width');
+   /**
+	  * change the value of color property of the navigability
+    * @param {string} colorValue : color's code ("#??????")
+  	*/
+  	setNavigabilityColor(colorValue){
+        this.navigability.attr({style: "fill:" + colorValue + "; stroke:" + colorValue});
+    }
+
+    distance(x1, y1, x2, y2){
+        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+    }
+
+    /** Check if a point is on the line
+      *
+      * @param {float} x : x coordinate
+      * @param {float} y : y coordinate
+      * @return {Boolean}
+      */
+    isInside(x, y){
+        let x1 = parseInt(this.line.attr("x1"));
+        let y1 = parseInt(this.line.attr("y1"));
+        let x2 = parseInt(this.line.attr("x2"));
+        let y2 = parseInt(this.line.attr("y2"));
+        return Math.abs(this.distance(x1, y1, x, y) + this.distance(x, y, x2, y2) - this.distance(x1, y1, x2, y2)) < 1;
     }
 
     /**
@@ -221,7 +392,7 @@ class Link {
         this.line.remove();
         this.e1.removeLink(this);
         this.e2.removeLink(this);
-        removeFromArray(myLinks, this);
+        removeFromArray(this.prod.myLinks, this);
     }
 
     /**
@@ -256,7 +427,7 @@ class Link {
 
       	let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
       	let yCenter = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));
-      	this.navigability = this.parent.polygon();
+      	this.navigability = this.prod.master.polygon();
 
        	let pos1 = this.e1.center();
        	let pos2 = this.e2.center();
@@ -271,6 +442,21 @@ class Link {
     		this.navigability.back();
     }
 
+    /**
+     * Check of the link has a navigability
+     * @return {Boolean}
+     */
+    hasNavigability(){
+        return this.navigability != null;
+    }
+
+    /**
+   	* reverse the navigability of the link
+   	*/
+   	reverseNavigability(){
+ 		    this.reversed = !this.reversed;
+     }
+
 	 /**
   	* Remove the navigability of the link
   	*/
@@ -281,20 +467,5 @@ class Link {
             this.angle = null;
 			      this.reversed = false;
         }
-    }
-
-	 /**
-  	* reverse the navigability of the link
-  	*/
-  	reverseNavigability(){
-		    this.reversed = !this.reversed;
-    }
-
-	 /**
-	  * change the value of color property of the navigability
-    * @param {string} colorValue : color's code ("#??????")
-  	*/
-  	setNavigabilityColor(colorValue){
-        this.navigability.attr({style: "fill:" + colorValue + ";stroke:" + colorValue});
     }
 }

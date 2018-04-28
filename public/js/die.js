@@ -2,7 +2,7 @@
 Physijs.scripts.worker = 'js/lib/physijs_worker.js';
 Physijs.scripts.ammo = 'ammo.js';
 
-var divDie = document.getElementById('productionArea');
+var divDie = $('#productionPanel > :nth-child(2)')[0];
 var initScene, render, loader, box_geometry, box, material,
     renderer, scene, ground_material, ground, camera, selected, vectAngularVelocity, diceLoop;
 

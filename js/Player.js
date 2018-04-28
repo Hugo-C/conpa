@@ -1,13 +1,11 @@
 
-const PLAYER_ROLE = 1;
-const ANIMATOR_ROLE = 2;
-
 module.exports = class Player {
 
   constructor(pseudo, role){
       this.pseudo = pseudo;
       this.role = role;
       this.question = '';
+      this.isAnimReady = false;
   }
 
   /**
@@ -54,12 +52,20 @@ module.exports = class Player {
       this.question = newQuestion;
   }
 
+  setIsAnimReady(isReady){
+      this.isAnimReady = isReady;
+  }
+
   /**
    * Tests if a player is ready
    * (a player is considered as ready if his question is different than the empty string)
    */
   isReady(){
-      return this.question != ''; // player is ready when he has defined his question
+      if(this.role == "animator"){
+          return this.isAnimReady;
+      }else{
+          return this.question != ''; // player is ready when he has defined his question
+      }
   }
 
   /**
@@ -67,7 +73,7 @@ module.exports = class Player {
    * @return {boolean} : true if the player is an animator, false in the other case
    */
   isAnimator(){
-      return this.role == ANIMATOR_ROLE;
+      return this.role == "animator";
   }
 
   recordPlayer(database, party){

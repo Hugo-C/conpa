@@ -35,7 +35,7 @@ function listAllServers(){
     var roomData = rooms[room];
     data.push({'name': room,
                 'host': roomData.getHost().getPseudo(),
-                'animate': roomData.getHost().getRole() == 'player' ? 'No' : 'Yes',
+                'animate': roomData.getHost().isAnimator() ? 'Yes' : 'No',
                 'places' : roomData.getNbPlayer() + ' / ' + roomData.getPlaces(),
                 'status': roomData.getStatus()});
   }
@@ -84,7 +84,7 @@ module.exports = function(io, socket){
    * form of received data : { 'pseudo': value }
    */
   socket.on('pseudo', function(data){
-      console.log('user ' + data['pseudo'] + ' is connected');
+      console.log('==> New player : ' + data['pseudo']);
       clients[data["pseudo"]] = socket.id;
       socket.room = null;
       io.sockets.emit('serverListUpdate', listAllServers());
@@ -97,11 +97,11 @@ module.exports = function(io, socket){
    */
   function startGameOnServerFull(serverName){
       var server = rooms[serverName];
-
       if(server.getNbPlayer() == server.getPlaces()){
-          io.to(server.getName()).emit('gameStart', {'server': server.getName(), 'players': server.getPlayers()});
+          io.to(server.getName()).emit('gameStart', {'server': server.getName(), 'animator': server.getAnimatorPseudo(), 'players': server.getActivePlayers()});
           server.setStatus(QUESTION_TIME);
           io.sockets.emit('serverListUpdate', listAllServers());
+          console.log('==> A game start : ' + server.getName());
       }
   }
 
@@ -119,9 +119,8 @@ module.exports = function(io, socket){
    *              'globalTimer': [value of the global timer] } }
    */
   socket.on('createServer', function(data){
-      console.log('creation of a new server');
-
       if(!(data["server"]["name"] in rooms)){
+          console.log('==> New game server : ' + data["server"]["name"]);
 
           var player = new Player(getPseudoWithId(socket.id), data["role"]);
           var server = new Game(data["server"]["name"], data["server"]["places"], player, data["server"]["indivTimer"], data["server"]["globalTimer"], WAITING_PLAYERS);
@@ -156,9 +155,10 @@ module.exports = function(io, socket){
       // A player can only remove his own server if the game has not started
       if(server != null && server.getStatus() == WAITING_PLAYERS
       && server.getHost().getPseudo() == getPseudoWithId(socket.id)){
+          console.log('==> Removing game server : ' + server.getName());
 
           io.sockets.in(socket.room).emit('serverRemoved', null);
-          var players = server.getPlayers();
+          var players = server.getActivePlayers();
           for(var index in players){
               io.sockets.connected[clients[players[index]]].leave();
           }
@@ -185,7 +185,9 @@ module.exports = function(io, socket){
 
       if(server != null){ // to prevent reception of bad data
           if(server.getNbPlayer() < server.getPlaces() && !(server.isInServer(getPseudoWithId(socket.id))) && server.getStatus() == WAITING_PLAYERS){
+
               var player = new Player(getPseudoWithId(socket.id), "player");
+              console.log('==> Player ' + player.getPseudo() + ' joined ' + server.getName());
 
               if(socket.room != null) rooms[socket.room].removePlayer(player);
               server.addNewPlayer(player);
@@ -208,7 +210,6 @@ module.exports = function(io, socket){
    * - the questions of each players
    */
   function getQuestionTimeState(server){
-      console.log("get question time state");
       return {'ready': server.nbPlayersReady(), 'playersQuestion': server.getPlayersQuestion()};
   }
 
@@ -218,6 +219,7 @@ module.exports = function(io, socket){
    * This message can only be send if the game has not started
    */
   socket.on('exitServer', function(data){
+      console.log('==> ' + getPseudoWithId(socket.id) + ' leaved ' + socket.room);
 
       rooms[data['server']].removePlayerByPseudo(getPseudoWithId(socket.id));
       socket.leave(data['server']);
@@ -235,6 +237,7 @@ module.exports = function(io, socket){
    *                          'pseudo': [player's pseudo]}
    */
   socket.on('joinGame', function(data){
+      console.log('--> ' + data['pseudo'] + ' joined ' + data['server']);
 
       var server = rooms[data['server']];
 
@@ -245,16 +248,32 @@ module.exports = function(io, socket){
               socket.join(socket.room);
               clients[player.getPseudo()] = socket.id;
 
-              if(server.nbPlayersReady() == server.getNbPlayer()){
+              if(server.isAllQuestionsDefined()){
                   socket.emit('allQuestionsDefined', getQuestionTimeState(server));
-                  io.to(socket.room).emit('players', server.getPlayers());
+                  io.sockets.in(server.getName()).emit('chatPlayers', server.getActivePlayers());
+                  io.sockets.in(server.getName()).emit('actualizeAnimatorMosaic', server.getPlayers());
               }else{
-                  socket.emit('initQuestionTime', server.getPlayers());
+                  socket.emit('initQuestionTime', {'players': server.getPlayers()});
                   socket.emit('actualizeQuestions', getQuestionTimeState(server));
               }
           }
       }
   });
+
+  function sendSystemMessage(server, message){
+      let data = {'sender': "system", 'msg': message};
+      io.sockets.in(server).emit('message', data);
+  }
+
+  function newTurn(gameServer){
+      console.log('--> New turn for the server ' + gameServer.getName() + ' : ');
+      gameServer.newTurn();
+      var data = {'currentPlayer': gameServer.getCurrentPlayer(),
+                  'nextPlayer': gameServer.getNextPlayer()};
+      console.log(data);
+      io.sockets.in(gameServer.getName()).emit('newTurn', data);
+      sendSystemMessage(gameServer.getName(), "It's the turn of " + data['currentPlayer']);
+  }
 
   /**
    * Process "recordMyQuestion" message
@@ -266,26 +285,45 @@ module.exports = function(io, socket){
    * form of received data : {'question': player's question}
    */
   socket.on('recordMyQuestion', function(data){
-
-      console.log(getPseudoWithId(socket.id));
-      console.log(socket.room);
+      console.log('--> ' + getPseudoWithId(socket.id) + ' recorded his question');
 
       var server = rooms[socket.room];
       server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
-      if(server.nbPlayersReady() == server.getNbPlayer()){ // all questions are defined, we can starts the game
-          io.to(socket.room).emit('allQuestionsDefined', getQuestionTimeState(server));
-          io.to(socket.room).emit('players', server.getPlayers());
+      if(server.isAllQuestionsDefined()){ // all questions are defined, we can starts the game
+          io.sockets.in(server.getName()).emit('allQuestionsDefined', getQuestionTimeState(server));
+          io.sockets.in(server.getName()).emit('chatPlayers', server.getActivePlayers());
+          io.sockets.in(server.getName()).emit('actualizeAnimatorMosaic', server.getPlayers());
           recordGameServer(server);
           server.setStatus(GAME_TIME);
           server.productionSharingManager = setInterval(productionSharingManager, 5000, server.getName());
+          newTurn(server);
       }else{
           io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
       }
   });
 
+  socket.on('animatorValidation', function(data){
+      console.log('--> ' + socket.room + ' : received animator validation');
+      var server = rooms[socket.room];
+      server.setAnimReady();
+      io.sockets.in(server.getName()).emit('allQuestionsDefined', getQuestionTimeState(server));
+      io.sockets.in(server.getName()).emit('chatPlayers', server.getActivePlayers());
+      io.sockets.in(server.getName()).emit('actualizeAnimatorMosaic', server.getPlayers());
+      recordGameServer(server);
+      server.setStatus(GAME_TIME);
+      server.productionSharingManager = setInterval(productionSharingManager, 5000, server.getName());
+      newTurn(server);
+  });
+
+  socket.on('endOfTurn', function(data){
+      console.log('--> ' + getPseudoWithId(socket.id) + ' finished his turn');
+      var server = rooms[socket.room];
+      newTurn(server);
+  });
+
   /**
    * Process quitGame message
-   * - Informs (main) server that the player has exited his game server
+   * - Inform server that the player has leaved the game server
    * - Remove the player from the game server
    * - Sends the actualized list of players to the game server players
    * - Sends to all players the actualized list of servers
@@ -294,8 +332,10 @@ module.exports = function(io, socket){
    *                          'pseudo': [player's name]}
    */
   socket.on('quitGame', function(data){
+      console.log('--> ' + data['pseudo'] + ' leaved game server ' + socket.room);
 
-      var server = rooms[data['server']];
+      let server = rooms[data['server']];
+      let currentPlayer = server.getCurrentPlayer();
 
       server.removePlayerByPseudo(data['pseudo']);
       socket.leave(data['server']);
@@ -307,9 +347,11 @@ module.exports = function(io, socket){
           clearInterval(server.productionSharingManager);
           delete rooms[server.getName()]; // if server is empty, we detroy it
       }else{
-          io.to(server.getName()).emit('players', server.getPlayers()); // informs players that a player has leave the game
+          io.sockets.in(server.getName()).emit('chatPlayers', server.getActivePlayers());
+          io.sockets.in(server.getName()).emit('actualizeAnimatorMosaic', server.getPlayers());
+          sendSystemMessage(server.getName(), data['pseudo'] + " leaved the game !");
+          if(currentPlayer == data['pseudo']) newTurn(server);
       }
-
       io.sockets.emit('serverListUpdate', listAllServers());
   });
 
@@ -323,11 +365,12 @@ module.exports = function(io, socket){
    *                          'msg': [message body]}
    */
   socket.on('message', function(data){
+      console.log('--> ' + socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
       if(data["dest"] === "all"){
-          rep = {"sender": getPseudoWithId(socket.id), "msg": data["msg"], "whisper": false};
+          rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
           socket.broadcast.to(socket.room).emit('message', rep);
       } else {
-          rep = {"sender": getPseudoWithId(socket.id), "msg": data["msg"], "whisper": true};
+          rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
           io.to(clients[data["dest"]]).emit("message", rep);
       }
   });
@@ -340,6 +383,7 @@ module.exports = function(io, socket){
    * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
    */
   socket.on('cardPicked', function(data){
+      console.log('--> ' + getPseudoWithId(socket.id) + ' picked a new card');
       io.sockets.in(socket.room).emit('cardPicked', data);
   });
 
@@ -351,6 +395,7 @@ module.exports = function(io, socket){
    * form of received data : no data sends with this message !
    */
   socket.on('processStopGame', function(data){
+      console.log('--> ' + getPseudoWithId(socket.id) + ' started a stop game process');
       var server = rooms[socket.room];
       server.exitBuffer.push(getPseudoWithId(socket.id));
       if(server.exitBuffer.length == server.getNbPlayer()){
@@ -367,6 +412,7 @@ module.exports = function(io, socket){
    * form of received data : {'exit': player's answer (true if he wants to stop, else false)}
    */
   socket.on('stopGame', function(data){
+      console.log('--> ' + getPseudoWithId(socket.id) + ' wants to stop game ? : ' + data['exit']);
       var server = rooms[socket.room];
       if(data['exit']){
           server.exitBuffer.push(getPseudoWithId(socket.id));
@@ -382,28 +428,17 @@ module.exports = function(io, socket){
   });
 
     /**
-     * Process "saveSvg" message on server side
-     * This message is send by client when he wants the server to save his production
+     * Process "shareMyProduction" message on server side
+     * The message is received when a player has send his production
+     * When this message is received, we share the production to the other players
      *
-     * form of received data : {'svg': player's production as svg}
+     * form of received data : {'pseudo' : player's pseudo, 'production': player's production}
      */
-    socket.on('saveSvg', function (data) {
-        fs.writeFile(path.join(SVG_FILE, "wow.svg"), data["svg"], function (err) {
-            if (err) {
-                console.log("error while saving a svg file, maybe you just need to create the directory 'svg' ?");
-                console.log(err);
-            } else {
-                console.log("A svg file was saved!");
-            }
-        });
-    });
-
     socket.on('shareMyProduction', function(data){
         socket.broadcast.to(socket.room).emit('playersProduction', data);
     });
 
     function productionSharingManager(serverName){
-        console.log('retrieving all productions');
         io.sockets.in(serverName).emit('shareYourProduction', null);
     }
 
@@ -417,8 +452,6 @@ module.exports = function(io, socket){
      * @param {Game} server : the game server for which this function works
      */
     function inactivePlayerManager(server){
-
-        console.log('I check if some players are inactive...');
 
         for(var index in server.inactivePlayer){
             if(io.sockets.connected[clients[server.inactivePlayer[index]]] == null
@@ -436,21 +469,23 @@ module.exports = function(io, socket){
                     console.log('updating server data');
                     if(server.getStatus() == QUESTION_TIME){
                         console.log('question time');
-                        if(server.nbPlayersReady() == server.getNbPlayer()){
+                        if(server.isAllQuestionsDefined()){
                             console.log('all questions are defined !');
                             io.sockets.in(server.getName()).emit('allQuestionsDefined', getQuestionTimeState(server));
-                            io.sockets.in(server.getName()).emit('players', server.getPlayers());
+                            io.sockets.in(server.getName()).emit('chatPlayers', server.getActivePlayers());
+                            io.sockets.in(server.getName()).emit('actualizeAnimatorMosaic', server.getPlayers());
                             recordGameServer(server);
                             server.setStatus(GAME_TIME);
                             server.productionSharingManager = setInterval(productionSharingManager, 5000, server.getName());
                         }else{
                             console.log('updating question time');
-                            io.sockets.in(server.getName()).emit('initQuestionTime', server.getPlayers());
+                            io.sockets.in(server.getName()).emit('initQuestionTime', {'players': server.getPlayers()});
                             io.sockets.in(server.getName()).emit('actualizeQuestions', getQuestionTimeState(server));
                         }
                     }else if(server.getStatus() == GAME_TIME){
                         console.log('updating game time');
-                        io.sockets.in(server.getName()).emit('players', server.getPlayers()); // informs players that a player has leave the game
+                        io.sockets.in(server.getName()).emit('chatPlayers', server.getActivePlayers());
+                        io.sockets.in(server.getName()).emit('actualizeAnimatorMosaic', server.getPlayers());
                     }
                 }
                 io.sockets.emit('serverListUpdate', listAllServers());
@@ -459,7 +494,7 @@ module.exports = function(io, socket){
 
         server.inactivePlayer = [];
 
-        var players = server.getPlayers();
+        var players = server.getActivePlayers();
         for(var index in players){
             if(io.sockets.connected[clients[players[index]]] == null
             || io.sockets.connected[clients[players[index]]].room == null){

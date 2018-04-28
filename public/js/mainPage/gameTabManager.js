@@ -44,6 +44,7 @@ socket.on('serverListUpdate', function(data){
 socket.on('serverRemoved', function(data){
     console.log('my server has been removed');
     sessionStorage.server = null;
+    sessionStorage.role = null;
 });
 
 /** Process "gameStart" message
@@ -52,6 +53,13 @@ socket.on('serverRemoved', function(data){
 socket.on('gameStart', function(data){
     console.log("GAME START !!!!");
     sessionStorage.server = data['server'];
+    if(data['animator'] != sessionStorage.pseudo){
+        console.log(data['animator'] + " != " + sessionStorage.pseudo);
+        sessionStorage.role = 'player';
+    }else{
+        console.log(data['animator'] + " == " + sessionStorage.pseudo);
+        sessionStorage.role = 'animator';
+    }
     sessionStorage.unload = 'false';
     window.location = '/gamerModule';
 });
@@ -69,6 +77,14 @@ $('#serverList').on('click', 'tbody tr', function(){
         $('#join').text('Exit'); // if he's not in his server and if the game has not started, he can leave it
     }else{
         $('#join').text('Join'); // if he's in no server, he can join it
+    }
+});
+
+$('#role').on('click', function(){
+    if($(this).val() == 'player'){
+        $(this).val('animator');
+    }else if($(this).val() == 'animator'){
+        $(this).val('player');
     }
 });
 
@@ -160,6 +176,8 @@ $("#validate").on("click", function(){
     var places = parseInt($('input#places')[0].value);
     var globalTimer = parseInt($('input#globalTimer')[0].value);
 
+    console.log(role);
+
     var data = {'role': role,
                 'server': {'name': serverName,
                            'places': places,
@@ -170,6 +188,7 @@ $("#validate").on("click", function(){
     if(checkServerCreationForm(data)){
         socket.emit('createServer', data);
         sessionStorage.server = serverName;
+        sessionStorage.role = role;
         sessionStorage.unload = 'false';
     }
 });
@@ -192,10 +211,12 @@ $("#join").on("click", function(){
         && selectedServer[4].innerHTML == WAITING_PLAYERS){
             socket.emit('removeServer', {'server': selectedServer[0].innerHTML});
             sessionStorage.server = null;
+            sessionStorage.role = null;
             $('#join').text('Join');
         }else if(selectedServer[0].innerHTML == sessionStorage.server){
             socket.emit('exitServer', {'server': selectedServer[0].innerHTML});
             sessionStorage.server = null;
+            sessionStorage.role = null;
             $('#join').text('Join');
         }else{
             socket.emit('joinServer', {'server': selectedServer[0].innerHTML});

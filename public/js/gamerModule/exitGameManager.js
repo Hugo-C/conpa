@@ -33,13 +33,13 @@ function actualizeBorderColor(pseudo){
  * Initialize the exit panel. Display all players of the game
  */
 function initGUI(){
-  var parentTag = $("#exitPanel > :nth-child(2) > div");
-  parentTag.empty(); // remove all child nodes to refresh the list
-  $('#exitMessage').text(''); // remove old messages
-  for(var index = 0; index < playersList.length; index++){
-      parentTag.append(addPlayerBox(playersList[index]));
-      setPP(playersList[index]);
-  }
+    var parentTag = $("#exitPanel > :nth-child(2) > div");
+    parentTag.empty(); // remove all child nodes to refresh the list
+    $('#exitMessage').text(''); // remove old messages
+    for(var index = 0; index < playersList.length; index++){
+        parentTag.append(addPlayerBox(playersList[index]));
+        setPP(playersList[index]);
+    }
 }
 
 /**
@@ -47,11 +47,11 @@ function initGUI(){
  * On click in this button, we display the exit panel
  */
 $("#exit").on("click", function(){
-    draw.zoom(1);
+    if(sessionStorage.role == 'player')
+        production.centerSVGToDefaultPosition();
     $('#gamePanel > :nth-child(2)').css('display', 'none'); // hide productionArea panel
     $('#exitPanel').css('display', 'block'); // display exit panel
     initGUI(); // initialize exit panel
-    //convertSvgTagToSvgFile();
 });
 
 /**
@@ -70,8 +70,9 @@ $("#closeExitPanel").on("click", function(){
 $("#leaveAlone").on("click", function(){
     socket.emit('quitGame', {'pseudo': sessionStorage.pseudo,
                              'server': sessionStorage.server,
-                             'production': getInlineSvg()}); // inform server that we leave the game
+                             'production': production.getInlineSvg()}); // inform server that we leave the game
     sessionStorage.server = null;
+    sessionStorage.role = null;
     window.location = '/'; // redirection to the main web page
 });
 
@@ -151,7 +152,7 @@ socket.on('refreshExitPanel', function(playersWhoWantStop){
  * form of received data : no data is send with this message !
  */
 socket.on('stopGameProcessAborted', function(data){
-    $('#exitMessage').text('Game will not be stopped because more than one player want continue');
+    $('#exitMessage').text('The game will not be stopped because more than one player wants to continue');
     $('#exitPanelTitle').text('Exit the game ?');
     // We are not in a "Stop Game Processus", we display the basic buttons
     $('#leaveAlone').css('display', 'block');
@@ -170,6 +171,5 @@ socket.on('stopGameProcessAborted', function(data){
  * form of received data : no data is send with this message !
  */
 socket.on('gameEnd', function(data){
-    console.log("EXIT GAME");
     $('#leaveAlone').click();
 });

@@ -1,0 +1,225 @@
+@import 'verticalText.css';
+
+#productionPanel {
+  display: block;
+}
+
+#productionPanel > :first-child {
+  border-right: 2px solid black;
+  background-color: lightgrey;
+  display: block;
+}
+
+#productionPanel > :first-child > :nth-child(1),
+#productionPanel > :first-child > :nth-child(2) {
+  height: 5%;
+  border-bottom: 2px solid black;
+}
+
+#productionPanel > :first-child > :nth-child(1) {
+  background-color: grey;
+}
+
+#productionPanel > :first-child > :nth-child(1) > div {
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+
+#productionPanel > :first-child > :nth-child(1) > div > span {
+  width: 100%;
+  font-size: 0.8vw;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+}
+
+#productionPanel > :first-child > :nth-child(2) {
+  display: flex;
+  align-items: center;
+}
+
+button#setPrivacy {
+  background-image: url("/img/gamerModule/private.svg");
+}
+
+#productionPanel > :first-child > :nth-child(3) {
+  height: 10%;
+  border-bottom: 2px solid black;
+  background-color: grey;
+}
+
+#productionPanel > :first-child > :nth-child(3) {
+  width: 100%;
+  font-size: 0.7vw;
+  font-weight: bold;
+}
+
+#productionPanel > :first-child > :nth-child(3) > p {
+  margin: 0;
+  padding: 0;
+  color: black;
+  font-size: 1vw;
+  text-align: center;
+}
+
+#productionPanel > :first-child > :nth-child(4) {
+  height: 80%;
+  border: none;
+  overflow-y: auto;
+}
+
+#productionPanel > :first-child > :nth-child(4) > div {
+  height: 10%;
+  padding-left: 5%;
+  padding-right: 5%;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid black;
+  cursor: pointer;
+}
+
+#productionPanel > :first-child > :nth-child(1) > div.currentPlayer,
+#productionPanel > :first-child > :nth-child(4) > div.currentPlayer {
+  background-color: #1269E6;
+}
+
+#productionPanel > :first-child > :nth-child(1) > div.nextPlayer,
+#productionPanel > :first-child > :nth-child(4) > div.nextPlayer {
+  background-color: #0AA6E1;
+}
+
+#productionPanel > :first-child > :nth-child(4) > div > img {
+  width: 30%;
+  padding-bottom: 5%;
+}
+
+#productionPanel > :first-child > :nth-child(4) > div > span {
+  width: 70%;
+  font-size: 0.8vw;
+  font-weight: bold;
+  text-align: center;
+  text-overflow: ellipsis;
+  color: black;
+}
+
+#productionPanel > :first-child > :nth-child(4) > div.selectedProduction > span,
+#productionPanel > :first-child > :nth-child(1) > div.selectedProduction > span {
+  text-decoration: underline;
+  text-decoration-style: double;
+  text-decoration-color: black;
+  font-style: italic;
+}
+
+#productionPanel > :last-child {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#productionPanel > :last-child > button#displayList {
+  width: 1%;
+  border-right: 1px solid black;
+  background-color: grey;
+  background-image: url("/img/gamerModule/hide.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+div#colorMenu {
+  display: none;
+  background-color: grey;
+}
+
+div#svgMenu {
+  display: block;
+}
+
+div.menu {
+  width: 7%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-right: 2px solid black;
+  background-color: lightgrey;
+}
+
+div.menu > button {
+  height: 10%;
+  padding: 0;
+}
+
+div#svgMenu > button {
+  margin-bottom: 15px;
+}
+
+button#bouton { background-image: url("/img/gamerModule/text.png"); }
+div#colorMenu > button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
+div#colorMenu > button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
+div#colorMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
+div#colorMenu > button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
+div#colorMenu > button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
+div#colorMenu > button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
+div#colorMenu > button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
+
+div#svgMenu > button[value="red"] { background-image: url("/img/gamerModule/redPencil.png"); }
+div#svgMenu > button[value="green"] { background-image: url("/img/gamerModule/greenPencil.png"); }
+div#svgMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellowPencil.png"); }
+div#svgMenu > button[value="blue"] { background-image: url("/img/gamerModule/bluePencil.png"); }
+div#svgMenu > button[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
+div#svgMenu > button[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
+div#svgMenu > button[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
+
+div#svgMenu > button#moveElement { background-image: url("/img/gamerModule/move.png"); }
+div#svgMenu > button#fullScreen { background-image: url("/img/gamerModule/fullscreen.png"); }
+
+div#production {
+  width: 92%;
+  overflow: hidden;
+}
+
+div#mosaic {
+  width: 99%;
+  overflow: hidden;
+  color: black;
+  background-color: darkgrey;
+}
+
+div#mosaic > div {
+  border-bottom: 2px solid black;
+  display: flex;
+}
+
+div#mosaic > div > div {
+  display: flex;
+  background-color: white;
+}
+
+div#mosaic > div > :first-child {
+  border-right: 2px solid black;
+}
+
+div#mosaic > div > div > svg {
+  width: 90%;
+  height: 100%;
+}
+
+div#mosaic > div > div > div {
+  width: 10%;
+  height: 100%;
+  border-right: 2px solid black;
+  background-color: lightgrey;
+}
+
+div#mosaic > div > div > div > div {
+  height: 70%;
+  width: 100%;
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+div#mosaic > div > div > div > div > span {
+  height: 100%;
+  width: 100%;
+  font-size: 1.5vw;
+}

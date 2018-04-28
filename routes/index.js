@@ -201,7 +201,6 @@ router.post('/importCardGame', function (req, res) {
                 }
             });
             checkIfCardGameExists(dest, function(err, exists, cardGame){
-
                 if(err){
                     res.send('ERROR');
                 }else{
