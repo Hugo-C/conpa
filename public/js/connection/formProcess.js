@@ -18,10 +18,14 @@ function removeAllAlerts(){
   $('.error_username').text('');
   $('.error_email').text('');
   $('.error_login').text('');
-  $('.myTooltip').css('display', 'none');
-  $('.invalid').removeClass('invalid');
-  clearInput('text');
-  clearInput('password');
+}
+
+function clearAllInput(){
+    $('.myTooltip').css('display', 'none');
+    $('.invalid').removeClass('invalid');
+    clearInput('text');
+    clearInput('email');
+    clearInput('password');
 }
 
 function showInvalidRegisterFields(){
