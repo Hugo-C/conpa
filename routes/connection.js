@@ -12,7 +12,7 @@ const htmlToText = require('html-to-text');
 const querystring = require('querystring');
 const http = require('http');
 
-const EMAIL_RESET_PASSWORD = path.join('../views/email/resetPassword.jade');
+const EMAIL_RESET_PASSWORD = path.join('./views/email/resetPassword.jade');
 
 
 router.get('/resetPassword/:token', function(req, res, next) {
@@ -53,6 +53,7 @@ router.post('/register', urlencodedParser, function(req, res){
 
 router.post('/login', urlencodedParser, function(req, res, next){
     var username = req.body.username;
+    console.log(req.body.password);
     var password = md5(req.body.password + "conpa35411");
 
     function connectUser(){
@@ -180,7 +181,7 @@ function sendResetPassword(url, email, username, token){
 }
 
 router.post('/setPassword', urlencodedParser, function(req, res, next) {
-    var password = (req.body.password + "conpa35411");
+    var password = md5(req.body.password + "conpa35411");
     var token = req.body.token;
     var recaptcha = req.body.recaptcha;
     let remoteIp = req.connection.remoteAddress;
