@@ -257,8 +257,12 @@ $("#validate").on("click", function(){
     let serverName = $('input#name')[0].value;
     let places = parseInt($('input#places')[0].value);
     let role = $('input#role')[0].value;
-    let cardGameName = $('#cardgames tbody .selected').children()[0].innerHTML;
-    let cardGameLanguage = $('#cardgames tbody .selected').children()[1].innerHTML;
+    let cardGameName = '';
+    let cardGameLanguage = '';
+    if($('#cardgames tbody .selected').children().length > 0){
+        cardGameName = $('#cardgames tbody .selected').children()[0].innerHTML;
+        cardGameLanguage = $('#cardgames tbody .selected').children()[1].innerHTML;
+    }
     let timers = $('input#timers')[0].value;
     let indivTimer = parseInt($('input#indivTimer')[0].value);
     let appropriationTime = parseInt($('input#appropriation')[0].value);
