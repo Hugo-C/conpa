@@ -29,7 +29,7 @@ function displayNewCard(family){
         let familiesId = Object.keys(cards);
         family = familiesId[family % familiesId.length];
     }
-    if(cards[family] === undefined || cards[family].length === 0){
+    if(cards[family] === undefined || cards[family]['cards'].length === 0){
         cardTextNode.nodeValue = ERR_MESSAGE_NO_MORE_CARDS;
         return false;
     } else {
@@ -80,7 +80,12 @@ function displayCard(family, text){
     triggerCssAnimation(cardContent);
     //cardFamilyNode.nodeValue = family;
     cardTextNode.nodeValue = text;
-    document.getElementById("cardFamilyLogo").src = LOGO_DIRECTORY + cards[family]["logo"];
+    if(cards[family]["logo"] != null){
+        document.getElementById("cardFamilyLogo").style.display = 'block';
+        document.getElementById("cardFamilyLogo").src = LOGO_DIRECTORY + cards[family]["logo"];
+    }else{
+        document.getElementById("cardFamilyLogo").style.display = 'none';
+    }
     document.getElementById("familyLogoDiv").style.display = 'inline-block';
     document.getElementById("familyLogoText").textContent = family;
 }
