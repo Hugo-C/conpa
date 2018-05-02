@@ -101,10 +101,11 @@ class Production {
                 self.menuState = 0;
                 self.menu.removeClass(self.active);
             }
+            $('.colorTool').css('display', 'none');
+            $('.mainTool').css('display', 'block');
         }
 
         this.positionMenu = function(e) {
-
             var menuWidth = self.menu.get(0).offsetWidth + 4;
             var menuHeight = self.menu.get(0).offsetHeight + 4;
 
@@ -221,102 +222,14 @@ class Production {
         }
 
         // ---------------------------------------------------------------------
-        // ------------------- TOOLS LISTENERS ---------------------------------
-        // ---------------------------------------------------------------------
-
-        $("#colorMenu button").on("click", function(){
-            console.log('new color');
-            var color = $(this).val();
-            self.selectedColor = self.colors[color];
-            if(self.selectedItem != null){
-                self.selectedItem.setFillColor(self.colors[color]);
-            }
-        });
-
-        // ---------------------------------------------------------------------
-        // ---------------- CONTEXTUAL MENU LISTENERS --------------------------
-        // ---------------------------------------------------------------------
-
-        $('#removeLink').on('click', function(){
-            if(self.selectedLink != null){
-                self.selectedLink.myRemove();
-                self.selectedLink = null;
-            }
-        });
-
-        $('#dashLink').on('click', function(){
-            if(self.selectedLink != null){
-                self.selectedLink.setDasharray(10.10);
-            }
-        });
-
-        $('#linearLink').on('click', function(){
-            if(self.selectedLink != null){
-                self.selectedLink.setDasharray(0);
-            }
-        });
-
-        $('#increaseWidth').on('click', function(){
-            if(self.selectedLink != null){
-                var strokeWidth = self.selectedLink.getWidth();
-                strokeWidth += 2;
-                if(strokeWidth <= 20){
-                    self.selectedLink.setWidth(strokeWidth);
-                }
-            }
-        });
-
-        $('#decreaseWidth').on('click', function(){
-            if(self.selectedLink != null){
-                var strokeWidth = self.selectedLink.getWidth();
-                strokeWidth -= 2;
-                if(strokeWidth > 0){
-                    self.selectedLink.setWidth(strokeWidth);
-                }
-            }
-        });
-
-        $('#navigability').on('click', function(){
-            if(self.selectedLink != null){
-                self.selectedLink.addNavigability();
-            }
-        });
-
-        $('#reverseNavigability').on('click', function(){
-            if(self.selectedLink != null && self.selectedLink.navigability != null){
-                self.selectedLink.reverseNavigability();
-        		    self.selectedLink.addNavigability();
-            }
-        });
-
-        $('#removeNavigability').on('click', function(){
-            if(self.selectedLink != null){
-                self.selectedLink.removeNavigability();
-            }
-        });
-
-        $('#linkColor').on('click', function(){
-            $('.colorTool').css('display', 'block');
-            $('.mainTool').css('display', 'none');
-        });
-
-        $('button.colorTool').on('click', function(){
-            if(self.selectedLink != null){
-                self.selectedLink.setColor(self.colors[$(this).val()]);
-            }
-            $('.colorTool').css('display', 'none');
-            $('.mainTool').css('display', 'block');
-        });
-
-        // ---------------------------------------------------------------------
         // --------------------- OTHERS LISTENERS ------------------------------
         // ---------------------------------------------------------------------
 
         // resize the svg when page is resized
         window.onresize = function(evt){
             self.toggleMenuOff();
-            var dimHeight = $('div#production').height();
-            var dimWidth = $('div#production').width();
+            var dimHeight = $(self.parent).height();
+            var dimWidth = $(self.parent).width();
             self.draw.attr({'height': dimHeight, 'width': dimWidth});
         }
 
@@ -351,6 +264,88 @@ class Production {
         this.draw.on('keydown', this.onKeydown);
         document.addEventListener('contextmenu', this.openContextMenu);
         document.addEventListener('click', this.documentClick);
+    }
+
+    setSelectedColor(color){
+        this.selectedColor = this.colors[color];
+        if(this.selectedItem != null){
+            this.selectedItem.setFillColor(this.colors[color]);
+        }
+    }
+
+    updatePanningState(pann){
+        doPanning = pann;
+    }
+
+    removeSelectedLink(){
+        if(this.selectedLink != null){
+            this.selectedLink.myRemove();
+            this.selectedLink = null;
+        }
+    }
+
+    setSelectedLinkDasharray(value){
+        if(this.selectedLink != null){
+            this.selectedLink.setDasharray(value);
+        }
+    }
+
+    increaseSelectedLinkWidth(){
+        if(this.selectedLink != null){
+            var strokeWidth = this.selectedLink.getWidth();
+            strokeWidth += 2;
+            if(strokeWidth <= 20){
+                this.selectedLink.setWidth(strokeWidth);
+            }
+        }
+    }
+
+    decreaseSelectedLinkWidth(){
+        if(this.selectedLink != null){
+            var strokeWidth = this.selectedLink.getWidth();
+            strokeWidth -= 2;
+            if(strokeWidth > 0){
+                this.selectedLink.setWidth(strokeWidth);
+            }
+        }
+    }
+
+    addNavigabilityToSelectedLink(){
+        if(this.selectedLink != null){
+            this.selectedLink.addNavigability();
+        }
+    }
+
+    reverseSelectedLinkNavigability(){
+        if(this.selectedLink != null && this.selectedLink.navigability != null){
+            this.selectedLink.reverseNavigability();
+            this.selectedLink.addNavigability();
+        }
+    }
+
+    removeSelectedLinkNavigability(){
+        if(this.selectedLink != null){
+            this.selectedLink.removeNavigability();
+        }
+    }
+
+    setSelectedLinkColor(color){
+        $('.mainTool').css('display', 'none');
+        $('.colorTool').css('display', 'block');
+    }
+
+    setSelectedLinkColor(color){
+        if(this.selectedLink != null){
+            this.selectedLink.setColor(this.colors[color]);
+        }
+    }
+
+    productionPrivate(){
+        this.parent.style.backgroundImage = 'url("/img/gamerModule/privateContent.png")';
+    }
+
+    productionPublic(){
+        this.parent.style.backgroundImage = '';
     }
 
     // -------------------------------------------------------------------------

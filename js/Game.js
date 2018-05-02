@@ -1,17 +1,25 @@
 
 module.exports = class Game {
-    constructor(name, places, host, indivTimer, globalTimer, status){
+    constructor(name, places, host, cardGameName, cardGameLanguage, useTimers,
+                indivTimer, globalTimer, forceEndOfTurn, delayBeforeForcing,
+                sharingInterval, status){
         this.name = name;
         this.places = places;
         this.host = host;
         this.players = require('fifo')();
         this.activePlayers = [];
         this.activePlayers.push(host.getPseudo());
+        this.cardGameName = cardGameName;
+        this.cardGameLanguage = cardGameLanguage;
+        this.useTimers = useTimers;
         this.indivTimer = indivTimer;
         this.globalTimer = globalTimer;
+        this.forceEndOfTurn = forceEndOfTurn;
+        this.delayBeforeForcing = delayBeforeForcing;
         this.status = status;
         this.inactivePlayerManager = null;
         this.productionSharingManager = null;
+        this.sharingInterval = sharingInterval;
         this.inactivePlayer = [];
         this.exitBuffer = []; // nobody wants quit the game
         this.partyHistoricId = null;
@@ -53,6 +61,14 @@ module.exports = class Game {
         return this.host;
     }
 
+    getCardGameName(){
+        return this.cardGameName;
+    }
+
+    getCardGameLanguage(){
+        return this.cardGameLanguage;
+    }
+
     /**
      * Return the name of the animator
      * @return {string} : if there is an animator : his name
@@ -62,7 +78,7 @@ module.exports = class Game {
         if(this.host.isAnimator()){
             return this.host.getPseudo();
         }else{
-            return "";
+            return null;
         }
     }
 
@@ -196,6 +212,47 @@ module.exports = class Game {
         }else{
             return this.getCurrentPlayer();
         }
+    }
+
+    /**
+     * Return true if the game use timers, return false if not
+     * @return {Boolean}
+     */
+    getUseTimers(){
+        return this.useTimers;
+    }
+
+    /**
+     * Return the value of the global timer
+     * @return {number}
+     */
+    getGlobalTimer(){
+        return this.globalTimer;
+    }
+
+    /**
+     * Return the value of the individual timer
+     * @return {number}
+     */
+    getIndividualTimer(){
+        return this.indivTimer;
+    }
+
+    getForceEndOfTurn(){
+        return this.forceEndOfTurn;
+    }
+
+    getDelayBeforeForcing(){
+        return this.delayBeforeForcing * this.indivTimer;
+    }
+
+    /**
+     * Return the delay between each productions sharing
+     * @return {number}
+     */
+    getSharingInterval(){
+        console.log('SHARING INTERVAL : ' + this.sharingInterval * 1000);
+        return this.sharingInterval * 1000;
     }
 
     /**

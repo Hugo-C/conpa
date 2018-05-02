@@ -14,9 +14,13 @@ button:focus {
   outline: 0;
 }
 
-button#bouton:focus {
-  background-image: url("/img/gamerModule/textC.png");
-}
+button#bouton[value="red"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_red.png");}
+button#bouton[value="green"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_green.png");}
+button#bouton[value="yellow"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_yellow.png");}
+button#bouton[value="purple"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_purple.png");}
+button#bouton[value="brown"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_brown.png");}
+button#bouton[value="blue"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_blue.png");}
+button#bouton[value="white"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_white.png");}
 
 button#exit:hover {
   background-image: url('/img/gamerModule/exitOnHover.svg');

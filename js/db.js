@@ -451,17 +451,33 @@ exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
  * Record a player's production in the historic of the party
  *
  * @param {string} pseudo : player's pseudo for which we want recorded the production
- * @param {integer} party : party's id in which player has played
+ * @param {number} party : party's id in which player has played
  * @param {blob} production : name of the player's production file on the server
  * @param {callback} callback : function used to return errors
  */
-exports.recordPlayerProduction = function(pseudo, party, production, callback){
+exports.recordPlayerProductionWithPartyId = function(pseudo, party, production, callback){
     var sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
               ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
               ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
               ' AND ' + keys.HPT_KEY_PARTY + ' = ?;';
     var values = [production, pseudo, party];
     state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+};
+
+exports.recordPlayerProduction = function(pseudo, serverName, date, production, callback){
+    var sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
+              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
+              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
+              ' AND ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
+    var values = [production, pseudo, serverName, date];
+    state.pool.query(sql, values, function(err, result){
+        console.log(err);
         if(err) callback(err);
         else callback(null);
     });

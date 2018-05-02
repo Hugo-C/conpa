@@ -15,7 +15,6 @@ function initCards(cardGame, language){
         let client = new HttpClient();
         client.get("/gamerModule/cards?cardGame=" + cardGame + "&language=" + language, function(response) {
             cards = JSON.parse(response);
-            //console.log(cards);
         });
     }
 }
@@ -49,7 +48,10 @@ function displayNewCard(family){
  */
 function shareMyCard(family, card){
   let question = $('#question').text();
-  socket.emit('cardPicked', {'family': family, 'cardContent': card, 'question': question});
+  socket.emit('cardPicked', {'family': family,
+                             'cardContent': card,
+                             'question': question,
+                             'pseudo': sessionStorage.pseudo});
 }
 
 /**
@@ -62,6 +64,11 @@ function shareMyCard(family, card){
 socket.on('cardPicked', function(data){
     displayCard(data['family'], data['cardContent']);
     $('#playerQuestion > span').text(data['question']);
+    $('#playerTurn > span').text(data['pseudo']);
+});
+
+socket.on('downloadCardGame', function(data){
+    initCards(data['cardGameName'], data['cardGameLanguage']);
 });
 
 /**
@@ -88,5 +95,3 @@ function triggerCssAnimation(element){
     void element.offsetWidth;
     element.id = id;
 }
-
-initCards("conpa", "fr"); //TODO: choose card game at the creation of the game server

@@ -2,7 +2,7 @@
 /* My styles */
 
 .myCustomTitle {
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 	font-size: 1.2vw;
 	font-weight: bold;
 	text-align: center;
@@ -13,7 +13,7 @@
   background: #e3e3e3;
 	border: 1px solid #ccc;
 	color: #333;
-	font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+	font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 	font-size: 1.2vw;
 	font-weight: bold;
 	text-align: center;
@@ -107,6 +107,13 @@
 
 .stretchedImage {
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+}
+
+.imageBackground {
+  background-size: auto;
   background-position: center;
   background-repeat: no-repeat;
   background-origin: content-box;

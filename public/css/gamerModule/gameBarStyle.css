@@ -3,7 +3,7 @@ div#gameBar {
   padding: 0;
   border: 2px solid black;
   overflow-y: scroll;
-  background-color: lightgrey;
+  background: linear-gradient(grey, #1B1919);
 }
 
 div#gameBar > div {
@@ -18,7 +18,7 @@ div.fieldLabel {
   margin-bottom: 1%;
   color: black;
   font-size: 1.8vw;
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 }
 
 div.box {
@@ -33,7 +33,7 @@ div.box {
 
 div.box > span {
   font-size: 1vw;
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 }
 
 div.row {
@@ -80,4 +80,10 @@ div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child > svg {
 
 div#gameBar > div > div:nth-child(7) > div.box > div.row:last-child > button {
   height: 75%;
+}
+
+.nextPlayerDeactivate {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: default;
 }

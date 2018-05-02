@@ -60,6 +60,31 @@ router.post('/removeHistoric', urlencodedParser, function(req, res){
     })
 });
 
+router.post('/getPlayerProduction', urlencodedParser, function(req, res){
+    var details = {'production': ''};
+
+    db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
+        if(err){
+            res.send('ERROR');
+        }else{
+            console.log(result != null);
+            if(result != null) details['production'] = result;
+            res.send(details);
+        }
+    });
+});
+
+router.post('/recordPlayerProduction', urlencodedParser, function(req, res){
+    console.log(req.body.production);
+    db.recordPlayerProduction(req.body.username, req.body.partyName, req.body.partyDate, req.body.production, function(err){
+        if(err){
+            res.send('ERROR');
+        }else{
+            res.send('OK');
+        }
+    });
+});
+
 router.post('/getDetails', urlencodedParser, function(req, res){
     var details = {'production': '', 'players': []};
 

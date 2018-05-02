@@ -8,6 +8,10 @@ displayQuestionPanel();
 socket.emit('joinGame', {'pseudo': sessionStorage.pseudo,
                          'server': sessionStorage.server});
 
+// -----------------------------------------------------------------------------
+// ------------------------------- FUNCTIONS -----------------------------------
+// -----------------------------------------------------------------------------
+
 function displayQuestionPanel(){
     $('#questionContent').css('display', 'block');
     $('#gameContent').css('display', 'none');
@@ -136,6 +140,58 @@ function actualizeNbReady(ready, total){
     indicatorField.text(ready + ' / ' + total);
 }
 
+/**
+ * Catch click event on the validate button
+ * On click in this button, we send our question to the server
+ */
+$('#validate').on('click', function(){
+    var question = $('#myQuestion').val();
+    if(sessionStorage.role == 'player' && question != ''){
+        socket.emit('recordMyQuestion', {'question': question});
+    }else if(sessionStorage.role == 'animator'){
+        socket.emit('animatorValidation', null);
+    }
+});
+
+/**
+ * Display player's question
+ * Used to refresh a question when a player change his question
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to refresh the question
+ * @param {string} question : question to display
+ */
+function actualizePlayerQuestion(pseudo, question){
+    console.log(pseudo + ' : ' + question);
+    $('#question' + pseudo + ' > span').text(question);
+}
+
+/**
+ * Change the border color of a player's box
+ * Used to have a graphic visual to the players who have already defined their question
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to change the box border color
+ */
+function actualizeBorderColor(pseudo){
+    $('#profil' + pseudo).css('border-color', '#4FAB1A');
+    $('#profil' + pseudo + '> div').css('border-color', '#4FAB1A');
+}
+
+/**
+ * Display the question on the gamer module page when game begin
+ *
+ * @param {object} playersQuestion : dictionnary of (player's pseudo, player's question) pair
+ */
+function displayMyQuestion(playersQuestion){
+    for(var index = 0; index < playersQuestion.length; index++){
+        if(playersQuestion[index]['player'] == sessionStorage.pseudo){
+            $('span#question').text(playersQuestion[index]['question']);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+// ----------------------- SOCKET LISTENERS ------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * Process "initQuestionTime" message
@@ -175,42 +231,6 @@ socket.on('initQuestionTime', function(data){
 });
 
 /**
- * Catch click event on the validate button
- * On click in this button, we send our question to the server
- */
-$('#validate').on('click', function(){
-    var question = $('#myQuestion').val();
-    if(sessionStorage.role == 'player' && question != ''){
-        socket.emit('recordMyQuestion', {'question': question});
-    }else if(sessionStorage.role == 'animator'){
-        socket.emit('animatorValidation', null);
-    }
-});
-
-/**
- * Display player's question
- * Used to refresh a question when a player change his question
- *
- * @param {string} pseudo : pseudo of the player for which we want to refresh the question
- * @param {string} question : question to display
- */
-function actualizePlayerQuestion(pseudo, question){
-    console.log(pseudo + ' : ' + question);
-    $('#question' + pseudo + ' > span').text(question);
-}
-
-/**
- * Change the border color of a player's box
- * Used to have a graphic visual to the players who have already defined their question
- *
- * @param {string} pseudo : pseudo of the player for which we want to change the box border color
- */
-function actualizeBorderColor(pseudo){
-    $('#profil' + pseudo).css('border-color', '#4FAB1A');
-    $('#profil' + pseudo + '> div').css('border-color', '#4FAB1A');
-}
-
-/**
  * Process the "actualizeQuestions" message
  * This message is send by the server when a question has changed
  *
@@ -232,19 +252,6 @@ socket.on('actualizeQuestions', function(data){
         $('#validate').css('display', 'block'); // TODO : create an animation instead of hide the button
     }
 });
-
-/**
- * Display the question on the gamer module page when game begin
- *
- * @param {object} playersQuestion : dictionnary of (player's pseudo, player's question) pair
- */
-function displayMyQuestion(playersQuestion){
-    for(var index = 0; index < playersQuestion.length; index++){
-        if(playersQuestion[index]['player'] == sessionStorage.pseudo){
-            $('span#question').text(playersQuestion[index]['question']);
-        }
-    }
-}
 
 /**
  * Process the "allQuestionsDefined" message

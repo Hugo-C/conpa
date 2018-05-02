@@ -1,20 +1,6 @@
 
-var playersList = null;
-
-/**
- * Process the players message
- * Displays the list of player in the tchat
- *
- * form of received data : array which contain the list of players's pseudo
- */
-socket.on('chatPlayers', function(players){
-    console.log(players);
-    actualizeChatPlayersList(players);
-});
-
 function actualizeChatPlayersList(players){
     console.log(players);
-    playersList = players;
     var playerSelector = $('#chatPlayers');
     playerSelector.children().remove();
     playerSelector.append('<option value="all">general</option>');

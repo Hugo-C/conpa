@@ -5,24 +5,12 @@ body, html {
   width: 100%;
 }
 
-body {
-  /*padding: 5px;*/
-}
-
 button {
   border: none;
   background-color: Transparent;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-}
-
-/* police parameters */
-.fieldLabel {
-  font-size: 24px;
-  font-weight: bold;
-  font-family: fantasy;
-  padding: 0;
 }
 
 .basicContainer {
@@ -62,7 +50,6 @@ button {
 
 #gamePanel > :nth-child(2) {
   height: 70%;
-  /*display: none;*/
 }
 
 /* The exit panel bloc is defined in the exitPanelStyle.css file */
@@ -76,6 +63,45 @@ div#chatInfos {
 /* -------------------------- Fist bloc style ------------------------------- */
 /* -------------------------------------------------------------------------- */
 
+@-webkit-keyframes timeover {
+  0%{background-color: #FF0303;}
+  25%{background-color:#AF0000;}
+  50%{background-color:#6E0000;}
+  75%{background-color:#AF0000;}
+  100%{background-color:#FF0300;}
+}
+@-moz-keyframes timeover {
+  0%{background-color: #FF0303;}
+  25%{background-color:#AF0000;}
+  50%{background-color:#6E0000;}
+  75%{background-color:#AF0000;}
+  100%{background-color:#FF0303;}
+}
+@keyframes timeover {
+  0%{background-color: #FF0303;}
+  25%{background-color:#AF0000;}
+  50%{background-color:#6E0000;}
+  75%{background-color:#AF0000;}
+  100%{background-color:#FF0303;}
+}
+
+.timeover {
+  -webkit-animation-name: timeover;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+
+  -moz-animation-name: timeover;
+  -moz-animation-duration: 4s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-timing-function: linear;
+
+  animation-name: timeover;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
 #gamePanel > :nth-child(1) > * {
   border-right: 2px solid black;
 }
@@ -88,9 +114,9 @@ div#chatInfos {
   background-image: url('/img/gamerModule/exit.svg');
 }
 
-#gamePanel > :nth-child(1) > :nth-child(2) {
-  background-image: url('/img/gamerModule/player.svg');
-}
+.pseudoField.stretchedImage { background-image: url('/img/gamerModule/player.svg'); }
+.globalTimerField.stretchedImage { background-image: url('/img/gamerModule/timer.svg'); }
+.questionField.stretchedImage { background-image: url('/img/gamerModule/question.svg'); }
 
 #gamePanel > :nth-child(1) > div > span {
   font-size: 1.2vw;
@@ -103,15 +129,11 @@ div#chatInfos {
   line-height: 1.4vw;
 }
 
-#gamePanel > :nth-child(1) > :nth-child(4) {
-  background-image: url('/img/gamerModule/question.svg');
-}
-
 /* -------------------------------------------------------------------------- */
 /* ------------------------- Second bloc style ------------------------------ */
 /* -------------------------------------------------------------------------- */
 
-
+/* This bloc is defined in the playerProductionPanel.css file */
 
 /* -------------------------------------------------------------------------- */
 /* ------------------------- Fourth bloc style ------------------------------ */
@@ -170,6 +192,7 @@ textarea#notesArea {
 div#menu {
   border-left: 1px solid black;
   justify-content: flex-start;
+  background: linear-gradient(grey , darkgrey);
 }
 
 button.notesTool {

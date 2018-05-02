@@ -1,3 +1,8 @@
+
+// -----------------------------------------------------------------------------
+// ---------------------------- FUNCTIONS --------------------------------------
+// -----------------------------------------------------------------------------
+
 /**
  * Create a "box" to represent a player
  * A player is represented by a box containing his profil image and his pseudo
@@ -33,14 +38,19 @@ function actualizeBorderColor(pseudo){
  * Initialize the exit panel. Display all players of the game
  */
 function initGUI(){
-    var parentTag = $("#exitPanel > :nth-child(2) > div");
+    let players = clientGame.getOnlinePlayers();
+    let parentTag = $("#exitPanel > :nth-child(2) > div");
     parentTag.empty(); // remove all child nodes to refresh the list
     $('#exitMessage').text(''); // remove old messages
-    for(var index = 0; index < playersList.length; index++){
-        parentTag.append(addPlayerBox(playersList[index]));
-        setPP(playersList[index]);
+    for(let index = 0; index < players.length; index++){
+        parentTag.append(addPlayerBox(players[index]));
+        setPP(players[index]);
     }
 }
+
+// -----------------------------------------------------------------------------
+// ----------------------- BUTTONS LISTENER ------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * Catch click event on exit button
@@ -48,7 +58,7 @@ function initGUI(){
  */
 $("#exit").on("click", function(){
     if(sessionStorage.role == 'player')
-        production.centerSVGToDefaultPosition();
+        clientGame.getProduction().centerSVGToDefaultPosition();
     $('#gamePanel > :nth-child(2)').css('display', 'none'); // hide productionArea panel
     $('#exitPanel').css('display', 'block'); // display exit panel
     initGUI(); // initialize exit panel
@@ -68,12 +78,15 @@ $("#closeExitPanel").on("click", function(){
  * This button his used to leave the game alone
  */
 $("#leaveAlone").on("click", function(){
+    // moving to our own production
+    $('#' + sessionStorage.pseudo + '_productionAccess').click();
+    let production = sessionStorage.role == 'animator' ? "" : JSON.stringify(clientGame.getProduction().saveProduction());
     socket.emit('quitGame', {'pseudo': sessionStorage.pseudo,
                              'server': sessionStorage.server,
-                             'production': production.getInlineSvg()}); // inform server that we leave the game
+                             'production': production}); // inform server that we leave the game
     sessionStorage.server = null;
     sessionStorage.role = null;
-    window.location = '/'; // redirection to the main web page
+    window.location = '/'; // redirection to the main page
 });
 
 /**
@@ -108,6 +121,10 @@ $("#cancelExit").on("click", function(){
     socket.emit('stopGame', {'exit': false}); // sends our answer to the server
     $("#closeExitPanel").click();
 });
+
+// -----------------------------------------------------------------------------
+// ------------------------- SOCKET LISTENERS ----------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * Process the "stopGame?" message

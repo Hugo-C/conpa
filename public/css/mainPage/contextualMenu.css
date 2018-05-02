@@ -1,0 +1,61 @@
+
+.contextMenu {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  padding: 0;
+  background-color: #fff;
+  border: solid 1px #dfdfdf;
+  box-shadow: 2px 2px 4px #cfcfcf;
+}
+
+.contextMenu button {
+  -moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+
+.contextMenu--active {
+  display: block;
+}
+
+.colorToolEditor {
+  display: none;
+}
+.mainToolEditor {
+  display: block;
+}
+
+div#linkContextMenu {
+  height: auto;
+  width: 15%;
+  height: 40%;
+}
+
+div#linkContextMenu > div.mainToolEditor {
+  padding: 0;
+  height: calc(100% / 9);
+}
+div#linkContextMenu > div.colorToolEditor {
+  padding: 0;
+  height: calc(100% / 7);
+}
+
+div#linkContextMenu > div > img {
+  padding: 0;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  height: 100%;
+  background: #e3e3e3;
+  border: 1px solid #ccc;
+  background-size: contain;
+}
+div#linkContextMenu > div > button {
+  height: 100%;
+  background: #e3e3e3;
+  color: #333;
+  border: 1px solid #ccc;
+  font-size: 1vw;
+	font-weight: bold;
+	text-align: center;
+}

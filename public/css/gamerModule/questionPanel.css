@@ -6,6 +6,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  display: block;
   /*display: none; /* <------- invisible */
 }
 
@@ -124,7 +125,7 @@
   background-color: #e3e3e3;
   font-size: 1vw;
   font-weight: bold;
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 }
 
 #questionPanel > :nth-child(3) > div > :nth-child(3) > :last-child {
@@ -136,7 +137,7 @@
   text-align: center;
   font-size: 1vw;
   font-weight: bold;
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 }
 
 /* Question displayer style */

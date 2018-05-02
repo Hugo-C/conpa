@@ -1,6 +1,7 @@
 html, body {
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 header {
@@ -46,7 +47,7 @@ img#profilePicture {
 
 .userInfos > div > span {
   font-size: 1.2vw;
-  font-family: "Trebuchet MS", "Myriad Pro", sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
   color: #fff;
 }
 
@@ -74,7 +75,7 @@ div#title {
 }
 
 div#clock {
-  font-size: 1.2vw;
+  font-size: 1vw;
   font-weight: normal;
 }
 

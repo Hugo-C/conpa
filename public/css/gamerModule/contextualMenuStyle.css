@@ -9,8 +9,7 @@
   box-shadow: 2px 2px 4px #cfcfcf;
 }
 
-.contextMenu > button {
-  width: 100%;
+.contextMenu button {
   -moz-border-radius: 0px;
 	-webkit-border-radius: 0px;
 	border-radius: 0px;
@@ -20,15 +19,43 @@
   display: block;
 }
 
-div#linkContextMenu {
-  height: auto;
-  width: 15%;
+.colorTool {
+  display: none;
 }
-
-div#linkContextMenu > button.mainTool {
+.mainTool {
   display: block;
 }
 
-div#linkContextMenu > button.colorTool {
-  display: none;
+div#linkContextMenu {
+  height: auto;
+  width: 15%;
+  height: 40%;
+}
+
+div#linkContextMenu > div.mainTool {
+  padding: 0;
+  height: calc(100% / 9);
+}
+div#linkContextMenu > div.colorTool {
+  padding: 0;
+  height: calc(100% / 7);
+}
+
+div#linkContextMenu > div > img {
+  padding: 0;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  height: 100%;
+  background: #e3e3e3;
+  border: 1px solid #ccc;
+  background-size: contain;
+}
+div#linkContextMenu > div > button {
+  height: 100%;
+  background: #e3e3e3;
+  color: #333;
+  border: 1px solid #ccc;
+  font-size: 1vw;
+	font-weight: bold;
+	text-align: center;
 }

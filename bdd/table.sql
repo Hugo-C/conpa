@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS Users(
   pseudo VARCHAR(20),
   password CHAR(32) NOT NULL,
   email VARCHAR(255) NOT NULL,
+  token CHAR(32),
+  tokenExpiration DATETIME,
   status CHAR(1) DEFAULT 0,
   PRIMARY KEY(pseudo),
   UNIQUE INDEX uniq_email (email(190)));

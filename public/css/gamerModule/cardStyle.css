@@ -64,6 +64,8 @@ div#gameBar > div > div:nth-child(6) > div > :last-child {
 }
 
 p#cardContent{
+  padding-left: 5px;
+  padding-right: 5px;
   margin: auto;
   overflow: auto;
   font-size:0.8vw;

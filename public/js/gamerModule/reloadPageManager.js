@@ -1,23 +1,19 @@
 
 function saveCurrentState(){
     sessionStorage.unload = 'true';
-    sessionStorage.players = JSON.stringify(playersList);
+    clientGame.saveGameState();
     sessionStorage.tchat = $('#messages')[0].outerHTML;
-    sessionStorage.productionData = JSON.stringify(production.saveProduction());
     sessionStorage.cards = JSON.stringify(cards);
     sessionStorage.currentCardLogo = $('#familyLogoText').text();
     sessionStorage.currentCardContent = $('#cardContent').text();
+    sessionStorage.currentPlayer = $('#playerTurn > span').text();
     sessionStorage.currentQuestion = $('#playerQuestion > span').text();
-    sessionStorage.gameState = JSON.stringify(gameState);
 }
 
 function restoreCurrentState(){
-    // restore the list of players (used for the tchat)
-    playersList = JSON.parse(sessionStorage.players);
+    clientGame.restoreGameState();
     // restore the tchat content
     $('#messages')[0].outerHTML = sessionStorage.tchat;
-    // restore the player's production
-    production.restoreProduction(JSON.parse(sessionStorage.productionData));
     // restore the state of the card game
     cards = JSON.parse(sessionStorage.cards);
     // restore the current card
@@ -26,17 +22,14 @@ function restoreCurrentState(){
     }
     // restore the current question
     $('#playerQuestion > span').text(sessionStorage.currentQuestion);
-    // restore the state of the game (player who playing and the next player)
-    gameState = JSON.parse(sessionStorage.gameState);
+    $('#playerTurn > span').text(sessionStorage.currentPlayer);
 
-    delete sessionStorage.players;
     delete sessionStorage.tchat;
-    delete sessionStorage.productionData;
     delete sessionStorage.cards;
     delete sessionStorage.currentCardLogo;
     delete sessionStorage.currentCardContent;
     delete sessionStorage.currentQuestion;
-    delete sessionStorage.gameState;
+    delete sessionStorage.currentPlayer;
 }
 
 $(window).on('unload', function(evt){
