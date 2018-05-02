@@ -1,5 +1,8 @@
+var util = require('util');
 var mysql = require('mysql');
 var keys = require('./dbConstants');
+var crypto = require('crypto');
+var md5 = require('md5');
 
 var PRODUCTION_DB = 'conpaV2'; // name of the production database
 var TEST_DB = 'conpaV2'; // name of the test database
@@ -11,6 +14,9 @@ var state = {
     pool: null, // connection instance to mysql database
     mode: null, // selected database
 };
+
+const TOKEN_EXPIRATION_DELAY = 1;
+const TOKEN_SALT = "conpa174567";
 
 /**
  * Creates a connection instance to the database and store it into state record
@@ -318,8 +324,55 @@ exports.getPassword = function(pseudo, callback){
     console.log(sql);
     var value = [pseudo];
     state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        } else if(result && result[0]) {
+            callback(null, result[0][keys.UT_KEY_PASSWORD]);
+        } else {
+            callback(null, null);
+        }
+    });
+};
+
+
+/**
+ * Set the password of the given user
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to retrieve the password
+ * @param {string} password : the new password, using md5 encryption
+ * @param {callback} callback : function called if the password is correctly set
+ */
+exports.setPassword = function(pseudo, password, callback){
+    console.log("i set the password to : " + password);
+    let sql = 'UPDATE ' + keys.USER_TABLE +
+        ' SET ' + keys.UT_KEY_PASSWORD + ' = ?' +
+        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    console.log(sql);
+    let value = [password, pseudo];
+    state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
-        else callback(null, result[0][keys.UT_KEY_PASSWORD]);
+        else callback(null, pseudo);
+    });
+};
+
+/**
+ * Retrieves the user's name from his email address
+ *
+ * @param {string} email : email address of the player for which we want to retrieve the username
+ * @param {callback} callback : function called to return the email
+ */
+exports.getUser = function(email, callback){
+    let sql = 'SELECT ' + keys.UT_KEY_PSEUDO +
+        ' FROM ' + keys.USER_TABLE +
+        ' WHERE ' + keys.UT_KEY_EMAIL + ' = ?;';
+    let value = [email];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else if (result && result[0]) {
+            callback(null, result[0][keys.UT_KEY_PSEUDO]);
+        } else {
+            callback(null, null);  // no result
+        }
     });
 };
 
@@ -336,7 +389,86 @@ exports.getEmail = function(pseudo, callback){
     let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
-        else callback(null, result[0][keys.UT_KEY_EMAIL]);
+        else if (result && result[0]) {
+            callback(null, result[0][keys.UT_KEY_EMAIL]);
+        } else {
+            callback(null, null);  // no result
+        }
+    });
+};
+
+/**
+ * Set a token for the given user, allowing him to change his password
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to set a new token
+ * @param {string} token : the token to set
+ * @param {callback} callback : function called to return the pseudo and the hashed token
+ */
+let setToken = function(pseudo, token, callback){
+    console.log("monTOKEN : ");
+    console.log(token);
+
+    // create a new date with the current date and add the expiration delay
+    let expirationDate = new Date();
+    if(token !== null)
+        expirationDate.setDate(expirationDate.getDate() + TOKEN_EXPIRATION_DELAY);
+    expirationDate = expirationDate.toISOString().substring(0, 19).replace('T', ' '); // convert js Date to mysql DATETIME
+
+    let sql = 'UPDATE ' + keys.USER_TABLE +
+        ' SET ' + keys.UT_KEY_TOKEN + ' = ?, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = ?' +
+        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    let value = [md5(token + TOKEN_SALT), expirationDate, pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            console.log(err);
+            callback(pseudo, null);
+        }
+        callback(pseudo, token);
+    });
+};
+
+/**
+ * Generate a new token for the given user, allowing him to change his password
+ * then set this token in the database
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to set a new token
+ * @param {callback} callback : function called when the token has been set
+ */
+exports.generateToken = function(pseudo, callback) {
+    var token;
+    crypto.randomBytes(32, function (ex, buf) {
+        token = buf.toString('hex');
+        setToken(pseudo, token, callback)
+    });
+};
+/**
+ * Check if the token is valid
+ *
+ * @param {string} token : the token to check
+ * @param {callback} callback : function called to return the pseudo and the hashed token
+ */
+exports.isValidToken = function(token, callback){
+    token = md5(token + TOKEN_SALT);
+    let sql = 'SELECT ' + keys.UT_KEY_PSEUDO + ', ' + keys.UT_KEY_TOKEN_EXPIRATION +
+        ' FROM ' + keys.USER_TABLE +
+        ' WHERE ' + keys.UT_KEY_TOKEN + ' = ?;';
+    let value = [token];
+    state.pool.query(sql, value, function(err, result){
+        if(err)callback(err);
+        else {
+            if(result.length === 0){
+                err = "this token is attached to no user";  // TODO handle errors more properly
+                callback(err);  // no user have the current token
+            } else {
+                let expirationDate = new Date(result[0][keys.UT_KEY_TOKEN_EXPIRATION]);
+                if(expirationDate.getTime() <= Date.now()){
+                    err = "this token has expired, try to submit your email again";
+                    callback(err);
+                } else {
+                    callback(null, result[0][keys.UT_KEY_PSEUDO], expirationDate);
+                }
+            }
+        }
     });
 };
 

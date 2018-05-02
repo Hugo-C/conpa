@@ -1,0 +1,30 @@
+doctype
+html
+    head
+        meta(charset="utf-8")
+        title= 'token response'
+    body
+        form(class="reset")
+            div
+                h3 Reset your password
+                div(class="g-recaptcha" data-sitekey="6LcNnFYUAAAAANJO9NgQBmnjZM6YfQpSHFkYE0uj")
+            div
+                div
+                    label Password:
+                    input(type="password" name="password" placeholder='New password' autofocus=true pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$" required)
+                    span(class="myTooltip") Password must contain at least 8 characters, 1 Uppercase letter and 1 number
+            div
+                div
+                    label Confirm password:
+                    input(type="password" name="confirm" placeholder='confirm password' autofocus=true pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$" required)
+
+            div
+                div
+                    input(type="submit" value="Set password")
+
+
+
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+    script(src='https://www.google.com/recaptcha/api.js')
+    script(src="/bower/js-md5/src/md5.js")
+    script(src="/js/connection/setPassword.js")

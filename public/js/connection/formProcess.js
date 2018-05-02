@@ -7,6 +7,9 @@ var $login_form = $('.login');
 var $login_username = $('.login input[name="username"]');
 var $login_password = $('.login input[name="password"]');
 
+var $reset_form = $('.forgot_password');
+var $reset_email = $('.forgot_password input[name="email"]');
+
 function clearInput(type){
     myInputs = $('input[type="' + type + '"]');
     for(let index = 0; index < myInputs.length; index++){
@@ -132,4 +135,18 @@ $('form.register input').on('keyup', function(evt){
     }else{
         $($(this)['context']['nextSibling']).css('display', 'none');
     }
+});
+
+$('input[value="Send reminder"]').on('click', function(){
+    $.ajax({
+        type: 'POST',
+        url: '/connection/resetPassword',
+        data: { email: $reset_email.val() },
+        error: function(){
+            console.log("Request Failed, try reloading the page to reset your password");
+        },
+        success: function(response){
+            alert("check your mail box !");
+        }
+    });
 });

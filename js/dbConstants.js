@@ -18,6 +18,8 @@ exports.CT_KEY_CARD_FAMILY = "family";
 exports.USER_TABLE = "Users";
 exports.UT_KEY_PSEUDO = "pseudo";
 exports.UT_KEY_EMAIL = "email";
+exports.UT_KEY_TOKEN = "token";
+exports.UT_KEY_TOKEN_EXPIRATION = "tokenExpiration";
 exports.UT_KEY_PASSWORD = "password";
 exports.UT_CONNECT = "status";
 
