@@ -249,7 +249,9 @@ var config = {
     "lang": "en",
     "langFile": "./../../locale.json"
 };
+/* FIXME
 //init internationalization / localization class
 var i18n_module = require('i18n-nodejs');
 var i18n = new i18n_module(config.lang, config.langFile);
 console.log(i18n.__('Salut'));
+*/

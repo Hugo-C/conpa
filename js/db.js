@@ -405,9 +405,6 @@ exports.getEmail = function(pseudo, callback){
  * @param {callback} callback : function called to return the pseudo and the hashed token
  */
 let setToken = function(pseudo, token, callback){
-    console.log("monTOKEN : ");
-    console.log(token);
-
     // create a new date with the current date and add the expiration delay
     let expirationDate = new Date();
     if(token !== null)
@@ -422,8 +419,9 @@ let setToken = function(pseudo, token, callback){
         if(err){
             console.log(err);
             callback(pseudo, null);
+        } else {
+            callback(pseudo, token);
         }
-        callback(pseudo, token);
     });
 };
 
@@ -439,6 +437,23 @@ exports.generateToken = function(pseudo, callback) {
     crypto.randomBytes(32, function (ex, buf) {
         token = buf.toString('hex');
         setToken(pseudo, token, callback)
+    });
+};
+
+/**
+ * Clear the token to the given player
+ *
+ * @param {string} pseudo : pseudo of the player for which we want to clear the token
+ * @param {callback} callback : function called when the token has been set
+ */
+exports.clearToken = function(pseudo, callback) {
+    let sql = 'UPDATE ' + keys.USER_TABLE +
+        ' SET ' + keys.UT_KEY_TOKEN + ' = NULL, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = NULL' +
+        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+    let value = [pseudo];
+    state.pool.query(sql, value, function(err, result) {
+        if(err) callback(err);
+        else callback(null, pseudo);
     });
 };
 /**
