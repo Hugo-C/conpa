@@ -130,10 +130,10 @@ $('input[value="Login"]').on('click', function(){
 });
 
 $('form.register input').on('keyup', function(evt){
-    if(!$(this)[0].checkValidity()){
-        $($(this)['context']['nextSibling']).css('display', 'inline-block');
-    }else{
+    if($(this)[0].checkValidity() || $(this)[0].value == ''){
         $($(this)['context']['nextSibling']).css('display', 'none');
+    }else{
+        $($(this)['context']['nextSibling']).css('display', 'inline-block');
     }
 });
 
