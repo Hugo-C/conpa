@@ -68,15 +68,7 @@ db.connect(db.MODE_TEST, function(err){
     }
 });
 
-// connect to MySQL on start
-db.connect(db.MODE_TEST, function(err){
-    if(err){
-        console.log('Unable to connect to MySQL');
-        process.exit(1);
-    }else{
-        console.log('Connected to MySQL');
-    }
-});
+
 
 // manage clients connections
 io.on('connection', function (socket) {
