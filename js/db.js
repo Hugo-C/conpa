@@ -22,7 +22,7 @@ const TOKEN_SALT = "conpa174567";
  * Creates a connection instance to the database and store it into state record
  *
  * @param {string} mode : allows user to choose between a production or test database
- * @param {function} done : nodejs function call when work is done
+ * @param {function} done : nodejs function called when the work is done
  */
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
@@ -37,7 +37,7 @@ exports.connect = function(mode, done){
 };
 
 /**
- * Gives access to the connection instance create by connect function
+ * Gives access to the connection instance created by the connect function
  *
  * @return {mysql connection} : connection instance to mysql database
  */
@@ -64,7 +64,7 @@ exports.commit = function(){
  * Retrieves family cards
  *
  * @param {unsigned integer} familyId : id of the family for which we want to retrieve cards
- * @param {callback} callback : function called to process retrieved data
+ * @param {callback} callback : function called to process on retrieved data
  */
 exports.getFamilyCards = function(familyId, callback){
     var sql = 'SELECT ' + keys.CT_KEY_CONTENT + ', ' + keys.CT_KEY_INFORMATION +
@@ -82,7 +82,7 @@ exports.getFamilyCards = function(familyId, callback){
  * Retrieves card game families and associated logos from a card game id
  *
  * @param {unsigned integer} cardGameId : id of the card game for which we want to retrieve families and associated logos
- * @param {callback} callback : function called to process retrieved data
+ * @param {callback} callback : function called to on process retrieved data
  */
 exports.getFamilies = function(cardGameId, callback){
     var sql = 'SELECT ' + keys.CARD_FAMILY_TABLE + '.' + keys.CFT_KEY_ID +
@@ -100,9 +100,9 @@ exports.getFamilies = function(cardGameId, callback){
 /**
  * Retrieves card game informations (id, name and language)
  *
- * @param {string} cardGame : name of card game we want to retrieved
- * @param {string} language : language of card game we want to retrieved
- * @param {callback} callback : function called to process retrieved data
+ * @param {string} cardGame : name of the card game we want to retrieve
+ * @param {string} language : language of the card game we want to retrieve
+ * @param {callback} callback : function called to process on retrieved data
  */
 exports.getCardGame = function(cardGame, language, callback){
     var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
@@ -118,7 +118,7 @@ exports.getCardGame = function(cardGame, language, callback){
 /**
  * Retrieves all card game stored in database
  *
- * @param {callback} callback : function called to process retrieved data
+ * @param {callback} callback : function called to process on retrieved data
  */
 exports.getCardGames = function(callback){
     var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE + ';';
@@ -148,7 +148,7 @@ exports.addCard = function(content, description, familyId, callback){
 };
 
 /**
- * Add a family into the database
+ * Add a family into the database (without logo)
  *
  * @param {string} name : family's name
  * @param {integer} cardGameId : id of the family's card game
@@ -166,7 +166,7 @@ exports.addCardFamilyWithoutLogo = function(name, cardGameId, callback){
 };
 
 /**
- * Add a family into the database
+ * Add a family into the database (with logo)
  *
  * @param {string} name : family's name
  * @param {string} logo : name of the logo image
@@ -189,7 +189,7 @@ exports.addCardFamilyWithLogo = function(name, logo, cardGameId, callback){
  *
  * @param {string} name : cardgame's name
  * @param {string} language : cardgame's language
- * @param {callback} callback : function called with a boolean to send the response
+ * @param {callback} callback : function called with a boolean to send the reply
  */
 exports.cardGameExists = function(name, language, callback){
     var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
@@ -228,7 +228,7 @@ exports.removeCardGame = function(name, language, callback){
 };
 
 /**
- * Add a new cardgame in the database (cardgame must not already exist)
+ * Add a new cardgame in the database (the cardgame mustn't already exist)
  *
  * @param {string} name : cardgame's name
  * @param {string} language : cardgame's language
