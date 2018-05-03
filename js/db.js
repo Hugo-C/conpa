@@ -61,15 +61,6 @@ exports.commit = function(){
 };
 
 /**
- * Function called when data has been retrieved from database.
- * This function is in charge of data processing.
- *
- * @callback callback
- * @param {error} err : error returned by the query if this one has failed
- * @param {object array} : result returned by the query if this one has working
- */
-
-/**
  * Retrieves family cards
  *
  * @param {unsigned integer} familyId : id of the family for which we want to retrieve cards
