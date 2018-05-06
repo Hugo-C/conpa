@@ -1,13 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var multer = require('multer');
-var upload = multer().single('uploadProduction');
-var querystring = require('querystring');
-var bodyParser = require('body-parser');
-var url = require('url');
-var db = require('../js/db');
-var keys = require('../js/dbConstants');
-var fs = require('fs');
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const upload = multer().single('uploadProduction');
+const querystring = require('querystring');
+const url = require('url');
+const db = require('../js/db');
+const keys = require('../js/dbConstants');
+const fs = require('fs');
 
 
 /**
@@ -66,9 +65,8 @@ router.post('/uploadProduction', function(req, res){
             console.log(err);
             res.send('ERROR');
         }else{
-            var file = req.file;
-            var fileName = file.originalname;
-            var dest = "./upload/" + fileName;
+            let file = req.file;
+            let dest = "./upload/" + file.originalname;
             fs.writeFile(dest, file.buffer, function(err){
                 if(err){
                     console.log(err);

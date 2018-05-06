@@ -1,11 +1,11 @@
 String.prototype.visualLength = function(){
-    var ruler = $("#ruler")[0];
+    let ruler = $("#ruler")[0];
     ruler.innerHTML = this;
     return ruler.offsetWidth;
 };
 
 String.prototype.visualFontSize = function(){
-    var ruler = $("#ruler")[0];
+    let ruler = $("#ruler")[0];
     ruler.innerHTML = this;
     return ruler.offsetHeight;
 };

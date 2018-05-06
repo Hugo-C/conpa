@@ -16,11 +16,10 @@ $($reset_form).on("submit", function(evt){
         $.ajax({
             type: 'POST',
             url: '/connection/setPassword',
-            timeout: 5000,
             data: {
                 password: md5($reset_password.val()),
                 token: token,
-                recaptcha: ''//grecaptcha.getResponse()
+                recaptcha: grecaptcha.getResponse()
             },
             error: function(err){
                 console.log(err);

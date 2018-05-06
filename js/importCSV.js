@@ -1,7 +1,6 @@
-var fs = require("fs");
-var parse = require('csv-parse/lib/sync');
-var keys = require('../js/dbConstants');
-var db = require('../js/db');
+const fs = require("fs");
+const parse = require('csv-parse/lib/sync');
+const db = require('../js/db');
 
 /**
  * Import the cards of the family to the database
@@ -11,12 +10,12 @@ var db = require('../js/db');
  * @param {int} familyId : The id of the family
  */
 function addCards(records, family, familyId) {
-    records = records.slice(2);  // first 4 éléments aren't about cards
-    var j = 0;
+    records = records.slice(2);  // first 4 elements aren't about cards
+    let j = 0;
     while(j < records.length && records[j][family] !== ""){
         // we process each cards
         // TODO add the cards by batch
-        db.addCard(records[j][family], records[j]["info sup " + family], familyId, function(err, result){
+        db.addCard(records[j][family], records[j]["info sup " + family], familyId, function(err){
             if(err){
                 console.log("err : " + err.message);
             }else{
@@ -33,8 +32,7 @@ function addCards(records, family, familyId) {
  * @param {Array.<string, string>} records : The records of families to process
  * @param {string} family : The family name, used as key in the record
  * @param {int} cardGameId : The id of the card game
- * @param {int} logoId : The id of the logo of the family
- * @param {callack} addCards : The function that will add the family's cards
+ * @param {callback} addCards : The function that will add the family's cards
  */
 function addFamily(records, family, cardGameId, addCards) {
 
@@ -55,7 +53,7 @@ function addFamily(records, family, cardGameId, addCards) {
  * @param {Array.<string, string>} records : The records of families to process
  * @param {int} cardGameId : The id of the card game
  */
-var processFamilies = function(records, cardGameId) {
+const processFamilies = function(records, cardGameId) {
     let nbrFamilies = (Object.keys(records[0]).length - 1) / 2;
     // divided by 2 since we don't want supplement informations to be counted as families
 
@@ -69,7 +67,7 @@ var processFamilies = function(records, cardGameId) {
  * Add a new card game to the database and process it's families
  *
  * @param {Array.<string, string>} records : The records of elements to add
- * @param {callack} processFamilies : The function to process the families of the card game
+ * @param {callback} processFamilies : The function to process the families of the card game
  */
 function addCardGame(records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
@@ -94,12 +92,10 @@ function updateCardGame(records, processFamilies) {
     db.removeCardGame(records[0]['nom jeu'], records[0]['langue'], function(err){
         if(err){
             console.log(err);
-            return;
         }else{
             addCardGame(records, processFamilies);
         }
-    })
-
+    });
 }
 
 /**
@@ -110,7 +106,7 @@ function updateCardGame(records, processFamilies) {
  */
 exports.importFromCsv = function(path, newCardGame){
     fs.readFile(path, function(err, data) {
-        var records = parse(data, {columns: true});
+        let records = parse(data, {columns: true});
         console.log(records);
         if(records.length > 0){
             if(newCardGame) addCardGame(records, processFamilies);
