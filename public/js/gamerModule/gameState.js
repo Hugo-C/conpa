@@ -4,7 +4,7 @@ class GameState {
         this.animator = null;
         this.players = [];
         this.playersProduction = {}; // used to keep in memory other players production and access it
-        this.production; // used to store Production class instance
+        this.production = null; // used to store Production class instance
         this.mosaic = {}; // used to store Production class instances of the mosaic
         this.state = {}; // used to keep in memory the name of the current player and the next one
         this.useTimer = false;
@@ -27,7 +27,7 @@ class GameState {
         return this.animator;
     }
 
-    timerToString(timer){
+    static timerToString(timer){
         let seconds = timer;
         let hours = parseInt(seconds / 3600);
         seconds = seconds % 3600;
@@ -44,12 +44,13 @@ class GameState {
     globalTimerManager(){
         if(this.globalTimer > 0){
             this.globalTimer--;
-            $('span.globalTimerField').text(this.timerToString(this.globalTimer));
+            $('span.globalTimerField').text(GameState.timerToString(this.globalTimer));
         }else{
             this.overtime++;
-            $('span.globalTimerField').text(' - ' + this.timerToString(this.overtime));
-            if(!$('span.globalTimerField').parent().hasClass('timeover')){
-                $('span.globalTimerField').parent().addClass('timeover');
+            let globalTimerField = $('span.globalTimerField');
+            globalTimerField.text(' - ' + GameState.timerToString(this.overtime));
+            if(!globalTimerField.parent().hasClass('timeover')){
+                globalTimerField.parent().addClass('timeover');
             }
         }
     }
@@ -107,7 +108,7 @@ class GameState {
 
     setPlayerOnline(pseudo){
         for(let index = 0; index < this.players.length; index++){
-            if(this.players[index]['pseudo'] == pseudo)
+            if(this.players[index]['pseudo'] === pseudo)
                 this.players[index]['state'] = 'online';
         }
     }
@@ -127,7 +128,7 @@ class GameState {
 
     updateMosaic(){
         for(let index = 0; index < this.players.length; index++){
-            if(this.players[index]['state'] == 'offline')
+            if(this.players[index]['state'] === 'offline')
                 delete this.mosaic[this.players[index]['pseudo']];
         }
     }
@@ -139,7 +140,7 @@ class GameState {
     getOnlinePlayers(){
         let res = [];
         for(let index = 0; index < this.players.length; index++){
-            if(this.players[index]['state'] == 'online')
+            if(this.players[index]['state'] === 'online')
                 res.push(this.players[index]['pseudo']);
         }
         return res;
@@ -205,34 +206,34 @@ class GameState {
     }
 
     saveGameState(){
-       sessionStorage.animator = this.animator;
-       sessionStorage.playersProduction = JSON.stringify(this.playersProduction);
-       sessionStorage.productionData = JSON.stringify(this.production.saveProduction());
-       sessionStorage.state = JSON.stringify(this.state);
-       sessionStorage.useTimer = this.useTimer;
-       sessionStorage.globalTimerValue = this.globalTimerValue;
-       sessionStorage.indivTimerValue = this.indivTimerValue;
-       if(this.useTimer) clearInterval(this.globalTimerControler);
-       sessionStorage.globalTimer = this.globalTimer;
-       sessionStorage.overtime = this.overtime;
-       if(this.indivTimerControler != null) clearInterval(this.indivTimerControler);
-       sessionStorage.indivTimer = this.indivTimer;
-       sessionStorage.isDiceDisplayed = isDiceDisplayed();
+        sessionStorage.animator = this.animator;
+        sessionStorage.playersProduction = JSON.stringify(this.playersProduction);
+        sessionStorage.productionData = JSON.stringify(this.production.saveProduction());
+        sessionStorage.state = JSON.stringify(this.state);
+        sessionStorage.useTimer = this.useTimer;
+        sessionStorage.globalTimerValue = this.globalTimerValue;
+        sessionStorage.indivTimerValue = this.indivTimerValue;
+        if (this.useTimer) clearInterval(this.globalTimerControler);
+        sessionStorage.globalTimer = this.globalTimer;
+        sessionStorage.overtime = this.overtime;
+        if (this.indivTimerControler != null) clearInterval(this.indivTimerControler);
+        sessionStorage.indivTimer = this.indivTimer;
+        sessionStorage.isDiceDisplayed = isDiceDisplayed();
     }
 
     restoreGameState(){
-        this.animator = sessionStorage.animator == "" ? null : sessionStorage.animator;
+        this.animator = sessionStorage.animator === "" ? null : sessionStorage.animator;
         createPlayersProductionList(this.getOnlinePlayers());
         this.playersProduction = JSON.parse(sessionStorage.playersProduction);
         actualizeChatPlayersList(this.getOnlinePlayers());
         this.production.restoreProduction(JSON.parse(sessionStorage.productionData));
-        if(sessionStorage.role == 'animator'){
+        if(sessionStorage.role === 'animator'){
             clearMosaic();
             createMosaic(this.getOnlinePlayers());
             refreshMosaic();
         }
         this.state = JSON.parse(sessionStorage.state);
-        this.useTimer = (sessionStorage.useTimer == 'true');
+        this.useTimer = (sessionStorage.useTimer === 'true');
         this.globalTimerValue = parseInt(sessionStorage.globalTimerValue);
         this.indivTimerValue = parseInt(sessionStorage.indivTimerValue);
         this.globalTimer = parseInt(sessionStorage.globalTimer);
@@ -244,12 +245,12 @@ class GameState {
         if(this.indivTimer > 0){
             this.startIndivTimer(0, this.indivTimer);
         }
-        if(this.getCurrentPlayer() != sessionStorage.pseudo){
+        if(this.getCurrentPlayer() !== sessionStorage.pseudo){
             deactivateNextPlayerButton();
-        }else if(sessionStorage.isDiceDisplayed == 'true'){
+        }else if(sessionStorage.isDiceDisplayed === 'true'){
             showDice();
         }
-        if(this.getCurrentPlayer() == sessionStorage.pseudo){
+        if(this.getCurrentPlayer() === sessionStorage.pseudo){
             individualTimerColor('#1F5473', '#0AA6E1');
         }else{
             individualTimerColor('black', 'grey');

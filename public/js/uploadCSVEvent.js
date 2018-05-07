@@ -6,11 +6,12 @@ var modelCSV = [/nom jeu,langue(,(famille [1-5]),info sup \2){5}/g,
 
 
 $("#valideImport").on("click", function(){
-    if($('#import')[0].files.length > 0){
-        handleFiles($('#import')[0].files);
-        $('#import').attr('type', ''); // reset input(type="file") content
-        $('#import').attr('type', 'file');
-        $('#importButton').text('No file chosen'); // no selected file
+    let csvImport = $('#import');
+    if(csvImport[0].files.length > 0){
+        handleFiles(csvImport[0].files);
+        csvImport.attr('type', ''); // reset input(type="file") content
+        csvImport.attr('type', 'file');
+        csvImport.text('No file chosen'); // no selected file
     }else{
         $('#importAlertMessage').text('No file selected');
     }
@@ -35,16 +36,15 @@ function handleFiles(files){
  * @param {file} fileToRead : file to process
  */
 function getAsText(fileToRead){
-    var reader = new FileReader();
+    let reader = new FileReader();
 
-    reader.onload = (function(f) {
-            return function(e) {
-                console.log(e.target.result);
-                loadHandler(e, fileToRead);
-            };
-        })(fileToRead);
-        reader.readAsText(fileToRead);
-
+    reader.onload = (function () {
+        return function (e) {
+            console.log(e.target.result);
+            loadHandler(e, fileToRead);
+        };
+    })();
+    reader.readAsText(fileToRead);
     reader.onerror = errorHandler;
 }
 
@@ -57,7 +57,7 @@ function getAsText(fileToRead){
  * @param {fileToRead} fileToRead : csv content to process
  */
 function loadHandler(event, fileToRead){
-    var csv = event.target.result;
+    let csv = event.target.result;
     csv = processData(csv); // retrieves each csv lines
 
     if(checkConformity(csv)){
@@ -74,11 +74,11 @@ function loadHandler(event, fileToRead){
  * @return {string array} : lines of the csv file
  */
 function processData(csv){
-    var allTextLines = csv.split(/\r\n|\n/);
-    var row = [];
-    for(var i = 0; i < allTextLines.length; i++){
-        var data = allTextLines[i].split(';');
-        for(var j = 0; j < data.length; j++){
+    let allTextLines = csv.split(/\r\n|\n/);
+    let row = [];
+    for(let i = 0; i < allTextLines.length; i++){
+        let data = allTextLines[i].split(';');
+        for(let j = 0; j < data.length; j++){
             row.push(data[j]);
         }
     }
@@ -93,8 +93,8 @@ function processData(csv){
 function checkConformity(row){
     console.log(row);
     if(row.length < modelCSV.length) return false; // csv count less lines than the model
-    success = true; // csv conformity state
-    test = 0; // line to be tested
+    let success = true; // csv conformity state
+    let test = 0; // line to be tested
     while(test < modelCSV.length && success){
         console.log(modelCSV[test] + ' match with ' + row[test]);
         success = modelCSV[test].test(row[test]);
@@ -118,21 +118,16 @@ function errorHandler(event){
  * the user to overwrite old card game version.
  */
 function uploadCSV(csvFile){
-
-    var formData = new FormData();
+    let formData = new FormData();
     formData.append("uploadCSV", csvFile);
 
     var request = new XMLHttpRequest();
-
     request.onload = function(){
-
-        var regex = /\.csv$/;
-        if(request.responseText == 'OK'){
+        let regex = /\.csv$/;
+        if(request.responseText === 'OK'){
             $('#importAlertMessage').text("import successful");
         }else if(request.responseText != null && regex.test(request.responseText)){
-
-            var updateCardGame = confirm("This card game already exists !\nWould you overwrite it ?");
-
+            let updateCardGame = confirm("This card game already exists !\nWould you overwrite it ?");
             $.ajax({
                 type: 'POST',
                 url: '/updateCardGame',
@@ -141,12 +136,12 @@ function uploadCSV(csvFile){
                     csv: request.responseText
                 },
                 error: function(){
-                   $('#importAlertMessage').text("Request failed");
+                    $('#importAlertMessage').text("Request failed");
                 },
                 success: function(response){
-                    if(response == 'OK'){
+                    if(response === 'OK'){
                         $('#importAlertMessage').text("Import successful");
-                    }else if(response == 'NO UPDATE'){
+                    }else if(response === 'NO UPDATE'){
                         $('#importAlertMessage').text("Data has not been updated");
                     }else{
                         $('#importAlertMessage').text("Request failed");
@@ -156,7 +151,7 @@ function uploadCSV(csvFile){
         }else{
             $('#importAlertMessage').text("import has failed");
         }
-    }
+    };
 
     request.open("post", "/importCardGame", true);
     request.send(formData);

@@ -11,7 +11,7 @@ document.getElementById('cardContent').appendChild(cardTextNode);
  * @param language {String} : language of the cardGame
  */
 function initCards(cardGame, language){
-    if(sessionStorage.unload == 'false'){ // we retrieve card only the fist time, not at each reload of the page
+    if(sessionStorage.unload === 'false'){ // we retrieve card only the fist time, not at each reload of the page
         let client = new HttpClient();
         client.get("/gamerModule/cards?cardGame=" + cardGame + "&language=" + language, function(response) {
             cards = JSON.parse(response);
@@ -46,12 +46,14 @@ function displayNewCard(family){
  * @param family {String} : the family of the card picked
  * @param card {String} : the content of the card picked
  */
-function shareMyCard(family, card){
-  let question = $('#question').text();
-  socket.emit('cardPicked', {'family': family,
-                             'cardContent': card,
-                             'question': question,
-                             'pseudo': sessionStorage.pseudo});
+function shareMyCard(family, card) {
+    let question = $('#question').text();
+    socket.emit('cardPicked', {
+        'family': family,
+        'cardContent': card,
+        'question': question,
+        'pseudo': sessionStorage.pseudo
+    });
 }
 
 /**
@@ -77,6 +79,7 @@ socket.on('downloadCardGame', function(data){
  * @param text {String} : the content of the card picked
  */
 function displayCard(family, text){
+    let cardContent = document.getElementById('cardContent');
     triggerCssAnimation(cardContent);
     //cardFamilyNode.nodeValue = family;
     cardTextNode.nodeValue = text;

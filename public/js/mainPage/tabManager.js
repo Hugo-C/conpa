@@ -1,7 +1,7 @@
 
 function turnOnPath(color){
-   $('.header2 > div').css('border-color', color);
-   $('.header3 > div').css('border-color', color);
+    $('.header2 > div').css('border-color', color);
+    $('.header3 > div').css('border-color', color);
 }
 
 $('#Game').on('click', function(){

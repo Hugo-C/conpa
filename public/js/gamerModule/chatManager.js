@@ -1,11 +1,11 @@
 
 function actualizeChatPlayersList(players){
     console.log(players);
-    var playerSelector = $('#chatPlayers');
+    let playerSelector = $('#chatPlayers');
     playerSelector.children().remove();
     playerSelector.append('<option value="all">general</option>');
-    for(var index in players){
-        if(players[index] != sessionStorage.pseudo){ // we not displays the pseudo of the current player
+    for(let index in players){
+        if(players[index] !== sessionStorage.pseudo){ // we not displays the pseudo of the current player
             playerSelector.append($('<option>', {
                 value: players[index],
                 text : players[index]
@@ -22,10 +22,10 @@ function actualizeChatPlayersList(players){
  * @param {string} color : color of the text
  */
 function insertTextInChat(msg, sender, color){
-    var tchat = $("#messages");
-    var senderTag = '<span style="font-weight:bold; color:' + color + '">' + sender + ' : </span>';
-    var msgTag = '<span style="font-weight:bold; color:' + color + '">' + msg + '</span>';
-    tchat.append('<p style="margin:0;">' + senderTag + msgTag + '</p>');
+    let chat = $("#messages");
+    let senderTag = '<span style="font-weight:bold; color:' + color + '">' + sender + ' : </span>';
+    let msgTag = '<span style="font-weight:bold; color:' + color + '">' + msg + '</span>';
+    chat.append('<p style="margin:0;">' + senderTag + msgTag + '</p>');
 }
 
 /**
@@ -47,10 +47,9 @@ function getColor(dest){
 
 /** sends our message to the server */
 function sendInputText(){
-    var dest = $("#chatPlayers").val();
-    var inputText = $("#inputBox").val();
-    var msg = inputText.match(/^Write your message here !/) ? "" : inputText;
-    var whisper = dest != "all";
+    let dest = $("#chatPlayers").val();
+    let inputText = $("#inputBox").val();
+    let msg = inputText.match(/^Write your message here !/) ? "" : inputText;
     socket.emit('message', {'dest': dest, 'msg': msg});
     insertTextInChat(msg, sessionStorage.pseudo, getColor(dest));
     $("#inputBox").val(""); // clean the input field
@@ -63,7 +62,7 @@ $("#sendButton").on("click", function(){
 
 /* sends the entered message when player press to 'enter' */
 $("#inputBox").on('keyup', function (e) {
-    if (e.keyCode == 13) sendInputText();
+    if (e.keyCode === 13) sendInputText();
 });
 
 /**

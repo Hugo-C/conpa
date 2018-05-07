@@ -34,9 +34,9 @@ $('#disconnect').on('click', function(){
         url: '/connection/logout',
         data: { username: sessionStorage.pseudo },
         error: function(){
-           alert("Request Failed");
+            alert("Request Failed");
         },
-        success: function(response){
+        success: function(){
             window.location = '/connection';
         }
     });

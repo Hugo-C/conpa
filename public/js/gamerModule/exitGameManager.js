@@ -10,7 +10,7 @@
  * @param {string} pseudo : player's pseudo
  */
 function addPlayerBox(pseudo){
-    var htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
                       '<div class="row">' +
                           '<img class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>' +
                       '</div>' +
@@ -57,7 +57,7 @@ function initGUI(){
  * On click in this button, we display the exit panel
  */
 $("#exit").on("click", function(){
-    if(sessionStorage.role == 'player')
+    if(sessionStorage.role === 'player')
         clientGame.getProduction().centerSVGToDefaultPosition();
     $('#gamePanel > :nth-child(2)').css('display', 'none'); // hide productionArea panel
     $('#exitPanel').css('display', 'block'); // display exit panel
@@ -80,7 +80,7 @@ $("#closeExitPanel").on("click", function(){
 $("#leaveAlone").on("click", function(){
     // moving to our own production
     $('#' + sessionStorage.pseudo + '_productionAccess').click();
-    let production = sessionStorage.role == 'animator' ? "" : JSON.stringify(clientGame.getProduction().saveProduction());
+    let production = sessionStorage.role === 'animator' ? "" : JSON.stringify(clientGame.getProduction().saveProduction());
     socket.emit('quitGame', {'pseudo': sessionStorage.pseudo,
                              'server': sessionStorage.server,
                              'production': production}); // inform server that we leave the game
@@ -156,7 +156,7 @@ socket.on('stopGame?', function(playersWhoWantStop){
  * form of received data (playersWhoWantStop) : list of players who want to stop the game
  */
 socket.on('refreshExitPanel', function(playersWhoWantStop){
-    for(var index = 0; index < playersWhoWantStop.length; index++){
+    for(let index = 0; index < playersWhoWantStop.length; index++){
         actualizeBorderColor(playersWhoWantStop[index]);
     }
 });
@@ -168,7 +168,7 @@ socket.on('refreshExitPanel', function(playersWhoWantStop){
  *
  * form of received data : no data is send with this message !
  */
-socket.on('stopGameProcessAborted', function(data){
+socket.on('stopGameProcessAborted', function(){
     $('#exitMessage').text('The game will not be stopped because more than one player wants to continue');
     $('#exitPanelTitle').text('Exit the game ?');
     // We are not in a "Stop Game Processus", we display the basic buttons
@@ -187,6 +187,6 @@ socket.on('stopGameProcessAborted', function(data){
  *
  * form of received data : no data is send with this message !
  */
-socket.on('gameEnd', function(data){
+socket.on('gameEnd', function(){
     $('#leaveAlone').click();
 });

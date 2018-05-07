@@ -52,49 +52,49 @@ class Production {
             self.pt.x = evt.clientX;
             self.pt.y = evt.clientY;
             return self.pt.matrixTransform(self.draw['node'].getScreenCTM().inverse());
-        }
+        };
 
         this.getElementAtCoordinates = function(x, y){
-            var res = null;
-            for(var index in self.myElements){
+            let res = null;
+            for(let index in self.myElements){
                 if(self.myElements[index].isInside(x, y)){
                     res = self.myElements[index];
                 }
             }
             return res;
-        }
+        };
 
         this.getLinkAtCoordinates = function(x, y){
             x = parseInt(x);
             y = parseInt(y);
-            for(var index in self.myLinks){
+            for(let index in self.myLinks){
                 if(self.myLinks[index].isInside(x, y)){
                     return self.myLinks[index];
                 }
             }
             return null;
-        }
+        };
 
         // ---------------------------------------------------------------------
         // --------------------- CONTEXTUAL MENU -------------------------------
         // ---------------------------------------------------------------------
 
         this.clickInsideElement = function(e) {
-            var el = e.srcElement || e.target;
+            let el = e.srcElement || e.target;
 
             if ($(self.parent)[0].contains(el)){
                 return el;
             }else{
                 return false;
             }
-        }
+        };
 
         this.toggleMenuOn = function() {
             if(self.menuState !== 1){
                 self.menuState = 1;
                 self.menu.addClass(self.active);
             }
-        }
+        };
 
         this.toggleMenuOff = function() {
             if(self.menuState !== 0){
@@ -103,17 +103,17 @@ class Production {
             }
             $('.colorTool').css('display', 'none');
             $('.mainTool').css('display', 'block');
-        }
+        };
 
         this.positionMenu = function(e) {
-            var menuWidth = self.menu.get(0).offsetWidth + 4;
-            var menuHeight = self.menu.get(0).offsetHeight + 4;
+            let menuWidth = self.menu.get(0).offsetWidth + 4;
+            let menuHeight = self.menu.get(0).offsetHeight + 4;
 
-            var productionWidth = $(self.parent).get(0).offsetWidth;
-            var productionHeight = $(self.parent).get(0).offsetHeight;
+            let productionWidth = $(self.parent).get(0).offsetWidth;
+            let productionHeight = $(self.parent).get(0).offsetHeight;
 
-            var menuPositionX = e.clientX;
-            var menuPositionY = e.clientY;
+            let menuPositionX = e.clientX;
+            let menuPositionY = e.clientY;
 
             menuPositionX -= (2 * menuWidth) / 3;
             menuPositionY -= menuHeight / 5;
@@ -129,14 +129,14 @@ class Production {
             }else{
                 self.menu.css('top', menuPositionY + "px");
             }
-        }
+        };
 
         // ---------------------------------------------------------------------
         // --------------------- DRAW LISTENERS --------------------------------
         // ---------------------------------------------------------------------
 
         this.onMouseDown = function(evt){
-            var coord = self.cursorPoint(evt);
+            let coord = self.cursorPoint(evt);
             if($('#bouton').is(":focus")) {
                 self.rectCreate = true;
                 doPanning = false;
@@ -152,13 +152,13 @@ class Production {
                     self.dy = coord.y - self.selectedItem.getY();
                 }
             }
-        }
+        };
 
         this.onMouseMove = function(evt){
-            var coord = self.cursorPoint(evt);
+            let coord = self.cursorPoint(evt);
             if(self.rectCreate && self.creatingRect != null){
-                var rectX = self.creatingRect.getX();
-                var rectY = self.creatingRect.getY();
+                let rectX = self.creatingRect.getX();
+                let rectY = self.creatingRect.getY();
                 if(coord.x >= rectX && coord.y >= rectY){
                     self.creatingRect.setWidth(coord.x - rectX);
                     self.creatingRect.setHeight(coord.y - rectY);
@@ -168,9 +168,9 @@ class Production {
                 self.selectedItem.setY(coord.y - self.dy);
                 self.selectedItem.refreshAttachedLinks();
             }
-        }
+        };
 
-        this.onMouseUp = function(evt){
+        this.onMouseUp = function(){
             if(self.rectCreate && self.creatingRect != null){
                 self.creatingRect.addTextArea();
                 self.rectCreate = false;
@@ -181,11 +181,11 @@ class Production {
                 self.dx = null;
                 self.dy = null;
             }
-        }
+        };
 
         this.onClick = function(evt){
-            var coord = self.cursorPoint(evt);
-            var item = self.getElementAtCoordinates(coord.x, coord.y);
+            let coord = self.cursorPoint(evt);
+            let item = self.getElementAtCoordinates(coord.x, coord.y);
 
             if(item != null){
                 self.lastSelectedItem = self.selectedItem;
@@ -207,7 +207,7 @@ class Production {
             if(self.selectedLink != null){
                 self.selectedLink = null;
             }
-        }
+        };
 
         this.onKeydown = function(event){
             if(event.keyCode === 46){
@@ -219,33 +219,33 @@ class Production {
                     self.selectedLink = null;
                 }
             }
-        }
+        };
 
         // ---------------------------------------------------------------------
         // --------------------- OTHERS LISTENERS ------------------------------
         // ---------------------------------------------------------------------
 
         // resize the svg when page is resized
-        window.onresize = function(evt){
+        window.onresize = function(){
             self.toggleMenuOff();
-            var dimHeight = $(self.parent).height();
-            var dimWidth = $(self.parent).width();
+            let dimHeight = $(self.parent).height();
+            let dimWidth = $(self.parent).width();
             self.draw.attr({'height': dimHeight, 'width': dimWidth});
-        }
+        };
 
         this.documentClick = function(evt){
-            var button = evt.which || evt.button;
-            var inside = self.clickInsideElement(evt);
+            let button = evt.which || evt.button;
+            let inside = self.clickInsideElement(evt);
             if ( button === 1 ) {
                 if(inside && self.selectedLink == null)
                     self.toggleMenuOff();
                 else if(!inside)
                     self.toggleMenuOff();
             }
-        }
+        };
 
         this.openContextMenu = function(evt){
-            var coord = self.cursorPoint(evt);
+            let coord = self.cursorPoint(evt);
             self.selectedLink = self.getLinkAtCoordinates(coord.x, coord.y);
 
             if(self.clickInsideElement(evt) && self.selectedLink != null){
@@ -255,7 +255,7 @@ class Production {
             }else{
                 self.toggleMenuOff();
             }
-        }
+        };
 
         this.draw.on('mousedown', this.onMouseDown);
         this.draw.on('mousemove', this.onMouseMove);
@@ -273,7 +273,7 @@ class Production {
         }
     }
 
-    updatePanningState(pann){
+    static updatePanningState(pann){
         doPanning = pann;
     }
 
@@ -292,7 +292,7 @@ class Production {
 
     increaseSelectedLinkWidth(){
         if(this.selectedLink != null){
-            var strokeWidth = this.selectedLink.getWidth();
+            let strokeWidth = this.selectedLink.getWidth();
             strokeWidth += 2;
             if(strokeWidth <= 20){
                 this.selectedLink.setWidth(strokeWidth);
@@ -302,7 +302,7 @@ class Production {
 
     decreaseSelectedLinkWidth(){
         if(this.selectedLink != null){
-            var strokeWidth = this.selectedLink.getWidth();
+            let strokeWidth = this.selectedLink.getWidth();
             strokeWidth -= 2;
             if(strokeWidth > 0){
                 this.selectedLink.setWidth(strokeWidth);
@@ -332,9 +332,6 @@ class Production {
     setSelectedLinkColor(color){
         $('.mainTool').css('display', 'none');
         $('.colorTool').css('display', 'block');
-    }
-
-    setSelectedLinkColor(color){
         if(this.selectedLink != null){
             this.selectedLink.setColor(this.colors[color]);
         }
@@ -377,17 +374,17 @@ class Production {
     }
 
     cutTextIntoLines(text, textWidth){
-        var words = text.split(/(\W+|\n)/);
-        var lines = [];
-        var currentLine = [];
-        var currentLineWidth = 0;
+        let words = text.split(/(\W+|\n)/);
+        let lines = [];
+        let currentLine = [];
+        let currentLineWidth = 0;
 
-        for(var index in words){
-            var word = words[index];
+        for(let index in words){
+            let word = words[index];
 
             if((currentLineWidth + word.visualLength()) < textWidth){
                 if(word.includes('\n')){
-                    var wordCut = word.split('\n', 2);
+                    let wordCut = word.split('\n', 2);
                     currentLine.push(wordCut[0]);
                     lines.push(currentLine);
                     currentLine = [wordCut[1]];
@@ -399,7 +396,7 @@ class Production {
             }else{
                 lines.push(currentLine);
                 if(word.includes('\n')){
-                    var wordCut = word.split('\n', 2);
+                    let wordCut = word.split('\n', 2);
                     currentLine = [wordCut[0]];
                     lines.push(currentLine);
                     currentLine = [wordCut[1]];
@@ -419,23 +416,23 @@ class Production {
     }
 
     extractParam(param, paramsList){
-        var result = paramsList.match(param + '=\"([-+]?[0-9.]+)\"'); // <-- repère
+        let result = paramsList.match(param + '=\"([-+]?[0-9.]+)\"');
         return parseInt(result[1]);
     }
 
     textareaToSVGText(params, text){
-        var x = this.extractParam('x', params);
-        var y = this.extractParam('y', params);
-        var height = this.extractParam('height', params);
-        var width = this.extractParam('width', params);
-        var lines = this.cutTextIntoLines(text, width - 10);
-        var lineHeight = 'd'.visualFontSize();
-        var result = "";
-        var index = 0;
+        let x = this.extractParam('x', params);
+        let y = this.extractParam('y', params);
+        let height = this.extractParam('height', params);
+        let width = this.extractParam('width', params);
+        let lines = this.cutTextIntoLines(text, width - 10);
+        let lineHeight = 'd'.visualFontSize();
+        let result = "";
+        let index = 0;
 
         while(index < lines.length && height > 0){
             result += '<text x="' + x + '" y="' + y + '">';
-            for(var i = 0; i < lines[index].length; i++){
+            for(let i = 0; i < lines[index].length; i++){
                 result += lines[index][i];
             }
             result += "</text>";
@@ -489,9 +486,10 @@ class Production {
     // -----------------------------------------------------------------------------
 
     saveProduction(){
-        var production = {'rectangles' : [], 'links': []};
-        for(var index in this.myElements){
-            var data = {};
+        let index;
+        let production = {'rectangles': [], 'links': []};
+        for(let index in this.myElements){
+            let data = {};
             data['id'] = this.myElements[index].getId();
             data['x'] = this.myElements[index].getX();
             data['y'] = this.myElements[index].getY();
@@ -502,8 +500,8 @@ class Production {
             production['rectangles'].push(data);
         }
 
-        for(var index in this.myLinks){
-            var data = {};
+        for(let index in this.myLinks){
+            let data = {};
             data['idRect1'] = this.myLinks[index].getFirstRectId();
             data['idRect2'] = this.myLinks[index].getSecondRectId();
             data['strokeWidth'] = this.myLinks[index].getWidth();
@@ -518,22 +516,22 @@ class Production {
     }
 
     restoreProduction(data){
-        var buffer = {}; // keep a link between old ids and new objects (used to links rectangles)
-        var rectangles = data['rectangles'];
-        for(var index in rectangles){
-            var rect = new Rectangle(rectangles[index]['x'],
-                                     rectangles[index]['y'],
-                                     rectangles[index]['width'],
-                                     rectangles[index]['height'],
-                                     rectangles[index]['fill'],
-                                     this);
+        let buffer = {}; // keep a link between old ids and new objects (used to links rectangles)
+        let rectangles = data['rectangles'];
+        for(let index in rectangles){
+            let rect = new Rectangle(rectangles[index]['x'],
+                                    rectangles[index]['y'],
+                                    rectangles[index]['width'],
+                                    rectangles[index]['height'],
+                                    rectangles[index]['fill'],
+                                    this);
             rect.addTextArea();
             $(this.myElements[index].text).children().val(rectangles[index]['text']);
             buffer[rectangles[index]['id']] = rect;
         }
 
-        var links = data['links'];
-        for(var index in links){
+        let links = data['links'];
+        for(let index in links){
             buffer[links[index]['idRect1']].linkRect(buffer[links[index]['idRect2']]);
             this.myLinks[index].setWidth(links[index]['strokeWidth']);
             console.log(links[index]['strokeDasharray']);
@@ -541,7 +539,7 @@ class Production {
             this.myLinks[index].setColor(links[index]['fill']);
             if(links[index]['navigability']){
                 this.myLinks[index].addNavigability(false);
-                if(this.myLinks[index].getNavigabilityAngle() != links[index]['navAngle']){
+                if(this.myLinks[index].getNavigabilityAngle() !== links[index]['navAngle']){
                     this.myLinks[index].addNavigability(true);
                 }
             }
@@ -553,11 +551,11 @@ class Production {
     // -------------------------------------------------------------------------
 
     centerSVGToDefaultPosition(){
-        var clientWidth = this.draw['node'].clientWidth;
-        var clientHeight = this.draw['node'].clientHeight;
-        var masterCoord = this.draw['node'].childNodes[1].getBBox();
-        var viewboxParam = "" + masterCoord.x + " " + masterCoord.y + " " + clientWidth + " " + clientHeight;
-        this.draw['node'].setAttribute("viewBox", viewboxParam)
+        let clientWidth = this.draw['node'].clientWidth;
+        let clientHeight = this.draw['node'].clientHeight;
+        let masterCoord = this.draw['node'].childNodes[1].getBBox();
+        let viewboxParam = "" + masterCoord.x + " " + masterCoord.y + " " + clientWidth + " " + clientHeight;
+        this.draw['node'].setAttribute("viewBox", viewboxParam);
     }
 
     clearSVG(){
