@@ -417,6 +417,28 @@ class Link {
         return (e === this.e1 || e === this.e2);
     }
 
+    // Geom functions
+
+    calculEquationDroite(xa, ya, xb, yb) {
+        console.log("xa : " + xa + " ya : " + ya + " xb : " + xb + " yb : " + yb);
+        let alpha = (xb - xa) / (yb - ya);
+        let beta = ya - alpha * xa;
+        console.log("alpha : " + alpha + " beta : " + beta);
+        return { a: alpha, b: beta };
+    }
+
+    calculPointIntersection(eq1, eq2) {
+        let pointX = (eq1.b - eq2.b) / (eq2.a - eq1.a);
+        let pointY = (((eq2.a * eq1.b) - (eq2.a * eq2.b)) / eq2.a - eq1.a) + eq2.b;
+        console.log("pointX : " + pointX + " pointY : " + pointY);
+        return { x: pointX, y: pointY };
+    }
+
+    calculDistance(p1, p2) {
+        console.log("x1 : " + p1.x + " y1 : " + p1.y + " x2 : " + p2.x + " y2 : " + p2.y);
+        return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
+    }
+
   	/**
   	* Associate a navigability to the link
   	*/
@@ -425,13 +447,80 @@ class Link {
       		  this.navigability.remove();
       	}
 
-      	let xCenter = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
-      	let yCenter = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));
-      	this.navigability = this.prod.master.polygon();
+      	let pos1 = this.e1.center();
+      	let pos2 = this.e2.center();
+      	this.angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x) * 180 / Math.PI;
 
-       	let pos1 = this.e1.center();
-       	let pos2 = this.e2.center();
-        this.angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x) * 180 / Math.PI;
+        // ORIGINAL //
+
+        /*let posX = 0.5 * (this.line.attr('x2') + this.line.attr('x1'));
+      	let posY = 0.5 * (this.line.attr('y2') + this.line.attr('y1'));*/
+
+        // TEST 1 //
+
+        /*let posX = this.e2.center().x;
+		let posXSupp = (Math.abs(((this.e1.center().x) - (this.e2.center().x - this.e2.rect.attr('width')*0.5)) - this.e2.rect.attr('width')*0.25) - this.line.width());
+		posX += posXSupp;
+		let posY = this.e2.center().y;
+		let posYSupp = (Math.abs(((this.e1.center().y) - (this.e2.center().y - this.e2.rect.attr('height')*0.5)) - this.e2.rect.attr('height')*0.25) - this.line.height());
+		posY += posYSupp;
+		posY += (Math.abs(this.e1.center().y - (this.e2.center().y - this.e2.rect.attr('height')*0.5)) - this.line.height());
+		console.log("posXSupp: " + posXSupp);*/
+
+        // TEST 2 //
+
+      	let mainEquation = this.calculEquationDroite(this.e2.center().x, this.e2.center().y, this.e1.center().x, this.e1.center().y);
+      	let equation1 = this.calculEquationDroite(this.e1.center().x + this.e1.rect.attr('width') * 0.5, this.e1.center().y - this.e1.rect.attr('height') * 0.5, this.e1.center().x + this.e1.rect.attr('width') * 0.5, this.e1.center().y + this.e1.rect.attr('height') * 0.5);
+      	let equation2 = this.calculEquationDroite(this.e1.center().x + this.e1.rect.attr('width') * 0.5, this.e1.center().y + this.e1.rect.attr('height') * 0.5, this.e1.center().x - this.e1.rect.attr('width') * 0.5, this.e1.center().y + this.e1.rect.attr('height') * 0.5);
+      	let equation3 = this.calculEquationDroite(this.e1.center().x - this.e1.rect.attr('width') * 0.5, this.e1.center().y + this.e1.rect.attr('height') * 0.5, this.e1.center().x - this.e1.rect.attr('width') * 0.5, this.e1.center().y - this.e1.rect.attr('height') * 0.5);
+      	let equation4 = this.calculEquationDroite(this.e1.center().x - this.e1.rect.attr('width') * 0.5, this.e1.center().y - this.e1.rect.attr('height') * 0.5, this.e1.center().x + this.e1.rect.attr('width') * 0.5, this.e1.center().y - this.e1.rect.attr('height') * 0.5);
+
+      	let intersection1 = this.calculPointIntersection(mainEquation, equation1);
+      	let intersection2 = this.calculPointIntersection(mainEquation, equation2);
+      	let intersection3 = this.calculPointIntersection(mainEquation, equation3);
+      	let intersection4 = this.calculPointIntersection(mainEquation, equation4);
+
+      	console.log("Intersection1.x : " + intersection1.x);
+
+      	let distance1 = this.calculDistance(this.e2.center(), intersection1);
+      	let distance2 = this.calculDistance(this.e2.center(), intersection2);
+      	let distance3 = this.calculDistance(this.e2.center(), intersection3);
+      	let distance4 = this.calculDistance(this.e2.center(), intersection4);
+
+      	console.log("distance1 : " + distance1);
+      	console.log("distance2 : " + distance2);
+      	console.log("distance3 : " + distance3);
+      	console.log("distance4 : " + distance4);
+
+      	let distanceMin = Math.min(distance1, distance2, distance3, distance4);
+
+      	console.log("Distance min : " + distanceMin);
+
+      	let meilleurPoint;
+      	switch (distanceMin) {
+      	    case distance1:
+      	        meilleurPoint = intersection1;
+      	        break;
+      	    case distance2:
+      	        meilleurPoint = intersection2;
+      	        break;
+      	    case distance3:
+      	        meilleurPoint = intersection3;
+      	        break;
+      	    case distance4:
+      	        meilleurPoint = intersection4;
+      	        break;
+      	}
+
+      	let posX = meilleurPoint.x;
+      	let posY = meilleurPoint.y;
+
+
+      	console.log(meilleurPoint);
+
+
+
+      	this.navigability = this.parent.polygon();
       	if(this.reversed){
 			       this.angle += 180;
         }
