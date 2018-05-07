@@ -91,7 +91,7 @@ function deleteScene() {
     for (let vertexIndex = 0; vertexIndex < box.geometry.vertices.length; vertexIndex++){
 
         let localVertex = box.geometry.vertices[vertexIndex].clone();
-        let globalVertex = box.matrix.multiplyVector3(localVertex);
+        let globalVertex = localVertex.applyMatrix4(box.matrix);
         let directionVector = globalVertex.sub(box.position);
 
         let ray = new THREE.Raycaster(box.position, directionVector.clone().normalize());
