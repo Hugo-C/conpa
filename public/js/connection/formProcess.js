@@ -1,26 +1,23 @@
-var $register_form = $('.register');
-var $register_username = $('.register input[name="username"]');
-var $register_email = $('.register input[name="email"]');
-var $register_password = $('.register input[name="password"]');
-
-var $login_form = $('.login');
-var $login_username = $('.login input[name="username"]');
-var $login_password = $('.login input[name="password"]');
-
-var $reset_form = $('.forgot_password');
-var $reset_email = $('.forgot_password input[name="email"]');
+const $register_form = $('.register');
+const $register_username = $('.register input[name="username"]');
+const $register_email = $('.register input[name="email"]');
+const $register_password = $('.register input[name="password"]');
+const $login_form = $('.login');
+const $login_username = $('.login input[name="username"]');
+const $login_password = $('.login input[name="password"]');
+const $reset_email = $('.forgot_password input[name="email"]');
 
 function clearInput(type){
-    myInputs = $('input[type="' + type + '"]');
+    let myInputs = $('input[type="' + type + '"]');
     for(let index = 0; index < myInputs.length; index++){
         myInputs[index].value = ''; // reset input(type="email") content
     }
 }
 
-function removeAllAlerts(){
-  $('.error_username').text('');
-  $('.error_email').text('');
-  $('.error_login').text('');
+function removeAllAlerts() {
+    $('.error_username').text('');
+    $('.error_email').text('');
+    $('.error_login').text('');
 }
 
 function clearAllInput(){
@@ -46,16 +43,16 @@ function showInvalidRegisterFields(){
 function processRegisterAnswer(response){
     removeAllAlerts();
     switch (response) {
-      case 'DUP_PSEUDO':
-        $('.error_username').text('pseudo not available');
-        break;
-      case 'DUP_EMAIL':
-        $('.error_email').text('email already used');
-        break;
-      case 'OK':
-        $('.register .linkform').click(); // redirection to the login form
-        alert('registration successful');
-        break;
+        case 'DUP_PSEUDO':
+            $('.error_username').text('pseudo not available');
+            break;
+        case 'DUP_EMAIL':
+            $('.error_email').text('email already used');
+            break;
+        case 'OK':
+            $('.register .linkform').click(); // redirection to the login form
+            alert('registration successful');
+            break;
     }
 }
 
@@ -68,7 +65,7 @@ $('input[value="Register"]').on('click', function(){
                     email: $register_email.val(),
                     password: md5($register_password.val())},
             error: function(){
-               alert("Request Failed");
+                alert("Request Failed");
             },
             success: function(response){
                 console.log(response);
@@ -76,7 +73,7 @@ $('input[value="Register"]').on('click', function(){
             }
         });
     }else{
-      showInvalidRegisterFields();
+        showInvalidRegisterFields();
     }
 });
 
@@ -92,20 +89,20 @@ function showInvalidLoginFields(){
 function processLoginAnswer(response){
     removeAllAlerts();
     switch (response) {
-      case 'NO_ACCOUNT':
-          $('.error_login').text('No account');
-          break;
-      case 'MISMATCH':
-          $('.error_login').text('pseudo / password mismatched');
-          break;
-      case 'ALREADY_CONNECT':
-          $('.error_login').text('You are already connected');
-          break;
-      case 'OK':
-          sessionStorage.pseudo = $login_username.val();
-          console.log(sessionStorage.pseudo);
-          window.location = '/';
-          break;
+        case 'NO_ACCOUNT':
+            $('.error_login').text('No account');
+            break;
+        case 'MISMATCH':
+            $('.error_login').text('pseudo / password mismatched');
+            break;
+        case 'ALREADY_CONNECT':
+            $('.error_login').text('You are already connected');
+            break;
+        case 'OK':
+            sessionStorage.pseudo = $login_username.val();
+            console.log(sessionStorage.pseudo);
+            window.location = '/';
+            break;
     }
 }
 
@@ -117,7 +114,7 @@ $('input[value="Login"]').on('click', function(){
             data: { username: $login_username.val(),
                     password: md5($login_password.val())},
             error: function(){
-               alert("Request Failed");
+                alert("Request Failed");
             },
             success: function(response){
                 console.log(response);
@@ -125,12 +122,12 @@ $('input[value="Login"]').on('click', function(){
             }
         });
     }else{
-      showInvalidLoginFields();
+        showInvalidLoginFields();
     }
 });
 
-$('form.register input').on('keyup', function(evt){
-    if($(this)[0].checkValidity() || $(this)[0].value == ''){
+$('form.register input').on('keyup', function(){
+    if($(this)[0].checkValidity() || $(this)[0].value === ''){
         $($(this)['context']['nextSibling']).css('display', 'none');
     }else{
         $($(this)['context']['nextSibling']).css('display', 'inline-block');
@@ -145,7 +142,7 @@ $('input[value="Send reminder"]').on('click', function(){
         error: function(){
             console.log("Request Failed, try reloading the page to reset your password");
         },
-        success: function(response){
+        success: function(){
             alert("check your mail box !");
         }
     });

@@ -1,4 +1,3 @@
-
 var clientGame = new GameState();
 initializeProductionPanel();
 
@@ -15,7 +14,7 @@ function createProductionAccess(pseudo, productionList){
     parent.setAttribute('onclick', 'changeDisplayedProduction(' + parent.id + ')');
     // create an image to display the state of the production
     let prodStatus = document.createElement('img');
-    if(pseudo == clientGame.getAnimator()){
+    if(pseudo === clientGame.getAnimator()){
         prodStatus.src = '/img/gamerModule/animator.png';
     }else{
         prodStatus.src = '/img/gamerModule/privateFlag.svg';
@@ -32,7 +31,7 @@ function createProductionAccess(pseudo, productionList){
 function createPlayersProductionList(players){
     let productionList = $('#productionPanel > div > div#productionList');
     for(let index = 0; index < players.length; index++){
-        if(players[index] != sessionStorage.pseudo
+        if(players[index] !== sessionStorage.pseudo
         && $('#' + players[index] + '_productionAccess')[0] == null){
             createProductionAccess(players[index], productionList);
         }
@@ -43,7 +42,7 @@ function updatePlayersState(){
     let playersState = clientGame.getPlayers();
     let playerProd;
     for(let index = 0; index < playersState.length; index++){
-        if(playersState[index]['state'] == 'offline'){
+        if(playersState[index]['state'] === 'offline'){
             playerProd = $('#' + playersState[index]['pseudo'] + '_productionAccess');
             playerProd.children()[0].src = '/img/gamerModule/offline.png';
         }
@@ -55,14 +54,13 @@ function updatePlayersState(){
  * other players production
  */
 function actualizePlayersProductionList(){
-    let productionList = $('#productionPanel > div > div#productionList');
     let playersProduction = clientGame.getPlayersProduction();
     let playerProd;
     for(let pseudo in playersProduction){
-        if(pseudo != sessionStorage.pseudo){ // we already have a button to come back to our production
+        if(pseudo !== sessionStorage.pseudo){ // we already have a button to come back to our production
             playerProd = $('#' + pseudo + '_productionAccess');
             if(playerProd.children()[0] != null){
-                if(playersProduction[pseudo] == ""){
+                if(playersProduction[pseudo] === ""){
                     playerProd.children()[0].src = '/img/gamerModule/privateFlag.svg';
                 }else{
                     playerProd.children()[0].src = '/img/gamerModule/publicFlag.svg';
@@ -80,7 +78,7 @@ function refreshMosaic(){
     let playersProduction = clientGame.getPlayersProduction();
     for(let pseudo in playersProduction){
         clientGame.getMosaicProduction(pseudo).clearSVG();
-        clientGame.getMosaicProduction(pseudo).restoreProduction(playersProduction[pseudo])
+        clientGame.getMosaicProduction(pseudo).restoreProduction(playersProduction[pseudo]);
     }
 }
 
@@ -132,7 +130,7 @@ function hideMosaic(){
  * @return {Boolean}
  */
 function isMosaicDisplayed(){
-    return $('#productionPanel > div > div#mosaic').css('display') == 'block';
+    return $('#productionPanel > div > div#mosaic').css('display') === 'block';
 }
 
 /**
@@ -142,13 +140,13 @@ function isMosaicDisplayed(){
 function processChangeForPlayer(currentProduction, targetedProduction){
     let playersProduction = clientGame.getPlayersProduction();
     // if we leave our production, we save it before
-    if(currentProduction[0].id.split('_')[0] == sessionStorage.pseudo){
+    if(currentProduction[0].id.split('_')[0] === sessionStorage.pseudo){
         clientGame.addNewProduction(sessionStorage.pseudo, clientGame.getProduction().saveProduction());
     }
     // remove the current production to replace it by another one
     clientGame.getProduction().clearSVG();
     // production is private, display an image to inform the player
-    if(playersProduction[targetedProduction[0].id.split('_')[0]] == ''){
+    if(playersProduction[targetedProduction[0].id.split('_')[0]] === ''){
         clientGame.getProduction().productionPrivate();
     }else{ // production is public, we display it
         clientGame.getProduction().productionPublic();
@@ -163,16 +161,16 @@ function processChangeForPlayer(currentProduction, targetedProduction){
  */
 function processChangeForAnimator(currentProduction, targetedProduction){
     let playersProduction = clientGame.getPlayersProduction();
-    if(targetedProduction[0].id.split('_')[0] == sessionStorage.pseudo){
+    if(targetedProduction[0].id.split('_')[0] === sessionStorage.pseudo){
         displayMosaic(); // animator's production is the mosaic
     }else{
-        if(currentProduction[0].id.split('_')[0] == sessionStorage.pseudo){
+        if(currentProduction[0].id.split('_')[0] === sessionStorage.pseudo){
             hideMosaic(); // we hide mosaic to display only one production
         }
         // remove the current production to replace it by another one
         clientGame.getProduction().clearSVG();
         // production is private, display an image to inform the player
-        if(playersProduction[targetedProduction[0].id.split('_')[0]] == ''){
+        if(playersProduction[targetedProduction[0].id.split('_')[0]] === ''){
             clientGame.getProduction().productionPrivate();
         }else{ // production is public, we display it
             clientGame.getProduction().productionPublic();
@@ -194,12 +192,12 @@ function changeDisplayedProduction(id){
     // used to know on which production we are
     let currentProduction = $('.selectedProduction');
     // if the targeted production is the current one or if production if not available, we do nothing
-    if(target[0].id == currentProduction[0].id) return;
-    if(sessionStorage.role != 'animator' && !clientGame.productionAvailable(target[0].id.split('_')[0])) return;
+    if(target[0].id === currentProduction[0].id) return;
+    if(sessionStorage.role !== 'animator' && !clientGame.productionAvailable(target[0].id.split('_')[0])) return;
     // display the targeted production
-    if(sessionStorage.role == 'player'){
+    if(sessionStorage.role === 'player'){
         processChangeForPlayer(currentProduction, target);
-    }else if(sessionStorage.role == 'animator'){
+    }else if(sessionStorage.role === 'animator'){
         processChangeForAnimator(currentProduction, target);
     }
     currentProduction.removeClass('selectedProduction');
@@ -256,7 +254,7 @@ function createNewRow(){
 function addElementToMosaic(player){
     let mosaic = $('#mosaic');
     let lastRow = $('#mosaic > div.row:last-child');
-    if(lastRow.children().length == 0 || lastRow.children().length == 2){
+    if(lastRow.children().length === 0 || lastRow.children().length === 2){
         createNewRow();
         lastRow = $('#mosaic > div.row:last-child');
     }
@@ -276,7 +274,7 @@ function clearMosaic(){
  */
 function createMosaic(players){
     for(let index in players){
-        if(players[index] != sessionStorage.pseudo)
+        if(players[index] !== sessionStorage.pseudo)
             addElementToMosaic(players[index]);
     }
     activateNavigation();
@@ -309,9 +307,9 @@ function initializeProductionPanel(){
     $(myProductionAccess)[0].id = sessionStorage.pseudo + '_productionAccess';
     $(myProductionAccess).attr('onclick', 'changeDisplayedProduction(' + $(myProductionAccess)[0].id + ')');
     clientGame.setProduction($('#productionPanel > div > div#production')[0], false);
-    if(sessionStorage.role == 'player'){
+    if(sessionStorage.role === 'player'){
         displayProductionPanel();
-    }else if(sessionStorage.role == 'animator'){
+    }else if(sessionStorage.role === 'animator'){
         displayAnimatorProductionPanel();
     }
 }
@@ -341,21 +339,21 @@ function indivTimerAnimation(begin, duration){
 }
 
 function isDiceDisplayed(){
-    return $('#startDice').get(0).style.display == "block";
+    return $('#startDice').get(0).style.display === "block";
 }
 
-function showDice(){
-  $('svg#hourglassSVG > :first-child > :nth-child(2)').get(0).setAttribute('display', 'none');
-  $('svg#hourglassSVG > :nth-child(2)').get(0).setAttribute('display', 'none');
-  $('svg#hourglassSVG > :nth-child(3)').get(0).setAttribute('display', 'none');
-  $('#startDice').get(0).style.display = "block";
+function showDice() {
+    $('svg#hourglassSVG > :first-child > :nth-child(2)').get(0).setAttribute('display', 'none');
+    $('svg#hourglassSVG > :nth-child(2)').get(0).setAttribute('display', 'none');
+    $('svg#hourglassSVG > :nth-child(3)').get(0).setAttribute('display', 'none');
+    $('#startDice').get(0).style.display = "block";
 }
 
-function hideDice(){
-  $('svg#hourglassSVG > :first-child > :nth-child(2)').get(0).setAttribute('display', 'block');
-  $('svg#hourglassSVG > :nth-child(2)').get(0).setAttribute('display', 'block');
-  $('svg#hourglassSVG > :nth-child(3)').get(0).setAttribute('display', 'block');
-  $('#startDice').get(0).style.display = "none";
+function hideDice() {
+    $('svg#hourglassSVG > :first-child > :nth-child(2)').get(0).setAttribute('display', 'block');
+    $('svg#hourglassSVG > :nth-child(2)').get(0).setAttribute('display', 'block');
+    $('svg#hourglassSVG > :nth-child(3)').get(0).setAttribute('display', 'block');
+    $('#startDice').get(0).style.display = "none";
 }
 
 function actualizeGameState(){
@@ -398,7 +396,7 @@ $("#displayList").on("click", function(){
     let productionList = $("#gamePanel > :nth-child(2) > div > :first-child");
     let productionArea = $("#gamePanel > :nth-child(2) > div > :last-child");
     let displayButton = $("#displayList");
-    if(productionList.css('display') == 'none'){ // if tool bar is hidden, we display it
+    if(productionList.css('display') === 'none'){ // if tool bar is hidden, we display it
         productionList.css('display', 'block');
         productionArea.css('width', '');
         displayButton.css('background-image', 'url("/img/gamerModule/hide.svg")');
@@ -433,14 +431,14 @@ $("#notesArea").on("focus", function(){
 $("#notesArea").focusout(function(){
     let value = $("textarea#notesArea").val();
     value = $.trim(value);
-    if(value == ""){
+    if(value === ""){
         $("textarea#notesArea").val("Write your notes here !");
     }
 });
 
 // remove default text when user wants to enter text
 $("#inputBox").on("focus", function(){
-    var value = $("input#inputBox").val();
+    let value = $("input#inputBox").val();
     if(value.match(/^Write your message here !/)){
         $("input#inputBox").val("");
     }
@@ -470,7 +468,7 @@ socket.on('initGameTime', function(data){
     clientGame.setPlayers(data['players']);
     createPlayersProductionList(data['players']);
     actualizeChatPlayersList(data['players']);
-    if(sessionStorage.role == 'animator'){
+    if(sessionStorage.role === 'animator'){
         createMosaic(data['players']);
     }
     if(data['useTimer']){
@@ -482,7 +480,7 @@ socket.on('changeDuringGameTime', function(data){
     clientGame.updatePlayersState(data['players']);
     updatePlayersState();
     actualizeChatPlayersList(clientGame.getOnlinePlayers());
-    if(sessionStorage.role == 'animator'){
+    if(sessionStorage.role === 'animator'){
         clearMosaic();
         createMosaic(clientGame.getOnlinePlayers());
         refreshMosaic();
@@ -499,7 +497,7 @@ socket.on('changeDuringGameTime', function(data){
 socket.on('playersProduction', function(data){
     clientGame.addNewProduction(data['pseudo'], data['production']);
     actualizePlayersProductionList();
-    if(sessionStorage.role == 'animator' && isMosaicDisplayed()){
+    if(sessionStorage.role === 'animator' && isMosaicDisplayed()){
         refreshMosaic();
     }
 });
@@ -515,7 +513,7 @@ socket.on('shareYourProduction', function(data){
     let currentProduction = $('.selectedProduction');
     let privacy = $("button#setPrivacy");
     if(sessionStorage.role != 'animator'){
-         // we send the production if and only if player has set the privacy to public
+        // we send the production if and only if player has set the privacy to public
         if(privacy[0].value == 'public'){
             // player works on his production, we send the current version
             if(currentProduction[0].id.split('_')[0] == sessionStorage.pseudo){
@@ -535,7 +533,7 @@ socket.on('shareYourProduction', function(data){
 socket.on('newTurn', function(data){
     clientGame.setState(data);
     actualizeGameState();
-    if(data['currentPlayer'] == sessionStorage.pseudo){
+    if(data['currentPlayer'] === sessionStorage.pseudo){
         showDice();
         activateNextPlayerButton();
         individualTimerColor('#1F5473', '#0AA6E1');
@@ -545,14 +543,14 @@ socket.on('newTurn', function(data){
     }
     if(data['useTimer']){
         clientGame.startIndivTimer(0, data['indivTimer']);
-        if(data['forceEndOfTurn'] && data['currentPlayer'] == sessionStorage.pseudo){
+        if(data['forceEndOfTurn'] && data['currentPlayer'] === sessionStorage.pseudo){
             clientGame.forceEndOfTurn(data['delayBeforeForcing'], skipTurn);
         }
     }
 });
 
 $('#endOfTurn').on('click', function(){
-    if(clientGame.getCurrentPlayer() == sessionStorage.pseudo){
+    if(clientGame.getCurrentPlayer() === sessionStorage.pseudo){
         socket.emit('endOfTurn', null);
         hideDice();
     }
@@ -571,8 +569,9 @@ $("#colorMenu button").on("click", function(){
     let selectedColor = $(this).val();
     $("#colorMenu").css('display', 'none');
     $("#svgMenu").css('display', 'block');
-    $("#color").val(selectedColor);
-    $("#color").css('background-color', 'url("/img/gamerModule/' + selectedColor + '.jpg")');
+    let color = $("#color");
+    color.val(selectedColor);
+    color.css('background-color', 'url("/img/gamerModule/' + selectedColor + '.jpg")');
     $("#bouton").val(selectedColor);
     clientGame.getProduction().setSelectedColor(selectedColor);
 });
@@ -584,11 +583,11 @@ $("#moveElement").on("click", function(){
         console.log('--------------');
         $(this).removeClass("selected");
         $(this).css('background-image', 'url(' + moveImage + ')');
-        clientGame.getProduction().updatePanningState(false);
+        Production.updatePanningState(false);
     }else{
         $(this).addClass("selected");
         $(this).css('background-image', 'url(' + movingImage + ')');
-        clientGame.getProduction().updatePanningState(true);
+        Production.updatePanningState(true);
     }
 });
 
@@ -597,8 +596,9 @@ function fullscreenProduction(){
     $('#displayList').css('display', 'none');
     $('#gamePanel > :nth-child(2)').css('height', '95%');
     $('#productionPanel > :first-child').css('display', 'none');
-    $('#productionPanel > :last-child').css('height', '100%');
-    $('#productionPanel > :last-child').css('width', '100%');
+    let lastChild = $('#productionPanel > :last-child');
+    lastChild.css('height', '100%');
+    lastChild.css('width', '100%');
     $('#production').css('width', '93%');
 }
 
@@ -607,8 +607,9 @@ function exitFullscreenProduction(){
     $('#displayList').css('display', 'block');
     $('#gamePanel > :nth-child(2)').css('height', '');
     $('#productionPanel > :first-child').css('display', 'block');
-    $('#productionPanel > :last-child').css('height', '');
-    $('#productionPanel > :last-child').css('width', '');
+    let lastChild = $('#productionPanel > :last-child');
+    lastChild.css('height', '');
+    lastChild.css('width', '');
     $('#production').css('width', '92%');
 }
 

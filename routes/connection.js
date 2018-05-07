@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const request = require('request');
 const path = require('path');
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
@@ -13,7 +12,7 @@ const htmlToText = require('html-to-text');
 const EMAIL_RESET_PASSWORD = path.join('views/email/resetPassword.jade');
 
 
-router.get('/resetPassword/:token', function(req, res, next) {
+router.get('/resetPassword/:token', function(req, res) {
     let token = req.params.token;
     db.isValidToken(token, function(err, name, tokenExpiration) {
         if(err){
@@ -30,10 +29,10 @@ router.get('/', function(req, res){
 
 router.post('/register', urlencodedParser, function(req, res){
     console.log("new register");
-    var username = req.body.username;
-    var email = req.body.email;
-    var password = md5(req.body.password + "conpa35411");
-    db.registerUser(username, email, password, function(err, result){
+    let username = req.body.username;
+    let email = req.body.email;
+    let password = md5(req.body.password + "conpa35411");
+    db.registerUser(username, email, password, function(err){
         if(err){
             if(err.sqlMessage.match('PRIMARY')){
                 res.send('DUP_PSEUDO');
@@ -50,7 +49,6 @@ router.post('/register', urlencodedParser, function(req, res){
 
 router.post('/login', urlencodedParser, function(req, res, next){
     var username = req.body.username;
-    console.log(req.body.password);
     var password = md5(req.body.password + "conpa35411");
 
     function connectUser(){
@@ -84,8 +82,8 @@ router.post('/login', urlencodedParser, function(req, res, next){
     });
 });
 
-router.post('/logout', urlencodedParser, function(req, res, next){
-    var username = req.body.username;
+router.post('/logout', urlencodedParser, function(req, res){
+    let username = req.body.username;
     db.disconnectUser(username, function(err){
         if(err){
             console.log(err);
@@ -98,7 +96,7 @@ router.post('/logout', urlencodedParser, function(req, res, next){
     });
 });
 
-router.post('/resetPassword', urlencodedParser, function(req, res, next) {
+router.post('/resetPassword', urlencodedParser, function(req, res) {
     let email = req.body.email;
     if(email){
         db.getUser(email, function(err, username){
@@ -121,15 +119,9 @@ router.post('/resetPassword', urlencodedParser, function(req, res, next) {
     }
 });
 
-router.post('/setPassword', urlencodedParser, function(req, res, next) {
-    var password = md5(req.body.password + "conpa35411");
-    var token = req.body.token;
-    var recaptcha = req.body.recaptcha;
-    let remoteIp = req.connection.remoteAddress;
-    /*console.log("ip : ");
-    console.log(remoteIp);
-    console.log("recaptcha :");
-    console.log(recaptcha);*/
+router.post('/setPassword', urlencodedParser, function(req, res) {
+    const password = md5(req.body.password + "conpa35411");
+    const token = req.body.token;
 
     let handlePasswordChanged = function(err, name){
         if(err){
@@ -147,49 +139,11 @@ router.post('/setPassword', urlencodedParser, function(req, res, next) {
             res.writeHead(403);
             res.send();
         } else {
-            db.setPassword(name, password, handlePasswordChanged)
+            db.setPassword(name, password, handlePasswordChanged);
         }
     };
 
     db.isValidToken(token, mySetPassword);
-    /** CAPTCHA **/
-    /*let checkCaptcha = function (response, remoteIp) {
-        let secretKey = '6LcNnFYUAAAAAASFWKc85oX9rFcaLlrGOI3Fj1Yx';
-        // Set the headers
-        let headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'charset': 'utf-8'
-            };
-
-        // Configure the request
-        let options = {
-            url: 'https://www.google.com/recaptcha/api/siteverify',
-            method: 'POST',
-            headers: headers,
-            form: {
-                'secret ': secretKey,
-                'response': response,
-                'remoteip': remoteIp
-            }
-        };
-
-        // Start the request
-        request(options, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                // Print out the response body
-                console.log(body);
-                let jsonResponse = JSON.parse(body);
-                console.log(jsonResponse);
-                if(jsonResponse.success){
-                    db.isValidToken(token, mySetPassword);
-                } else {
-                    res.writeHead(403);
-                    res.send();
-                }
-            }
-        });
-    };
-    checkCaptcha(recaptcha, remoteIp);*/
 });
 
 
@@ -230,7 +184,7 @@ function sendmail(emailAdresse, subject, htmlFile, jadeParameters) {
         html: html,
     };
     // send email with defined transport object
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, function(error) {
         if (error) {
             return console.log(error);
         }

@@ -1,8 +1,7 @@
-var express = require('express');
-var db = require('../js/db');
-var keys = require('../js/dbConstants');
-var fs = require('fs');
-var csv = require('fast-csv');
+const db = require('../js/db');
+const keys = require('../js/dbConstants');
+const fs = require('fs');
+const csv = require('fast-csv');
 
 const FAMILY_NAME = 0;
 const CARDS_HEADER = 1;
@@ -26,13 +25,13 @@ function generateRandomCsvFileName(){
  * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 function finalizeWriting(records, familiesExport, onFileReady){
-    for(task = 0; task < familiesExport.length; task++){
+    for(let task = 0; task < familiesExport.length; task++){
         if(!familiesExport[task]) return; // if all families cards have not been recovered, not write data
     }
 
-    var csvFileName = generateRandomCsvFileName();
+    let csvFileName = generateRandomCsvFileName();
 
-    var stream = fs.createWriteStream('./public/' + csvFileName); // writable stream to csv file
+    let stream = fs.createWriteStream('./public/' + csvFileName); // writable stream to csv file
     stream.on("finish", function(){
         onFileReady(csvFileName); // call alert function when file is ready
     });
@@ -60,8 +59,8 @@ function writeIntoColumn(records, familyNb, object, content){
     var infoFamily = "info sup famille " + (familyNb + 1); // header of the family informations column
     switch (object) {
         case CARD:
-            var line = CARD + content["cardNumber"];
-            if(records.length == line){ // no data have been written on this line, we add new one
+            let line = CARD + content["cardNumber"];
+            if(records.length === line){ // no data have been written on this line, we add new one
                 records.push({[family]: content["content"],
                               [infoFamily]: content["information"]});
             }else{ // we add data on the line
@@ -97,11 +96,11 @@ function processFamilyCards(err, records, rows, column, familiesExport, onFileRe
             writeIntoColumn(records, column, CARD,
                 {"cardNumber" : card,
                  "content" : rows[card][keys.CT_KEY_CONTENT],
-                 "information" : rows[card][keys.CT_KEY_INFORMATION] == "NULL" ? "" : rows[card][keys.CT_KEY_INFORMATION]});
+                 "information" : rows[card][keys.CT_KEY_INFORMATION] === "NULL" ? "" : rows[card][keys.CT_KEY_INFORMATION]});
         }
         familiesExport[column] = true; // all cards of this family have been add to records array
-        finalizeWriting(records, familiesExport, onFileReady); // this family may be the last to be add
-                                                               // we try to write data in csv
+        // this family may be the last to be added, we try to write data in csv
+        finalizeWriting(records, familiesExport, onFileReady);
     }
 }
 
@@ -135,8 +134,7 @@ function processFamilies(err, records, rows, onFileReady){
     if(err){
         console.log(err);
     }else{
-        var familiesExport = [false, false, false, false, false]; // used to track families recovery process when all
-                                                                  // values are 'true', we can write records data in csv
+        let familiesExport = [false, false, false, false, false]; // used to track families recovery process when all
         for(fafa = 0; fafa < rows.length; fafa++){
             writeIntoColumn(records, fafa, FAMILY_NAME, rows[fafa][keys.CFT_KEY_NAME]);
             writeIntoColumn(records, fafa, CARDS_HEADER, "cartes famille " + (fafa + 1));
@@ -202,6 +200,6 @@ function recoverCardGame(cardGame, language, records, processCardGame, onFileRea
  * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
 exports.exportToCSV = function(cardGame, language, onFileReady){
-    records = new Array(); // array used to store retrieved data before to be write into csv file
+    let records = []; // array used to store retrieved data before to be write into csv file
     recoverCardGame(cardGame, language, records, processCardGame, onFileReady);
 };

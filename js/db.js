@@ -1,11 +1,10 @@
-var util = require('util');
-var mysql = require('mysql');
-var keys = require('./dbConstants');
-var crypto = require('crypto');
-var md5 = require('md5');
+const mysql = require('mysql');
+const keys = require('./dbConstants');
+const crypto = require('crypto');
+const md5 = require('md5');
 
-var PRODUCTION_DB = 'conpaV2'; // name of the production database
-var TEST_DB = 'conpaV2'; // name of the test database
+const PRODUCTION_DB = 'conpaV2'; // name of the production database
+const TEST_DB = 'conpaV2'; // name of the test database
 
 exports.MODE_TEST = 'mode_test';
 exports.MODE_PRODUCTION = 'mode_production';
@@ -46,17 +45,17 @@ exports.get = function(){
 };
 
 exports.startTransaction = function(){
-    var sql = "SET autocommit=0;";
+    let sql = "SET autocommit=0;";
     state.pool.query(sql);
 };
 
 exports.rollback = function(){
-    var sql = "ROLLBACK;";
+    let sql = "ROLLBACK;";
     state.pool.query(sql);
 };
 
 exports.commit = function(){
-    var sql = "COMMIT; SET autocommit=1;";
+    let sql = "COMMIT; SET autocommit=1;";
     state.pool.query(sql);
 };
 
@@ -67,11 +66,11 @@ exports.commit = function(){
  * @param {callback} callback : function called to process on retrieved data
  */
 exports.getFamilyCards = function(familyId, callback){
-    var sql = 'SELECT ' + keys.CT_KEY_CONTENT + ', ' + keys.CT_KEY_INFORMATION +
+    let sql = 'SELECT ' + keys.CT_KEY_CONTENT + ', ' + keys.CT_KEY_INFORMATION +
               ' FROM ' + keys.CARD_TABLE +
               ' WHERE ' + keys.CT_KEY_CARD_FAMILY + ' = ?' +
               ' ORDER BY ' + keys.CT_KEY_CONTENT + ';';
-    var value = [familyId];
+    let value = [familyId];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -85,12 +84,12 @@ exports.getFamilyCards = function(familyId, callback){
  * @param {callback} callback : function called to on process retrieved data
  */
 exports.getFamilies = function(cardGameId, callback){
-    var sql = 'SELECT ' + keys.CARD_FAMILY_TABLE + '.' + keys.CFT_KEY_ID +
+    let sql = 'SELECT ' + keys.CARD_FAMILY_TABLE + '.' + keys.CFT_KEY_ID +
               ', ' + keys.CFT_KEY_NAME +
               ', ' + keys.CFT_KEY_LOGO +
               ' FROM ' + keys.CARD_FAMILY_TABLE +
               ' WHERE ' + keys.CFT_KEY_CARD_GAME + ' = ?;';
-    var value = [cardGameId];
+    let value = [cardGameId];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -105,10 +104,10 @@ exports.getFamilies = function(cardGameId, callback){
  * @param {callback} callback : function called to process on retrieved data
  */
 exports.getCardGame = function(cardGame, language, callback){
-    var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
+    let sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
               ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
-    var values = [cardGame, language];
+    let values = [cardGame, language];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -121,7 +120,7 @@ exports.getCardGame = function(cardGame, language, callback){
  * @param {callback} callback : function called to process on retrieved data
  */
 exports.getCardGames = function(callback){
-    var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE + ';';
+    let sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE + ';';
     state.pool.query(sql, null, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -137,10 +136,10 @@ exports.getCardGames = function(callback){
  * @param {callback} callback : function called to inform of the success of the operation
  */
 exports.addCard = function(content, description, familyId, callback){
-    var sql = 'INSERT INTO ' + keys.CARD_TABLE +
+    let sql = 'INSERT INTO ' + keys.CARD_TABLE +
               ' (' + keys.CT_KEY_CONTENT + ', ' + keys.CT_KEY_INFORMATION + ', ' + keys.CT_KEY_CARD_FAMILY + ')' +
               ' VALUES (?, ?, ?);';
-    var values = [content, description == '' ? 'NULL' : description, familyId];
+    let values = [content, description == '' ? 'NULL' : description, familyId];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -155,10 +154,10 @@ exports.addCard = function(content, description, familyId, callback){
  * @param {callback} callback : function called to inform of the success of the operation
  */
 exports.addCardFamilyWithoutLogo = function(name, cardGameId, callback){
-    var sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
+    let sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
               ' (' + keys.CFT_KEY_NAME + ', ' + keys.CFT_KEY_CARD_GAME + ')' +
               ' VALUES (?, ?);';
-    var values = [name, cardGameId];
+    let values = [name, cardGameId];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -174,10 +173,10 @@ exports.addCardFamilyWithoutLogo = function(name, cardGameId, callback){
  * @param {callback} callback : function called to inform of the success of the operation
  */
 exports.addCardFamilyWithLogo = function(name, logo, cardGameId, callback){
-    var sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
+    let sql = 'INSERT INTO ' + keys.CARD_FAMILY_TABLE +
               ' (' + keys.CFT_KEY_NAME + ', ' + keys.CFT_KEY_LOGO + ', ' + keys.CFT_KEY_CARD_GAME + ')' +
               ' VALUES (?, ?, ?);';
-    var values = [name, logo, cardGameId];
+    let values = [name, logo, cardGameId];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -192,10 +191,10 @@ exports.addCardFamilyWithLogo = function(name, logo, cardGameId, callback){
  * @param {callback} callback : function called with a boolean to send the reply
  */
 exports.cardGameExists = function(name, language, callback){
-    var sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
+    let sql = 'SELECT * FROM ' + keys.CARD_GAME_TABLE +
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
               ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
-    var values = [name, language];
+    let values = [name, language];
     state.pool.query(sql, values, function(err, result){
         if(err){
             callback(false);
@@ -217,10 +216,10 @@ exports.cardGameExists = function(name, language, callback){
  * @param {callback} callback : function use to throw errors
  */
 exports.removeCardGame = function(name, language, callback){
-    var sql = 'DELETE FROM ' + keys.CARD_GAME_TABLE +
+    let sql = 'DELETE FROM ' + keys.CARD_GAME_TABLE +
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
               ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
-    var values = [name, language];
+    let values = [name, language];
     state.pool.query(sql, values, function(err){
         if(err) callback(err);
         else callback(null);
@@ -235,10 +234,10 @@ exports.removeCardGame = function(name, language, callback){
  * @param {callback} callback : function use to throw errors and return cardgame id
  */
 exports.addCardGame = function(name, language, callback){
-    var sql = 'INSERT INTO ' + keys.CARD_GAME_TABLE +
+    let sql = 'INSERT INTO ' + keys.CARD_GAME_TABLE +
               ' (' + keys.CGT_KEY_NAME + ', ' + keys.CGT_KEY_LANGUAGE + ')' +
               ' VALUES (? , ?);';
-    var values = [name, language];
+    let values = [name, language];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -254,10 +253,10 @@ exports.addCardGame = function(name, language, callback){
  * @param {callback} callback : function called when the player has been added
  */
 exports.registerUser = function(pseudo, email, password, callback){
-    var sql = 'INSERT INTO ' + keys.USER_TABLE +
+    let sql = 'INSERT INTO ' + keys.USER_TABLE +
               ' (' + keys.UT_KEY_PSEUDO + ', ' + keys.UT_KEY_PASSWORD + ', ' + keys.UT_KEY_EMAIL + ')' +
               ' VALUES (?, ?, ?);';
-    var values = [pseudo, password, email];
+    let values = [pseudo, password, email];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -271,11 +270,11 @@ exports.registerUser = function(pseudo, email, password, callback){
  * @param {callback} callback : function called to send the answer of the research
  */
 exports.userExists = function(user, callback){
-    var sql = 'SELECT *' +
+    let sql = 'SELECT *' +
               ' FROM ' + keys.USER_TABLE +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     console.log(sql);
-    var value = [user];
+    let value = [user];
     state.pool.query(sql, value, function(err, result){
         console.log(result);
         if(err) callback(false);
@@ -290,15 +289,15 @@ exports.userExists = function(user, callback){
  * @param {callback} callback : function called to send the answer of the research
  */
 exports.isConnected = function(user, callback){
-    var sql = 'SELECT ' + keys.UT_CONNECT +
+    let sql = 'SELECT ' + keys.UT_CONNECT +
               ' FROM ' + keys.USER_TABLE +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     console.log(sql);
-    var value = [user];
+    let value = [user];
     state.pool.query(sql, value, function(err, result){
         console.log(result);
         if(err) callback(false);
-        else callback(result[0][keys.UT_CONNECT] == '1');
+        else callback(result[0][keys.UT_CONNECT] === '1');
     });
 };
 
@@ -309,11 +308,11 @@ exports.isConnected = function(user, callback){
  * @param {callback} callback : function called to return the password
  */
 exports.getPassword = function(pseudo, callback){
-    var sql = 'SELECT ' + keys.UT_KEY_PASSWORD +
+    let sql = 'SELECT ' + keys.UT_KEY_PASSWORD +
               ' FROM ' + keys.USER_TABLE +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     console.log(sql);
-    var value = [pseudo];
+    let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err){
             callback(err);
@@ -334,13 +333,12 @@ exports.getPassword = function(pseudo, callback){
  * @param {callback} callback : function called if the password is correctly set
  */
 exports.setPassword = function(pseudo, password, callback){
-    console.log("i set the password to : " + password);
     let sql = 'UPDATE ' + keys.USER_TABLE +
         ' SET ' + keys.UT_KEY_PASSWORD + ' = ?' +
         ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     console.log(sql);
     let value = [password, pseudo];
-    state.pool.query(sql, value, function(err, result){
+    state.pool.query(sql, value, function(err){
         if(err) callback(err);
         else callback(null, pseudo);
     });
@@ -400,13 +398,13 @@ let setToken = function(pseudo, token, callback){
     let expirationDate = new Date();
     if(token !== null)
         expirationDate.setDate(expirationDate.getDate() + TOKEN_EXPIRATION_DELAY);
-    expirationDate = expirationDate.toISOString().substring(0, 19).replace('T', ' '); // convert js Date to mysql DATETIME
+    expirationDate = db.toMysqlDatetime(expirationDate);
 
     let sql = 'UPDATE ' + keys.USER_TABLE +
         ' SET ' + keys.UT_KEY_TOKEN + ' = ?, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = ?' +
         ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [md5(token + TOKEN_SALT), expirationDate, pseudo];
-    state.pool.query(sql, value, function(err, result){
+    state.pool.query(sql, value, function(err){
         if(err){
             console.log(err);
             callback(pseudo, null);
@@ -424,10 +422,10 @@ let setToken = function(pseudo, token, callback){
  * @param {callback} callback : function called when the token has been set
  */
 exports.generateToken = function(pseudo, callback) {
-    var token;
+    let token;
     crypto.randomBytes(32, function (ex, buf) {
         token = buf.toString('hex');
-        setToken(pseudo, token, callback)
+        setToken(pseudo, token, callback);
     });
 };
 
@@ -442,7 +440,7 @@ exports.clearToken = function(pseudo, callback) {
         ' SET ' + keys.UT_KEY_TOKEN + ' = NULL, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = NULL' +
         ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [pseudo];
-    state.pool.query(sql, value, function(err, result) {
+    state.pool.query(sql, value, function(err) {
         if(err) callback(err);
         else callback(null, pseudo);
     });
@@ -463,12 +461,12 @@ exports.isValidToken = function(token, callback){
         if(err)callback(err);
         else {
             if(result.length === 0){
-                err = "this token is attached to no user";  // TODO handle errors more properly
+                err = new Error("this token is attached to no user");
                 callback(err);  // no user have the current token
             } else {
                 let expirationDate = new Date(result[0][keys.UT_KEY_TOKEN_EXPIRATION]);
                 if(expirationDate.getTime() <= Date.now()){
-                    err = "this token has expired, try to submit your email again";
+                    err = new Error("this token has expired, try to submit your email again");
                     callback(err);
                 } else {
                     callback(null, result[0][keys.UT_KEY_PSEUDO], expirationDate);
@@ -485,11 +483,11 @@ exports.isValidToken = function(token, callback){
  * @param {callback} callback : function used to return errors
  */
 exports.connectUser = function(pseudo, callback){
-    var sql = 'UPDATE ' + keys.USER_TABLE +
+    let sql = 'UPDATE ' + keys.USER_TABLE +
               ' SET ' + keys.UT_CONNECT + ' = 1' +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-    var value = [pseudo];
-    state.pool.query(sql, value, function(err, result){
+    let value = [pseudo];
+    state.pool.query(sql, value, function(err){
         if(err) callback(err);
         else callback(null);
     });
@@ -502,11 +500,11 @@ exports.connectUser = function(pseudo, callback){
  * @param {callback} callback : function used to return errors
  */
 exports.disconnectUser = function(pseudo, callback){
-    var sql = 'UPDATE ' + keys.USER_TABLE +
+    let sql = 'UPDATE ' + keys.USER_TABLE +
               ' SET ' + keys.UT_CONNECT + ' = 0' +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-    var value = [pseudo];
-    state.pool.query(sql, value, function(err, result){
+    let value = [pseudo];
+    state.pool.query(sql, value, function(err){
         if(err) callback(err);
         else callback(null);
     });
@@ -522,10 +520,10 @@ exports.disconnectUser = function(pseudo, callback){
  * @param {callback} callback : function used to return the id of the party
  */
 exports.recordNewParty = function(server, animator, date, callback){
-    var sql = 'INSERT INTO ' + keys.PARTY_TABLE +
+    let sql = 'INSERT INTO ' + keys.PARTY_TABLE +
               ' (' + keys.PT_KEY_SERVER + ', ' + keys.PT_KEY_ANIMATOR + ', ' + keys.PT_KEY_DATE + ')' +
               ' VALUES (?, ?, ?);';
-    var values = [server, animator, date];
+    let values = [server, animator, date];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result.insertId);
@@ -541,11 +539,11 @@ exports.recordNewParty = function(server, animator, date, callback){
  * @param {callback} callback : function used to return errors
  */
 exports.linkPlayerAndParty = function(pseudo, party, question, callback){
-    var sql = 'INSERT INTO ' + keys.HAS_PLAYED_IN_TABLE +
+    let sql = 'INSERT INTO ' + keys.HAS_PLAYED_IN_TABLE +
               ' (' + keys.HPT_KEY_PSEUDO + ', ' + keys.HPT_KEY_PARTY + ', ' + keys.HPT_KEY_QUESTION + ')' +
               ' VALUES (?, ?, ?);';
-    var values = [pseudo, party, question];
-    state.pool.query(sql, values, function(err, result){
+    let values = [pseudo, party, question];
+    state.pool.query(sql, values, function(err){
         if(err) callback(err);
         else callback(null);
     });
@@ -560,28 +558,28 @@ exports.linkPlayerAndParty = function(pseudo, party, question, callback){
  * @param {callback} callback :  function used to return errors
  */
 exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
-    var sql = 'SELECT ' + keys.PT_KEY_ID +
+    let sql = 'SELECT ' + keys.PT_KEY_ID +
               ' FROM ' + keys.PARTY_TABLE +
               ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
-    var values = [party, date];
+    let values = [party, date];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else{
-            if(result.length == 0) callback(err);
+            if(result.length === 0) callback(err);
             else{
-                sql = 'DELETE FROM ' + keys.HAS_PLAYED_IN_TABLE +
+                let sql = 'DELETE FROM ' + keys.HAS_PLAYED_IN_TABLE +
                       ' WHERE ' + keys.HPT_KEY_PARTY + ' = ?' +
                       ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-                values = [result[0][keys.PT_KEY_ID], pseudo];
-                state.pool.query(sql, values, function(err, result){
+                let values = [result[0][keys.PT_KEY_ID], pseudo];
+                state.pool.query(sql, values, function(err){
                     if(err) callback(err);
                     else callback(null);
                 });
             }
         }
     });
-}
+};
 
 
 
@@ -594,27 +592,27 @@ exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
  * @param {callback} callback : function used to return errors
  */
 exports.recordPlayerProductionWithPartyId = function(pseudo, party, production, callback){
-    var sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
+    let sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
               ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
               ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
               ' AND ' + keys.HPT_KEY_PARTY + ' = ?;';
-    var values = [production, pseudo, party];
-    state.pool.query(sql, values, function(err, result){
+    let values = [production, pseudo, party];
+    state.pool.query(sql, values, function(err){
         if(err) callback(err);
         else callback(null);
     });
 };
 
 exports.recordPlayerProduction = function(pseudo, serverName, date, production, callback){
-    var sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
+    let sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
               ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
               ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
               ' AND ' + keys.PT_KEY_SERVER + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
-    var values = [production, pseudo, serverName, date];
-    state.pool.query(sql, values, function(err, result){
+    let values = [production, pseudo, serverName, date];
+    state.pool.query(sql, values, function(err){
         console.log(err);
         if(err) callback(err);
         else callback(null);
@@ -622,7 +620,7 @@ exports.recordPlayerProduction = function(pseudo, serverName, date, production, 
 };
 
 exports.getHistoricEntries = function(pseudo, callback){
-    var sql = 'SELECT ' + keys.PT_KEY_SERVER +
+    let sql = 'SELECT ' + keys.PT_KEY_SERVER +
               ', ' + keys.PT_KEY_ANIMATOR +
               ', DATE_FORMAT(' + keys.PT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") AS ' + keys.PT_KEY_DATE +
               ', ' + keys.HPT_KEY_QUESTION +
@@ -630,7 +628,7 @@ exports.getHistoricEntries = function(pseudo, callback){
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
               ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-    var value = [pseudo];
+    let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -638,13 +636,13 @@ exports.getHistoricEntries = function(pseudo, callback){
 };
 
 exports.getPlayersInParty = function(party, date, callback){
-    var sql = 'SELECT ' + keys.HPT_KEY_PSEUDO +
+    let sql = 'SELECT ' + keys.HPT_KEY_PSEUDO +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
               ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
-    var values = [party, date];
+    let values = [party, date];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -652,14 +650,14 @@ exports.getPlayersInParty = function(party, date, callback){
 };
 
 exports.getProduction = function(pseudo, party, date, callback){
-    var sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
+    let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
               ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?' +
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-    var values = [party, date, pseudo];
+    let values = [party, date, pseudo];
     state.pool.query(sql, values, function(err, result){
         console.log(result);
         if(err) callback(err);
@@ -668,7 +666,7 @@ exports.getProduction = function(pseudo, party, date, callback){
 };
 
 exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
-    var sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
+    let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
               ', ' + keys.HPT_KEY_QUESTION +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
@@ -676,10 +674,19 @@ exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
               ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?' +
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-              var values = [party, date, pseudo];
+    let values = [party, date, pseudo];
     state.pool.query(sql, values, function(err, result){
         console.log(result);
         if(err) callback(err);
         else callback(null, result);
     });
+};
+
+/**
+ * Convert a js Date to a mysql DATETIME
+ * @param {Date} date : the date we want to convert
+ * @returns {string}
+ */
+exports.toMysqlDatetime = function(date){
+    return date.toISOString().substring(0, 19).replace('T', ' '); // convert js Date to mysql DATETIME
 };

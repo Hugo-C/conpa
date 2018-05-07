@@ -1,10 +1,13 @@
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({ extended: true });
-var db = require('../js/db');
+const express = require('express');
+const router = express.Router();
+const bodyParser = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended: true});
+const db = require('../js/db');
 
-router.post('/email', urlencodedParser, function(req, res, next) {
+/**
+ * Return the email of a given user
+ */
+router.post('/email', urlencodedParser, function(req, res) {
     console.log("PSEUDO : " + req.body.username);
     db.getEmail(req.body.username, function(err, pp){
         if(err){
@@ -18,7 +21,7 @@ router.post('/email', urlencodedParser, function(req, res, next) {
 });
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
     res.send('respond with a resource');
 });
 

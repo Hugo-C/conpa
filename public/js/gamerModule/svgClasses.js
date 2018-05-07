@@ -5,254 +5,254 @@ var myLinks = []; // list all links in the svg
 
 class Rectangle {
 
-  /**
-   * Constructor of the Rectangle class
-   * @param {float} x : x coordinate
-   * @param {float} y : y coordinate
-   * @param {integer} width : rectangle's width
-   * @param {integer} height : rectangle's height
-   * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
-   */
-  constructor(x, y, width, height, fill, prod){
-      this.prod = prod;
-      this.rect = this.prod.master.rect(width, height);
-      this.rect.attr({
-        x: x,
-        y: y,
-        fill: fill
-      });
-      this.text = null;
-      this.links = [];
-      this.prod.myElements.push(this);
-  }
+    /**
+     * Constructor of the Rectangle class
+     * @param {float} x : x coordinate
+     * @param {float} y : y coordinate
+     * @param {integer} width : rectangle's width
+     * @param {integer} height : rectangle's height
+     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
+     */
+    constructor(x, y, width, height, fill, prod) {
+        this.prod = prod;
+        this.rect = this.prod.master.rect(width, height);
+        this.rect.attr({
+            x: x,
+            y: y,
+            fill: fill
+        });
+        this.text = null;
+        this.links = [];
+        this.prod.myElements.push(this);
+    }
 
-  /**
+    /**
    * Associate a textarea with the rectangle
    */
-  addTextArea(){
-      var group = this.prod.master.group(); // use to "bind" the rectangle and the textArea
+    addTextArea(){
+        let group = this.prod.master.group(); // use to "bind" the rectangle and the textArea
 
-      // this tag allow to use html tags in the svg
-      var htmlCompatibilyTag = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      htmlCompatibilyTag.setAttribute('x', this.rect.attr('x'));
-      htmlCompatibilyTag.setAttribute('y', this.rect.attr('y'));
-      htmlCompatibilyTag.setAttribute('width', this.rect.attr('width')); // match parent
-      htmlCompatibilyTag.setAttribute('height', this.rect.attr('height')); // match parent
+        // this tag allow to use html tags in the svg
+        let htmlCompatibilyTag = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        htmlCompatibilyTag.setAttribute('x', this.rect.attr('x'));
+        htmlCompatibilyTag.setAttribute('y', this.rect.attr('y'));
+        htmlCompatibilyTag.setAttribute('width', this.rect.attr('width')); // match parent
+        htmlCompatibilyTag.setAttribute('height', this.rect.attr('height')); // match parent
 
-      // textarea associated with the rectangle
-      var text = document.createElement("textarea");
-      text.style.height = "100%"; // match parent
-      text.style.width = "100%"; // match parent
-      text.style.resize = "none";
-      text.style.border = "none";
-      text.style.padding = "5px";
+        // textarea associated with the rectangle
+        let text = document.createElement("textarea");
+        text.style.height = "100%"; // match parent
+        text.style.width = "100%"; // match parent
+        text.style.resize = "none";
+        text.style.border = "none";
+        text.style.padding = "5px";
 	    text.style.color = "#000000";
-      text.style.overflow = "hidden";
-      text.style.backgroundColor = "transparent";
-      text.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        text.style.overflow = "hidden";
+        text.style.backgroundColor = "transparent";
+        text.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
 
-      htmlCompatibilyTag.appendChild(text);
-      group.add(this.rect);
-      document.getElementById(group.attr('id')).appendChild(htmlCompatibilyTag);
+        htmlCompatibilyTag.appendChild(text);
+        group.add(this.rect);
+        document.getElementById(group.attr('id')).appendChild(htmlCompatibilyTag);
 
-      this.text = htmlCompatibilyTag;
-  }
+        this.text = htmlCompatibilyTag;
+    }
 
-  /**
+    /**
    * Return the id of the rectangle (used to identified each elements in the svg)
    * @return {string} : id of the rectangle
    */
-  getId(){
-      return this.rect.attr('id');
-  }
+    getId(){
+        return this.rect.attr('id');
+    }
 
-  /**
+    /**
    * Return the x coordinate of the top left corner
    * @return {float} : x coordinate of the top left corner
    */
-  getX(){
-      return this.rect.attr('x');
-  }
+    getX(){
+        return this.rect.attr('x');
+    }
 
-  /**
+    /**
    * Return the y coordinate of the top left corner
    * @return {float} : y coordinate of the top left corner
    */
-  getY(){
-      return this.rect.attr('y');
-  }
+    getY(){
+        return this.rect.attr('y');
+    }
 
-  /**
+    /**
    * Return the height of the rectangle
    * @return {float} : height of the rectangle
    */
-  getHeight(){
-      return this.rect.attr('height');
-  }
+    getHeight(){
+        return this.rect.attr('height');
+    }
 
-  /**
+    /**
    * Return the width of the rectangle
    * @return {float} : width of the rectangle
    */
-  getWidth(){
-      return this.rect.attr('width');
-  }
+    getWidth(){
+        return this.rect.attr('width');
+    }
 
-  /**
+    /**
    * Return the fill color of the rectangle
    * @return {string} : color code
    */
-  getFillColor(){
-      return this.rect.attr('fill');
-  }
+    getFillColor(){
+        return this.rect.attr('fill');
+    }
 
-  /**
+    /**
    * Update the x coordinate of the top left corner
    * @param {float} x : x coordinate of the top left corner
    */
-  setX(x){
-      this.rect.attr('x', x);
-      if(this.text != null)
-          this.text.setAttribute('x', x);
-  }
+    setX(x){
+        this.rect.attr('x', x);
+        if(this.text != null)
+            this.text.setAttribute('x', x);
+    }
 
-  /**
+    /**
    * Update the y coordinate of the top left corner
    * @param {float} y : y coordinate of the top left corner
    */
-  setY(y){
-      this.rect.attr('y', y);
-      if(this.text != null)
-          this.text.setAttribute('y', y);
-  }
+    setY(y){
+        this.rect.attr('y', y);
+        if(this.text != null)
+            this.text.setAttribute('y', y);
+    }
 
-  /**
+    /**
    * Update the height of the rectangle
    * @param {float} height : height of the rectangle
    */
-  setHeight(height){
-      this.rect.attr('height', height);
-  }
+    setHeight(height){
+        this.rect.attr('height', height);
+    }
 
-  /**
+    /**
    * Update the width of the rectangle
    * @param {float} width : width of the rectangle
    */
-  setWidth(width){
-      this.rect.attr('width', width);
-  }
+    setWidth(width){
+        this.rect.attr('width', width);
+    }
 
-  /**
+    /**
    * Update the fill color of the rectangle
    * @param {string} color : color code (example : '#000000')
    */
-  setFillColor(color){
-      this.rect.attr('fill', color);
-  }
+    setFillColor(color){
+        this.rect.attr('fill', color);
+    }
 
-  /**
+    /**
    * Display the selection border
    */
-  select() {
-      this.rect.animate(100).stroke({'color': 'black', 'width': 5});
-  }
+    select() {
+        this.rect.animate(100).stroke({'color': 'black', 'width': 5});
+    }
 
-  /**
+    /**
    * Hide the selection border
    */
-  unselect() {
-      this.rect.animate(100).stroke({'width': 0});
-  }
+    unselect() {
+        this.rect.animate(100).stroke({'width': 0});
+    }
 
-  /**
+    /**
    * Return the element's center by x and y coordinates
    *
    * @return {{x: number, y: number}}
    */
-  center() {
-      let xCenter = this.rect.attr('x') + this.rect.attr('width') / 2;
-      let yCenter = this.rect.attr('y') + this.rect.attr('height') / 2;
-      return {x: xCenter, y: yCenter};
-  }
+    center() {
+        let xCenter = this.rect.attr('x') + this.rect.attr('width') / 2;
+        let yCenter = this.rect.attr('y') + this.rect.attr('height') / 2;
+        return {x: xCenter, y: yCenter};
+    }
 
-  /**
+    /**
    * Check if a point is inside the rectangle
    *
    * @param {float} x : x coordinate
    * @param {float} y : y coordinate
    * @return {Boolean}
    */
-  isInside(x, y){
-      return this.rect.inside(x, y);
-  }
+    isInside(x, y){
+        return this.rect.inside(x, y);
+    }
 
-  /**
+    /**
    * Link two rect with a line
    *
    * @param {Rectangle} e : rectangle with which we want to create a link
    */
-  linkRect(e){
-      if(!this.isLinkedTo(e)){
-          var link = new Link(this, e, this.prod);
-  	      link.line.stroke({color:"#333333"});
-          this.addLink(link);
-          e.addLink(link);
-      }
-  }
+    linkRect(e){
+        if(!this.isLinkedTo(e)){
+            let link = new Link(this, e, this.prod);
+  	        link.line.stroke({color:"#333333"});
+            this.addLink(link);
+            e.addLink(link);
+        }
+    }
 
-  /**
+    /**
    * Check if this rectangle and the 'e' rectangle are linked
    *
    * @param {Rectangle} e : the rectangle to check
    */
-  isLinkedTo(e) {
-      let res = false;
-      if(e === this)
-          res = true;
-          this.links.forEach(function (link) {
-          if (link.hasElement(e)) {
-              res = true;
-          }
-      });
-      return res;
-  }
+    isLinkedTo(e) {
+        let res = false;
+        if(e === this)
+            res = true;
+        this.links.forEach(function (link) {
+            if (link.hasElement(e)) {
+                res = true;
+            }
+        });
+        return res;
+    }
 
-  /**
+    /**
    * Add a link to the element
    *
    * @param {Link} link : the link to add
    */
-  addLink(link){
-      this.links.push(link);
-  }
+    addLink(link){
+        this.links.push(link);
+    }
 
-  refreshAttachedLinks(){
-      this.links.forEach(function (link) {
-          link.refreshPosition();
-      });
-  }
+    refreshAttachedLinks(){
+        this.links.forEach(function (link) {
+            link.refreshPosition();
+        });
+    }
 
-  /**
+    /**
    * Remove the element and all links attached to it
    */
-  myRemove(){
-      var l;
-      this.rect.parent().remove();
-      while(this.links.length > 0){
-          l = this.links.pop();
-          l.myRemove();
-      }
-      removeFromArray(this.prod.myElements, this);
-  }
+    myRemove(){
+        let l;
+        this.rect.parent().remove();
+        while(this.links.length > 0){
+            l = this.links.pop();
+            l.myRemove();
+        }
+        removeFromArray(this.prod.myElements, this);
+    }
 
-  /**
+    /**
    * Remove the connection between a link and this element
    *
    * @param {Link} link : the link to remove
    */
-  removeLink(link){
-      removeFromArray(this.links, link);
-  }
+    removeLink(link){
+        removeFromArray(this.links, link);
+    }
 }
 
 class Link {
@@ -300,7 +300,7 @@ class Link {
      * @return {string} : color code
      */
     getColor(){
-       return this.line.attr('stroke');
+        return this.line.attr('stroke');
     }
 
     /**
@@ -358,7 +358,7 @@ class Link {
         }
     }
 
-   /**
+    /**
 	  * change the value of color property of the navigability
     * @param {string} colorValue : color's code ("#??????")
   	*/
@@ -366,7 +366,7 @@ class Link {
         this.navigability.attr({style: "fill:" + colorValue + "; stroke:" + colorValue});
     }
 
-    distance(x1, y1, x2, y2){
+    static distance(x1, y1, x2, y2){
         return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
 
@@ -381,7 +381,7 @@ class Link {
         let y1 = parseInt(this.line.attr("y1"));
         let x2 = parseInt(this.line.attr("x2"));
         let y2 = parseInt(this.line.attr("y2"));
-        return Math.abs(this.distance(x1, y1, x, y) + this.distance(x, y, x2, y2) - this.distance(x1, y1, x2, y2)) < 1;
+        return Math.abs(Link.distance(x1, y1, x, y) + Link.distance(x, y, x2, y2) - Link.distance(x1, y1, x2, y2)) < 1;
     }
 
     /**
@@ -544,7 +544,7 @@ class Link {
    	*/
    	reverseNavigability(){
  		    this.reversed = !this.reversed;
-     }
+    }
 
 	 /**
   	* Remove the navigability of the link
