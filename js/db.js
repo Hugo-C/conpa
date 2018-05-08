@@ -398,7 +398,7 @@ let setToken = function(pseudo, token, callback){
     let expirationDate = new Date();
     if(token !== null)
         expirationDate.setDate(expirationDate.getDate() + TOKEN_EXPIRATION_DELAY);
-    expirationDate = db.toMysqlDatetime(expirationDate);
+    expirationDate = toMysqlDatetime(expirationDate);
 
     let sql = 'UPDATE ' + keys.USER_TABLE +
         ' SET ' + keys.UT_KEY_TOKEN + ' = ?, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = ?' +
@@ -687,6 +687,7 @@ exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
  * @param {Date} date : the date we want to convert
  * @returns {string}
  */
-exports.toMysqlDatetime = function(date){
+function toMysqlDatetime(date){
     return date.toISOString().substring(0, 19).replace('T', ' '); // convert js Date to mysql DATETIME
-};
+}
+exports.toMysqlDatetime =toMysqlDatetime;

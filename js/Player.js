@@ -1,3 +1,4 @@
+const db = require('../js/db');
 
 module.exports = class Player {
 
@@ -76,8 +77,8 @@ module.exports = class Player {
         return this.role === "animator";
     }
 
-    recordPlayer(database, party){
-        database.linkPlayerAndParty(this.pseudo, party, this.question, function(err){
+    recordPlayer(party){
+        db.linkPlayerAndParty(this.pseudo, party, this.question, function(err){
             if(err) console.log(err);
         });
     }

@@ -2,7 +2,6 @@ const Player = require('./Player.js');
 const Game = require('./Game.js');
 const db = require('../js/db');
 
-const SVG_FILE = "../svg";
 const WAITING_PLAYERS = "waiting for players";
 const QUESTION_TIME = "question time";
 const GAME_TIME = "game time";
@@ -53,7 +52,7 @@ function recordGameServer(gameServer){
         }else{
             console.log(partyId);
             gameServer.setHistoricId(partyId);
-            gameServer.addPlayersToPartyHistoric(db);
+            gameServer.addPlayersToPartyHistoric();
         }
     });
 }

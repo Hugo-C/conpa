@@ -346,11 +346,11 @@ module.exports = class Game {
         return counter;
     }
 
-    addPlayersToPartyHistoric(database){
+    addPlayersToPartyHistoric(){
         console.assert(this.partyHistoricId != null, "historic id is null !"); // party historic id should be not null
         for(let node = this.players.node; node; node = this.players.next(node)){
-            node.value.recordPlayer(database, this.partyHistoricId);
+            node.value.recordPlayer(this.partyHistoricId);
         }
-        if(this.host.isAnimator()) this.host.recordPlayer(database, this.partyHistoricId);
+        if(this.host.isAnimator()) this.host.recordPlayer(this.partyHistoricId);
     }
 };
