@@ -9,7 +9,7 @@ module.exports = class Player {
     }
 
     /**
-   * Return the pseudo of a player
+   * Returns the pseudo of a player
    * @return {string} : player's pseudo
    */
     getPseudo(){
@@ -17,7 +17,7 @@ module.exports = class Player {
     }
 
     /**
-   * Return the role of a player
+   * Returns the role of a player
    * @return {integer} : player's role flag
    */
     getRole(){
@@ -25,8 +25,8 @@ module.exports = class Player {
     }
 
     /**
-   * Tests if a pseudo corresponding to his own pseudo
-   * @return {boolean} : true if pseudos are equals, false in the other case
+   * Tests if a pseudo corresponds to his own pseudo
+   * @return {boolean} : true if pseudos are equals, false if not
    */
     pseudoEquals(pseudo){
         return this.pseudo === pseudo;
@@ -45,7 +45,7 @@ module.exports = class Player {
     }
 
     /**
-   * Update the question of a player
+   * Updates the question of a player
    * @param {string} newQuestion : new version of the player's question
    */
     setQuestion(newQuestion){
@@ -58,7 +58,7 @@ module.exports = class Player {
 
     /**
    * Tests if a player is ready
-   * (a player is considered as ready if his question is different than the empty string)
+   * (a player is considered as ready if his question is different from an empty string)
    */
     isReady(){
         if(this.role === "animator"){
@@ -70,7 +70,7 @@ module.exports = class Player {
 
     /**
    * Tests if a player is an animator
-   * @return {boolean} : true if the player is an animator, false in the other case
+   * @return {boolean} : true if the player is an animator, false if not
    */
     isAnimator(){
         return this.role === "animator";
