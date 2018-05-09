@@ -31,9 +31,9 @@ function removeFromArray(array, e){
 /**
  * Handle http request
  */
-var HttpClient = function() {
+const HttpClient = function() {
     this.get = function(aUrl, aCallback) {
-        var anHttpRequest = new XMLHttpRequest();
+        let anHttpRequest = new XMLHttpRequest();
         anHttpRequest.onreadystatechange = function() {
             if (anHttpRequest.readyState === 4 && anHttpRequest.status === 200)
                 aCallback(anHttpRequest.responseText);

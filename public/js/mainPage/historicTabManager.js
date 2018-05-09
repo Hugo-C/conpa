@@ -1,4 +1,3 @@
-
 var myProduction;
 
 /**
@@ -10,14 +9,14 @@ var myProduction;
  *  'date': date at which game has been played, 'question': player's question}
  */
 function displayHistoric(historic){
-    var historicTable = $('#myHistoric').find('tbody');
+    let historicTable = $('#myHistoric').find('tbody');
     historicTable.children().remove(); // we will replace old data by the data we have received
-    for(var entry in historic){
+    for(let entry in historic){
         historicTable.append($('<tr>')
-                      .append($('<td>' + historic[entry]['name'] + '</td>'))
-                      .append($('<td>' + historic[entry]['animator'] + '</td>'))
-                      .append($('<td>' + historic[entry]['date'] + '</td>'))
-                      .append($('<td>' + historic[entry]['question'] + '</td>')));
+            .append($('<td>' + historic[entry]['name'] + '</td>'))
+            .append($('<td>' + historic[entry]['animator'] + '</td>'))
+            .append($('<td>' + historic[entry]['date'] + '</td>'))
+            .append($('<td>' + historic[entry]['question'] + '</td>')));
     }
 }
 
@@ -30,7 +29,7 @@ function refreshHistoric(){
             console.log("historic retrieving has failed");
         },
         success: function(response){
-            if(response == 'ERROR'){
+            if(response === 'ERROR'){
                 console.log("historic retrieving has failed");
             }else{
                 console.log(response);
@@ -50,7 +49,7 @@ $('#myHistoric').on('click', 'tbody tr', function(){
 
 /** allow to remove an entry in the player's historic */
 $('#deleteEntry').on('click', function(){
-    var selectedEntry = $('#myHistoric tbody .selected');
+    let selectedEntry = $('#myHistoric tbody .selected');
     if(selectedEntry != null){
         $.ajax({
             type: 'POST',
@@ -64,7 +63,7 @@ $('#deleteEntry').on('click', function(){
                 console.log('removing has failed');
             },
             success: function(response){
-                if(response == 'OK'){
+                if(response === 'OK'){
                     refreshHistoric();
                 }else{
                     console.log('removing has failed');
@@ -76,9 +75,9 @@ $('#deleteEntry').on('click', function(){
 
 /** Display the list of players who have played in the same game as you */
 function displayPlayersList(players){
-    var playersList = $('#partyPlayers').find('tbody');
+    let playersList = $('#partyPlayers').find('tbody');
     playersList.children().remove();
-    for(var index in players){
+    for(let index in players){
         playersList.append($('<tr>')
                         .append($('<td>' + players[index] + '</td>')));
     }
@@ -87,7 +86,7 @@ function displayPlayersList(players){
 function displayProduction(production){
     $('.partySheet #productionViewer > svg').remove();
     $('.partySheet #productionViewer')[0].style.backgroundImage = '';
-    if(production != "" && production != null){
+    if(production !== "" && production != null){
         myProduction = new Production($('.partySheet #productionViewer')[0], true);
         myProduction.restoreProduction(JSON.parse(production));
     }else{
@@ -100,10 +99,9 @@ function displayPartyDetails(data){
     $(".partySheet").animate({"display": "block"}, 1000, function(){
         $(".partySheet").css("display", "block");
     });
-
-    $("#historicTab").css('height', '100%');
-    $("#historicTab").css('width', '80%');
-
+    let historicTab = $("#historicTab");
+    historicTab.css('height', '100%');
+    historicTab.css('width', '80%');
     $("#partyName").val(data['server']);
     $("#partyDate").val(data['date']);
     $("#partyAnimator").val(data['animator']);
@@ -111,7 +109,7 @@ function displayPartyDetails(data){
 
     displayPlayersList(data['players']);
 
-    if(data['animator'] == sessionStorage.pseudo){
+    if(data['animator'] === sessionStorage.pseudo){
         $('#editProduction').css('display', 'none'); // animator has no production to edit
         $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/animator.png")';
     }else{
@@ -121,7 +119,7 @@ function displayPartyDetails(data){
 
 /** Joining the selected game server */
 $('#open').on('click', function(){
-    var selectedParty =  $('#myHistoric tbody .selected');
+    let selectedParty = $('#myHistoric tbody .selected');
     if(selectedParty != null){
         $.ajax({
             type: 'POST',
@@ -135,7 +133,7 @@ $('#open').on('click', function(){
                 console.log("details retrieving has failed");
             },
             success: function(response){
-                if(response == 'ERROR'){
+                if(response === 'ERROR'){
                     console.log("details retrieving has failed");
                 }else{
                     console.log(response);
@@ -152,38 +150,36 @@ $('#open').on('click', function(){
 
 /** Retrieve the url of the production */
 function getProductionImageUrl(){
-    var img = new Image();
-    var blob = new Blob([myProduction.getInlineSvg()], {type: "image/svg+xml;charset=utf-8"});
-    var urlCreator = window.URL || window.webkitURL;
-    var imageUrl = urlCreator.createObjectURL( blob );
-    return imageUrl;
+    let blob = new Blob([myProduction.getInlineSvg()], {type: "image/svg+xml;charset=utf-8"});
+    let urlCreator = window.URL || window.webkitURL;
+    return urlCreator.createObjectURL(blob);
 }
 
 /** allow to download a production as an svg image */
 $('#download').on('click', function(){
-    var productionUrl = getProductionImageUrl();
-    var partyName = $('#partyName').val();
-    var partyDate = $('#partyDate').val();
-    var partyQuestion = $('#partyQuestion').val();
-    var fileName = partyName + '(' + partyDate + ')[' + partyQuestion + '].svg';
+    let productionUrl = getProductionImageUrl();
+    let partyName = $('#partyName').val();
+    let partyDate = $('#partyDate').val();
+    let partyQuestion = $('#partyQuestion').val();
+    let fileName = partyName + '(' + partyDate + ')[' + partyQuestion + '].svg';
     if(productionUrl.match("blob")){
-        var downloader = document.createElement("a");
+        let downloader = document.createElement("a");
         document.body.appendChild(downloader);
         downloader.href = productionUrl;
         downloader.download = fileName;
         downloader.click();
         downloader.remove();
     }
-    var urlCreator = window.URL || window.webkitURL;
+    let urlCreator = window.URL || window.webkitURL;
     urlCreator.revokeObjectURL(productionUrl);
 });
 
 /** Remove the image from the browser buffer */
 function freeProductionImage(){
-    var productionUrl = getProductionImageUrl();
+    let productionUrl = getProductionImageUrl();
     if(productionUrl.match("blob")){
         console.log("free image : " + productionUrl);
-        var urlCreator = window.URL || window.webkitURL;
+        let urlCreator = window.URL || window.webkitURL;
         urlCreator.revokeObjectURL(productionUrl);
     }
 }
@@ -207,7 +203,7 @@ function loadSelectedPlayer(selectedPlayer){
                 console.log("player's details retrieving has failed");
             },
             success: function(response){
-                if(response == 'ERROR'){
+                if(response === 'ERROR'){
                     console.log("player's details retrieving has failed");
                 }else{
                     console.log(response);
@@ -222,8 +218,8 @@ function loadSelectedPlayer(selectedPlayer){
 $('#partyPlayers').on('click', 'tbody tr', function(){
     $('#partyPlayers tbody .selected').removeClass('selected');
     $(this).addClass('selected');
-    var selectedPlayer =  $(this).children();
-    if(selectedPlayer[0].innerHTML == $('#partyAnimator').val()){
+    let selectedPlayer =  $(this).children();
+    if(selectedPlayer[0].innerHTML === $('#partyAnimator').val()){
         // animator has no production, we display an image to inform the player
         $('.partySheet #productionViewer > svg').remove();
         $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/animator.png")';
@@ -239,8 +235,9 @@ $('#close').on('click', function(){
         $("#historicTab > .tabContent").css("display", "block");
     });
 
-    $("#historicTab").css('height', '100%');
-    $("#historicTab").css('width', '100%');
+    let historicTab = $("#historicTab");
+    historicTab.css('height', '100%');
+    historicTab.css('width', '100%');
     myProduction = null;
     $('#productionViewer > svg').remove();
 });
@@ -251,8 +248,9 @@ function openProductionEditor(production){
         $(".productionEditor").css("display", "block");
     });
 
-    $("#historicTab").css('height', '100%');
-    $("#historicTab").css('width', '100%');
+    let historicTab = $("#historicTab");
+    historicTab.css('height', '100%');
+    historicTab.css('width', '100%');
 
     $('.partySheet #productionViewer > svg').remove();
     myProduction = null;
@@ -273,7 +271,7 @@ $('#editProduction').on('click', function(){
             console.log("production retrieving has failed");
         },
         success: function(response){
-            if(response == 'ERROR'){
+            if(response === 'ERROR'){
                 console.log("production retrieving has failed");
             }else{
                 console.log(response);
@@ -297,9 +295,9 @@ $('#saveProduction').on('click', function(){
             console.log("backup failed");
         },
         success: function(response){
-            if(response == 'ERROR'){
+            if(response === 'ERROR'){
                 console.log("backup failed");
-            }else if(response == 'OK'){
+            }else if(response === 'OK'){
                 console.log("backup success");
                 $('#closeEditor').click();
             }
@@ -313,8 +311,9 @@ function closeProductionEditor(production){
         $(".partySheet").css("display", "block");
     });
 
-    $("#historicTab").css('height', '100%');
-    $("#historicTab").css('width', '80%');
+    let historicTab = $("#historicTab");
+    historicTab.css('height', '100%');
+    historicTab.css('width', '80%');
 
     $('.productionEditor #productionEditor > svg').remove();
     $('.partySheet #productionViewer')[0].style.backgroundImage = '';
@@ -336,7 +335,7 @@ $('#closeEditor').on('click', function(){
             console.log("production retrieving has failed");
         },
         success: function(response){
-            if(response == 'ERROR'){
+            if(response === 'ERROR'){
                 console.log("production retrieving has failed");
             }else{
                 console.log(response);
@@ -374,12 +373,12 @@ $("#moveElement").on("click", function(){
         console.log('--------------');
         $(this).removeClass("selected");
         $(this).css('background-image', 'url(' + moveImage + ')');
-        myProduction.updatePanningState(false);
+        Production.updatePanningState(false);
     }else{
         console.log($(this));
         $(this).addClass("selected");
         $(this).css('background-image', 'url(' + movingImage + ')');
-        myProduction.updatePanningState(true);
+        Production.updatePanningState(true);
     }
 });
 

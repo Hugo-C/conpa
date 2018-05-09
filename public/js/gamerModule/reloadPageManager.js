@@ -17,7 +17,7 @@ function restoreCurrentState(){
     // restore the state of the card game
     cards = JSON.parse(sessionStorage.cards);
     // restore the current card
-    if(sessionStorage.currentCardLogo != '' && sessionStorage.currentCardContent != ''){
+    if(sessionStorage.currentCardLogo !== '' && sessionStorage.currentCardContent !== ''){
         displayCard(sessionStorage.currentCardLogo, sessionStorage.currentCardContent);
     }
     // restore the current question
@@ -37,7 +37,7 @@ $(window).on('unload', function(evt){
 });
 
 $(window).on('load', function(evt){
-    if(sessionStorage.unload != null && sessionStorage.unload == 'true'){
+    if(sessionStorage.unload != null && sessionStorage.unload === 'true'){
         restoreCurrentState();
     }
 });

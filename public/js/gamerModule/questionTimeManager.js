@@ -39,16 +39,17 @@ function setPP(pseudo){
 
 // Display the questions guide
 $('#projector').on('click', function(){
-    var image_on = '/img/gamerModule/power_on.png'; // used to check if projector is on (and to change button's image)
-    var image_off = '/img/gamerModule/power_off.png'; // used to check if projector is off (and to change button's image)
+    let image_on = '/img/gamerModule/power_on.png'; // used to check if projector is on (and to change button's image)
+    let image_off = '/img/gamerModule/power_off.png'; // used to check if projector is off (and to change button's image)
+    let guide = $('#guide');
     if($('#projector').css('background-image').includes(image_off)){ // projector is off, we turn it on
         $('#projector').css('background-image', 'url("' + image_on + '")');
-        $('#guide').css('visibility', 'visible');
-        $('#guide').css('opacity', 1);
+        guide.css('visibility', 'visible');
+        guide.css('opacity', 1);
     }else{ // projector is on, we turn it off
         $('#projector').css('background-image', 'url("' + image_off + '")');
-        $('#guide').css('opacity', 0);
-        $('#guide').css('visibility', 'hidden');
+        guide.css('opacity', 0);
+        guide.css('visibility', 'hidden');
     }
 });
 
@@ -59,7 +60,7 @@ $('#projector').on('click', function(){
  * @param {string} pseudo : player's pseudo
  */
 function addPlayerBox(pseudo){
-    var htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-2 col-md-2">' +
+    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-2 col-md-2">' +
                       '<div class="row">' +
                           '<img class="col-lg-12 col-md-12"/>' +
                       '</div>' +
@@ -83,8 +84,8 @@ function addPlayerBox(pseudo){
  * @param {string} player2 : second player's pseudo
  */
 function addTwoPlayers(player1, player2){
-    var parentTag = $('#playersQuestion');
-    var html ='<div class="questionsDisplayer rowFlexContainer">' +
+    let parentTag = $('#playersQuestion');
+    let html ='<div class="questionsDisplayer rowFlexContainer">' +
                   addPlayerBox(player1) +
                   '<div class="col-lg-8 col-md-8">' +
                       '<div class="row">' +
@@ -111,8 +112,8 @@ function addTwoPlayers(player1, player2){
  * @param {string} player : player's pseudo
  */
 function addOnePlayer(player){
-    var parentTag = $('#playersQuestion');
-    var html ='<div class="questionsDisplayer rowFlexContainer">' +
+    let parentTag = $('#playersQuestion');
+    let html ='<div class="questionsDisplayer rowFlexContainer">' +
                   addPlayerBox(player) +
                   '<div class="col-lg-8 col-md-8">' +
                       '<div class="row">' +
@@ -136,7 +137,7 @@ function addOnePlayer(player){
  * @param {integer} total : numbers of player in the game
  */
 function actualizeNbReady(ready, total){
-    var indicatorField = $('#nbReady');
+    let indicatorField = $('#nbReady');
     indicatorField.text(ready + ' / ' + total);
 }
 
@@ -145,10 +146,10 @@ function actualizeNbReady(ready, total){
  * On click in this button, we send our question to the server
  */
 $('#validate').on('click', function(){
-    var question = $('#myQuestion').val();
-    if(sessionStorage.role == 'player' && question != ''){
+    let question = $('#myQuestion').val();
+    if(sessionStorage.role === 'player' && question !== ''){
         socket.emit('recordMyQuestion', {'question': question});
-    }else if(sessionStorage.role == 'animator'){
+    }else if(sessionStorage.role === 'animator'){
         socket.emit('animatorValidation', null);
     }
 });
@@ -182,8 +183,8 @@ function actualizeBorderColor(pseudo){
  * @param {object} playersQuestion : dictionnary of (player's pseudo, player's question) pair
  */
 function displayMyQuestion(playersQuestion){
-    for(var index = 0; index < playersQuestion.length; index++){
-        if(playersQuestion[index]['player'] == sessionStorage.pseudo){
+    for(let index = 0; index < playersQuestion.length; index++){
+        if(playersQuestion[index]['player'] === sessionStorage.pseudo){
             $('span#question').text(playersQuestion[index]['question']);
         }
     }
@@ -213,19 +214,19 @@ socket.on('initQuestionTime', function(data){
             addOnePlayer(players[0]);
             setPP(players[0]);
         }else{ // more than one player
-            for(var index = 0; index < players.length - 1; index += 2){
+            for(let index = 0; index < players.length - 1; index += 2){
                 addTwoPlayers(players[index], players[index + 1]); // we display two players in the same line while we can
                 setPP(players[index]);
                 setPP(players[index + 1]);
             }
-            if(players.length % 3 == 0){
+            if(players.length % 3 === 0){
                 addOnePlayer(players[players.length - 1]); // impair numbers of player, we display the last one alone
                 setPP(players[players.length - 1]);
             }
         }
     }
 
-    if(sessionStorage.role == 'animator'){
+    if(sessionStorage.role === 'animator'){
         $('#validate').css('display', 'none');
     }
 });
@@ -238,17 +239,16 @@ socket.on('initQuestionTime', function(data){
  *                           'playersQuestion': dictionnary of (player's pseudo, player's question) pair }
  */
 socket.on('actualizeQuestions', function(data){
-    var playersQuestion = data['playersQuestion'];
+    let playersQuestion = data['playersQuestion'];
     actualizeNbReady(data['ready'], playersQuestion.length);
 
-    for(var index = 0; index < playersQuestion.length; index++){
+    for(let index = 0; index < playersQuestion.length; index++){
         actualizePlayerQuestion(playersQuestion[index]['player'], playersQuestion[index]['question']);
-        if(playersQuestion[index]['question'] != ''){
+        if(playersQuestion[index]['question'] !== ''){
             actualizeBorderColor(playersQuestion[index]['player']);
         }
     }
-
-    if(data['ready'] == playersQuestion.length && sessionStorage.role == 'animator'){
+    if(data['ready'] === playersQuestion.length && sessionStorage.role === 'animator'){
         $('#validate').css('display', 'block'); // TODO : create an animation instead of hide the button
     }
 });

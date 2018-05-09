@@ -1,26 +1,22 @@
-var $reset_form = $('.reset');
-var $reset_password = $('.reset input[name="password"]');
-var $reset_confirm = $('.reset input[name="confirm"]');
-var $error_mismatch = $('.reset .error_mismatch');
-var $recaptcha = $('.g-recaptcha');
+const reset_form = $('.reset');
+const reset_password = $('.reset input[name="password"]');
+const reset_confirm = $('.reset input[name="confirm"]');
+const error_mismatch = $('.reset .error_mismatch');
 var token = window.location.href.toString();  // retrieve the token from url
 token = token.split("/");
 token = token[token.length - 1];
-console.log(token);
 
-$($reset_form).on("submit", function(evt){
+$(reset_form).on("submit", function(evt){
     evt.preventDefault();  // FIXME
-    if($reset_password.val() !== $reset_confirm.val()){
-        $error_mismatch.text("both field must be equal");
-    } else if($reset_form[0].checkValidity()){
+    if(reset_password.val() !== reset_confirm.val()){
+        error_mismatch.text("both field must be equal");
+    } else if(reset_form[0].checkValidity()){
         $.ajax({
             type: 'POST',
             url: '/connection/setPassword',
-            timeout: 5000,
             data: {
-                password: md5($reset_password.val()),
+                password: md5(reset_password.val()),
                 token: token,
-                recaptcha: ''//grecaptcha.getResponse()
             },
             error: function(err){
                 console.log(err);
@@ -38,7 +34,7 @@ $($reset_form).on("submit", function(evt){
 });
 
 $('form.reset input').on('keyup', function(evt){
-    if($(this)[0].checkValidity() || $(this)[0].value == ''){
+    if($(this)[0].checkValidity() || $(this)[0].value === ''){
         $($(this)[0]['nextSibling']).css('display', 'none');
     }else{
         $($(this)[0]['nextSibling']).css('display', 'inline-block');

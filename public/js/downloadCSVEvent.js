@@ -6,7 +6,7 @@ var lastFocusedElement = null;
  * @param {url} request : request to send
  */
 function sendRequest(request){
-    var downloaderTag = document.createElement("a"); // create 'a' html tag
+    let downloaderTag = document.createElement("a"); // create 'a' html tag
     downloaderTag.href = request; // add request as href param
     document.body.appendChild(downloaderTag);
     downloaderTag.click(); // send request
@@ -15,7 +15,7 @@ function sendRequest(request){
 }
 
 $("#exportToCSV").on("click", function(){
-    var openSelectorRequest = "/editor?selector=yes";
+    let openSelectorRequest = "/editor?selector=yes";
     sendRequest(openSelectorRequest);
 });
 
@@ -25,14 +25,14 @@ $(".cardGame").on("focus", function(){
 
 $("#validateButton").on("click", function(){
     if(lastFocusedElement != null){
-        var name = document.getElementById(lastFocusedElement.id).childNodes[1].innerHTML;
-        var infos = name.match(/(.*)\ \(([a-z]+)\)/);
-        var downloadRequest = "/editor/exportCSV?cardGame=" + infos[1] + "&language=" + infos[2];
+        let name = document.getElementById(lastFocusedElement.id).childNodes[1].innerHTML;
+        let infos = name.match(/(.*) \(([a-z]+)\)/);
+        let downloadRequest = "/editor/exportCSV?cardGame=" + infos[1] + "&language=" + infos[2];
         sendRequest(downloadRequest);
     }
 });
 
 $("#cancelButton").on("click", function(){
-    var exitSelectorRequest = "/editor?selector=no";
+    let exitSelectorRequest = "/editor?selector=no";
     sendRequest(exitSelectorRequest);
 });

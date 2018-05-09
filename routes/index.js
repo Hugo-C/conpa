@@ -1,43 +1,43 @@
-var express = require('express');
-var router = express.Router();
-var multer = require('multer');
-var upload = multer().single('uploadCSV');
-var url = require('url');
-var querystring = require('querystring');
-var path = require('path');
-var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({ extended: true });
-var db = require('../js/db');
-var keys = require('../js/dbConstants');
-var exportCSV = require('../js/exportCSV');
-var importCSV = require('../js/importCSV');
-var parse = require('csv-parse/lib/sync');
-var fs = require('fs');
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const upload = multer().single('uploadCSV');
+const url = require('url');
+const querystring = require('querystring');
+const path = require('path');
+const bodyParser = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended: true});
+const db = require('../js/db');
+const keys = require('../js/dbConstants');
+const exportCSV = require('../js/exportCSV');
+const importCSV = require('../js/importCSV');
+const parse = require('csv-parse/lib/sync');
+const fs = require('fs');
+const i18n_module = require('i18n-nodejs');
 
-router.get('/', function(req, res, next) {
-  res.render('mainWebSitePage');
+router.get('/', function (req, res) {
+    res.render('mainWebSitePage');
 });
 
-router.post('/checkConnection', urlencodedParser, function(req, res){
-  db.isConnected(req.body.username, function(connected){
-    if(connected){
-      res.send("OK");
-    }else{
-      res.send("REJECT");
-    }
-  });
+router.post('/checkConnection', urlencodedParser, function (req, res) {
+    db.isConnected(req.body.username, function (connected) {
+        if (connected) {
+            res.send("OK");
+        } else {
+            res.send("REJECT");
+        }
+    });
 });
 
 router.post('/getHistoric', urlencodedParser, function(req, res){
-
     db.getHistoricEntries(req.body.username, function(err, result){
         if(err){
             console.log(err);
             res.send('ERROR');
         }else{
-            var historic = []; // used to store historic entries
-            for(var entry in result){
-                var data = {'name': result[entry][keys.PT_KEY_SERVER],
+            let historic = []; // used to store historic entries
+            for(let entry in result){
+                let data = {'name': result[entry][keys.PT_KEY_SERVER],
                             'animator': result[entry][keys.PT_KEY_ANIMATOR],
                             'date': result[entry][keys.PT_KEY_DATE],
                             'question': result[entry][keys.HPT_KEY_QUESTION]};
@@ -49,7 +49,6 @@ router.post('/getHistoric', urlencodedParser, function(req, res){
 });
 
 router.post('/removeHistoric', urlencodedParser, function(req, res){
-
     db.removePlayerPartyHistoric(req.body.username, req.body.server, req.body.date, function(err){
         if(err){
             console.log(err);
@@ -57,12 +56,11 @@ router.post('/removeHistoric', urlencodedParser, function(req, res){
         }else{
             res.send('OK');
         }
-    })
+    });
 });
 
 router.post('/getPlayerProduction', urlencodedParser, function(req, res){
     var details = {'production': ''};
-
     db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
         if(err){
             res.send('ERROR');
@@ -90,7 +88,7 @@ router.post('/getDetails', urlencodedParser, function(req, res){
 
     function processPlayersList(players){
 
-        for(var index in players){
+        for(let index in players){
             details['players'].push(players[index][keys.HPT_KEY_PSEUDO]);
         }
 
@@ -116,7 +114,6 @@ router.post('/getDetails', urlencodedParser, function(req, res){
 
 router.post('/getPlayerDetails', urlencodedParser, function(req, res){
     var details = {};
-
     db.getPlayerPartyDetails(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
         if(err){
             res.send('ERROR');
@@ -129,15 +126,14 @@ router.post('/getPlayerDetails', urlencodedParser, function(req, res){
 });
 
 router.post('/getCardGames', urlencodedParser, function(req, res){
-
     db.getCardGames(function(err, result){
         if(err){
             console.log(err);
             res.send('ERROR');
         }else{
-            var cardGames = []; //used to send all card games
-            for(var entry in result){
-                var data = {'name': result[entry][keys.CGT_KEY_NAME],
+            let cardGames = []; //used to send all card games
+            for(let entry in result){
+                let data = {'name': result[entry][keys.CGT_KEY_NAME],
                             'language': result[entry][keys.CGT_KEY_LANGUAGE]};
                 cardGames.push(data);
             }
@@ -162,9 +158,9 @@ router.get('/exportCardGame', function(req, res){
 });
 
 router.post('/updateCardGame', urlencodedParser, function(req, res){
-    var update = req.body.update;
-    var cardGamePath = "./upload/" + req.body.csv;
-    if(update == 'yes'){
+    let update = req.body.update;
+    let cardGamePath = "./upload/" + req.body.csv;
+    if(update === 'yes'){
         console.log("overwrite data");
         importCSV.importFromCsv(cardGamePath, false);
         res.send('OK');
@@ -179,7 +175,7 @@ router.post('/updateCardGame', urlencodedParser, function(req, res){
  * Check if a card game (with csv format) already exists in the database
  *
  * @param {string} csvPath : path to the csv on the server
- * @param {callack} cardGameExistsCallback : used to return the answer (takes a boolean param and file content)
+ * @param {callback} cardGameExistsCallback : used to return the answer (takes a boolean param and file content)
  */
 function checkIfCardGameExists(csvPath, cardGameExistsCallback){
     console.log('checking if card game exists');
@@ -216,7 +212,7 @@ router.post('/importCardGame', function (req, res) {
             res.send('ERROR');
         }else{
             // Save file on the server
-            var file = req.file; // file content and metadata
+            let file = req.file; // file content and metadata
             var fileName = generateRandomCsvFileName();
             var dest = "./upload/" + fileName; // path to the file (uploaded files are saved on the upload folder)
             fs.writeFile(dest, file.buffer, function(err){
@@ -245,13 +241,12 @@ router.post('/importCardGame', function (req, res) {
 module.exports = router;
 
 // Test to change the language
-var config = {
+let config = {
     "lang": "en",
     "langFile": "./../../locale.json"
 };
 
 //init internationalization / localization class
-var i18n_module = require('i18n-nodejs');
-var i18n = new i18n_module(config.lang, config.langFile);
+let i18n = new i18n_module(config.lang, config.langFile);
 console.log(i18n.__('Salut'));
 
