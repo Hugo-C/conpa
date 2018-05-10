@@ -30,7 +30,7 @@ module.exports = class Game {
     }
 
     /**
-      * Return game server name
+      * Returns the game server name
       * @return {string} : game server name
       */
     getName(){
@@ -38,7 +38,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return game server capacity
+     * Returns the game server capacity
      * @return {integer} : number of players that can accept this game
      */
     getPlaces(){
@@ -46,7 +46,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return how many players are currently in the game
+     * Returns how many players are currently in the game
      * @return {integer} : number of players currently in the game
      */
     getNbPlayer(){
@@ -54,7 +54,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the name of the player who have created this server
+     * Returns the name of the player who have created this server
      * @return {string} : name of the game server's creator
      */
     getHost(){
@@ -70,9 +70,9 @@ module.exports = class Game {
     }
 
     /**
-     * Return the name of the animator
+     * Returns the name of the animator
      * @return {string} : if there is an animator : his name
-     *                    else : the empty string
+     *                    else : an empty string
      */
     getAnimatorPseudo(){
         if(this.host.isAnimator()){
@@ -83,7 +83,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the list of all players pseudo (only players, not animator)
+     * Returns the list of all players's pseudos (only players, not animator)
      */
     getPlayers(){
         let result = []; // used to store players pseudo
@@ -94,8 +94,8 @@ module.exports = class Game {
     }
 
     /**
-     * Return the list of all players pseudo (players + animator)
-     * @return {string list} : players pseudo currently in the game
+     * Return the list of all players's pseudos (players + animator)
+     * @return {string list} : players's pseudo currently in the game
      */
     getActivePlayers(){
         return this.activePlayers;
@@ -113,8 +113,8 @@ module.exports = class Game {
 
     /**
      * Return the question of all players in the game
-     * @return {object array} : list of all players question
-     *                          the result is an array of object which have the form :
+     * @return {object array} : list of all players's questions
+     *                          the result is an array of objects which have the form :
      *                          { 'player': player's pseudo, 'question': player's question }
      */
     getPlayersQuestion(){
@@ -160,7 +160,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the instance of Player which corresponding to the given pseudo
+     * Returns the instance of Player corresponding to the given pseudo
      * @param {string} pseudo : pseudo of the desired player
      * @return {Player} : instance of Player
      */
@@ -174,7 +174,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the id of this party in the historic table
+     * Returns the id of this party in the historic table
      * @return {number} : historic id of this party
      */
     getHistoricId(){
@@ -191,7 +191,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the pseudo of the player for whom it's the turn
+     * Returns the pseudo of the player of whom it's the turn
      * @return {string} : a player's pseudo
      */
     getCurrentPlayer(){
@@ -203,7 +203,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the pseudo of the player who will played to the next turn
+     * Returns the pseudo of the player who will play to the next turn
      * @return {string} : a player's pseudo
      */
     getNextPlayer(){
@@ -215,7 +215,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return true if the game use timers, return false if not
+     * Returns true if the game uses timers, returns false if not
      * @return {Boolean}
      */
     getUseTimers(){
@@ -223,7 +223,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the value of the global timer
+     * Returns the value of the global timer
      * @return {number}
      */
     getGlobalTimer(){
@@ -231,7 +231,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the value of the individual timer
+     * Retursn the value of the individual timer
      * @return {number}
      */
     getIndividualTimer(){
@@ -247,7 +247,7 @@ module.exports = class Game {
     }
 
     /**
-     * Return the delay between each productions sharing
+     * Returns the delay between each productions sharing
      * @return {number}
      */
     getSharingInterval(){
@@ -256,7 +256,7 @@ module.exports = class Game {
     }
 
     /**
-     * Update the question of a player
+     * Updates the question of a player
      * @param {string} pseudo : player's pseudo for which we want to update the question
      * @param {string} question : player's question
      */
@@ -278,8 +278,8 @@ module.exports = class Game {
     }
 
     /**
-     * Change the historic id of the party
-     * This function is called only one time when all players have defined their question
+     * Changes the historic id of the party
+     * This function is called only one time when all players have defined their questions
      * Indeed there is no reason for which this id can change during the game
      * @param {number} historicId : new id of the party in the historic table
      */
@@ -298,7 +298,7 @@ module.exports = class Game {
 
     /**
      * Check if the given player is recorded in this game server
-     * @param {string} playerPseudo : pseudo of the player that we searched
+     * @param {string} playerPseudo : pseudo of the player that we are searching for
      */
     isInServer(playerPseudo){
         return this.getPlayerNode(playerPseudo) != null;
@@ -312,7 +312,7 @@ module.exports = class Game {
     }
 
     /**
-     * Remove a player from this game server
+     * Removes a player from this game server
      * @param {Player} player : player to remove from this game server
      */
     removePlayer(player){
@@ -332,9 +332,9 @@ module.exports = class Game {
     }
 
     /**
-     * Return the number of players who have already defined their question
-     * (a question is considered as defined when this one is different than the empty string)
-     * @return {integer} : number of players who have already defined their question
+     * Returns the number of players who have already defined their questions
+     * (a question is considered as defined when this one is not an empty string)
+     * @return {integer} : number of players who have already defined their questions
      */
     nbPlayersReady(){
         let counter = 0;
@@ -346,11 +346,11 @@ module.exports = class Game {
         return counter;
     }
 
-    addPlayersToPartyHistoric(database){
+    addPlayersToPartyHistoric(){
         console.assert(this.partyHistoricId != null, "historic id is null !"); // party historic id should be not null
         for(let node = this.players.node; node; node = this.players.next(node)){
-            node.value.recordPlayer(database, this.partyHistoricId);
+            node.value.recordPlayer(this.partyHistoricId);
         }
-        if(this.host.isAnimator()) this.host.recordPlayer(database, this.partyHistoricId);
+        if(this.host.isAnimator()) this.host.recordPlayer(this.partyHistoricId);
     }
 };

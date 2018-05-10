@@ -6,7 +6,7 @@ const db = require('../js/db');
  * Import the cards of the family to the database
  *
  * @param {Array.<string, string>} records : The records of families to process
- * @param {string} family : The family name, used as key in the record
+ * @param {string} family : The family's name, used as key in the record
  * @param {int} familyId : The id of the family
  */
 function addCards(records, family, familyId) {
@@ -27,10 +27,10 @@ function addCards(records, family, familyId) {
 }
 
 /**
- * Import the family'name to the database then add it's cards
+ * Import the family's name to the database then add its cards
  *
  * @param {Array.<string, string>} records : The records of families to process
- * @param {string} family : The family name, used as key in the record
+ * @param {string} family : The family's name, used as key in the record
  * @param {int} cardGameId : The id of the card game
  * @param {callback} addCards : The function that will add the family's cards
  */
@@ -48,7 +48,7 @@ function addFamily(records, family, cardGameId, addCards) {
 }
 
 /**
- * Process all the families of the record by calling processFamily to each one
+ * Process all the families of the record by calling processFamily on each one
  *
  * @param {Array.<string, string>} records : The records of families to process
  * @param {int} cardGameId : The id of the card game

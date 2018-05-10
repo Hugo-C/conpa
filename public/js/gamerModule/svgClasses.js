@@ -1,4 +1,5 @@
 const STROKE_WIDTH = "4";
+const CORNER_DETECTION_MARGIN = 25;
 
 var myElements = []; // list all elements in the svg
 var myLinks = []; // list all links in the svg
@@ -184,6 +185,18 @@ class Rectangle {
    */
     isInside(x, y){
         return this.rect.inside(x, y);
+    }
+
+    /**
+     * Check if the coordinate are around the bottom right corner of the rectangle
+     * @param x {float} : x coordinate
+     * @param y {float} : y coordinate
+     * @return {boolean}
+     */
+    isAroundBottomRightCorner(x, y){
+        let x2 = this.getX() + this.getWidth();
+        let y2 = this.getY() + this.getHeight();
+        return Link.distance(x, y, x2, y2) <= CORNER_DETECTION_MARGIN;
     }
 
     /**

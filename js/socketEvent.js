@@ -2,19 +2,18 @@ const Player = require('./Player.js');
 const Game = require('./Game.js');
 const db = require('../js/db');
 
-const SVG_FILE = "../svg";
 const WAITING_PLAYERS = "waiting for players";
 const QUESTION_TIME = "question time";
 const GAME_TIME = "game time";
 
 
-var clients = {}; // keep a link between user's pseudo and socket's id
+var clients = {}; // keeps a link between user's pseudo and socket's id
 var rooms = {}; // list of available servers (rooms)
 
 /**
- * Return the pseudo associated with the given socket id
+ * Returns the pseudo associated with the given socket id
  *
- * @param {string} id : id associated with the pseudo searched
+ * @param {string} id : id associated with the pseudo we are searching for
  * @return {string} : pseudo associated with the given id
  */
 function getPseudoWithId(id){
@@ -24,8 +23,8 @@ function getPseudoWithId(id){
 }
 
 /**
- * Return an array in which is stored all servers informations
- * Use to display the list of servers on the client side
+ * Returns an array in which is stored all servers's informations
+ * Used to display the list of servers on the client side
  */
 function listAllServers(){
     data = []; // accumulator
@@ -41,7 +40,7 @@ function listAllServers(){
 }
 
 /**
- * Add a new entry in the party historic table
+ * Adds a new entry in the party historic table
  * @param {Game} gameServer : the game server to record
  */
 function recordGameServer(gameServer){
@@ -53,18 +52,18 @@ function recordGameServer(gameServer){
         }else{
             console.log(partyId);
             gameServer.setHistoricId(partyId);
-            gameServer.addPlayersToPartyHistoric(db);
+            gameServer.addPlayersToPartyHistoric();
         }
     });
 }
 
 /**
- * Add a new entry in the hasPlayedIn table
- * Used to keep a track of the player's production do in a party
+ * Adds a new entry in the hasPlayedIn table
+ * Used to keep a track of the player's production in a party
  *
  * @param {string} pseudo : player's pseudo
  * @param {number} partyHistoricId : id which represents the party in the party historic table
- * @param {string} production : a string which describe the svg production
+ * @param {string} production : a string which describes the svg production
  */
 function recordProduction(pseudo, partyHistoricId, production){
     console.log(production);
@@ -80,7 +79,7 @@ module.exports = function(io, socket){
     // -----------------------------------------------------------------------------
 
     /**
-     * Check if game server is full and launch the game if is it
+     * Checks if the game server is full and launch the game if it is
      *
      * @param {string} serverName : name of server which is concerned
      */
@@ -98,9 +97,9 @@ module.exports = function(io, socket){
     }
 
     /**
-     * Return the current state of the question time
+     * Returns the current state of the question time
      * - the number of players who have defined their questions
-     * - the questions of each players
+     * - the questions of each player
      */
     function getQuestionTimeState(server){
         return {'ready': server.nbPlayersReady(), 'playersQuestion': server.getPlayersQuestion()};
@@ -122,7 +121,7 @@ module.exports = function(io, socket){
     }
 
     /**
-     * Send a system message to all players of the game
+     * Sends a system message to all players of the game
      * A system message is used to send informations about
      * the current state of the game
      *
@@ -135,7 +134,7 @@ module.exports = function(io, socket){
     }
 
     /**
-     * Select the next player and start a new turn
+     * Selects the next player and start a new turn
      * @param {Game} gameServer : game server for which we want to start a new turn
      */
     function newTurn(gameServer){
@@ -165,10 +164,10 @@ module.exports = function(io, socket){
 
     /**
      * This function is used to manage unexpected disconnections
-     * When the server loose the connection with a player in the given game server,
-     * he is add to a list of inactive players.
-     * The player has then a short delay to reconnect his self
-     * If the player don't reconnect his self, he is removed from the game
+     * When the server looses the connection with a player in the given game server,
+     * he is added to a list of inactive players.
+     * Then, the player has a short delay to log in again
+     * If the player don't reconnect, he is removed from the game
      *
      * @param {Game} server : the game server for which this function works
      */
@@ -226,7 +225,7 @@ module.exports = function(io, socket){
 
     /**
      * Process pseudo message
-     * Adds a new player in the clients dictionnary and
+     * Adds a new player in the clients dictionnaries and
      * sends to him the list of available servers
      *
      * form of received data : { 'pseudo': value }
@@ -273,7 +272,7 @@ module.exports = function(io, socket){
             socket.room = data["server"]["name"];
             socket.join(socket.room);
 
-            socket.emit('serverCreated', {'error': false, 'msg': null}); // informs the creator that server has been created successfully
+            socket.emit('serverCreated', {'error': false, 'msg': null}); // informs the creator that the server has been created successfully
             io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
             startGameOnServerFull(server.getName()); // try to start the game
             server.inactivePlayerManager = setInterval(inactivePlayerManager, 10000, server);
@@ -284,14 +283,14 @@ module.exports = function(io, socket){
 
     /**
      * Process "removeServer" message
-     * Players send this message when they want to remove a server they are created
-     * When this message is received, we remove from the server the given game server
+     * Players sends their messages when they want to remove a server they have created
+     * When this message is received, we remove  the given game server from the server
      *
      * form of received data : {'server': server's name}
      */
     socket.on('removeServer', function(data){
         let server = rooms[data["server"]];
-        // A player can only remove his own server if the game has not started
+        // A player can only remove his own server if the game hasn't started
         if(server != null && server.getStatus() === WAITING_PLAYERS
         && server.getHost().getPseudo() === getPseudoWithId(socket.id)){
             console.log('==> Removing game server : ' + server.getName());
@@ -311,7 +310,7 @@ module.exports = function(io, socket){
      * Process joinServer message
      * - Creates a new player (player who wants to join the server)
      *   If the player is already in a server, he is automatically removed form his server
-     *   before to be added in the new one
+     *   before being added in the new one
      * - Sends to all players the new list of available servers
      * - launch the game if the server is full
      *
@@ -351,7 +350,7 @@ module.exports = function(io, socket){
 
     /**
      * Process "exitServer" message
-     * Players send this message when they want to leave a game server
+     * Players sends this message when they want to leave a game server
      * This message can only be send if the game has not started
      */
     socket.on('exitServer', function(data){
@@ -366,7 +365,7 @@ module.exports = function(io, socket){
 
     /**
      * Process joinGame message
-     * Players send this message automatically when the game starts
+     * Players sends this message automatically when the game starts
      * This message allow the (main) server to know in which room are all players
      *
      * form of received data : {'server': [name of the game server in which player is],
@@ -404,10 +403,10 @@ module.exports = function(io, socket){
 
     /**
      * Process "recordMyQuestion" message
-     * Players send this message when they are defined their question
+     * Players sends this message when they have defined their question
      * When this message is received :
      * - we send to all players the question of the player
-     * - if all players have defined their question, we starts the game
+     * - if all players have defined their questions, we starts the game
      *
      * form of received data : {'question': player's question}
      */
@@ -425,10 +424,10 @@ module.exports = function(io, socket){
 
     /**
      * Process "animatorValidation" message
-     * Animator sends this message when all players have defined their question
+     * Animator sends this message when all players have defined their questions
      * When this message is received, we can start the game
      *
-     * form of received data : no data are send with this message (null)
+     * form of received datas : no data are send with this message (null)
      */
     socket.on('animatorValidation', function(data){
         console.log('--> ' + socket.room + ' : received animator validation');
@@ -446,10 +445,10 @@ module.exports = function(io, socket){
     /**
      * Process tchat message on server side
      * Redirects message to the good receivers
-     * If destination equals 'all', message is sends to all players of the sender's room
+     * If the destination equals 'all', message is sends to all players of the sender's room
      * else message is sends to the specified receiver
      *
-     * form of received data : {'dest': ["all" or receiver's pseudo],
+     * form of received datas : {'dest': ["all" or receiver's pseudo],
      *                          'msg': [message body]}
      */
     socket.on('message', function(data){
@@ -466,7 +465,7 @@ module.exports = function(io, socket){
     /**
      * Process "cardPicked" message on server side
      * This message is send by client when a player has picked a new card
-     * When we received this message, we send the card picked by the player to other players
+     * When we receives this message, we send the card picked by the player to other players
      *
      * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
      */
@@ -488,10 +487,10 @@ module.exports = function(io, socket){
 
     /**
      * Process "processStopGame" message on server side
-     * This message is send by client when a player wants to stop the game
+     * This message is sent by client when a player wants to stop the game
      * When this message is received, we ask to all players if they agree with it
      *
-     * form of received data : no data are send with this message (null)
+     * form of received datas : no datas are sent with this message (null)
      */
     socket.on('processStopGame', function(data){
         console.log('--> ' + getPseudoWithId(socket.id) + ' started a stop game process');
@@ -507,7 +506,7 @@ module.exports = function(io, socket){
 
     /**
      * Process "stopGame" message on server side
-     * This message is send by client to answer at the "stopGame?" message
+     * This message is sent by client to answer at the "stopGame?" message
      *
      * form of received data : {'exit': player's answer (true if he wants to stop, else false)}
      */
@@ -518,10 +517,10 @@ module.exports = function(io, socket){
             server.exitBuffer.push(getPseudoWithId(socket.id));
             if(server.exitBuffer.length === server.getNbPlayer()){ // all players have accepted to stop the game
                 io.sockets.in(server.getName()).emit('gameEnd', null);
-            }else{  // another player have accepted to stop the game
+            }else{  // another player has accepted to stop the game
                 io.to(server.getName()).emit('refreshExitPanel', server.exitBuffer);
             }
-        }else{ // a player have refused to stop  the game
+        }else{ // a player has refused to stop  the game
             io.to(server.getName()).emit('stopGameProcessAborted', null);
             server.exitBuffer = [];
         }
@@ -529,8 +528,8 @@ module.exports = function(io, socket){
 
     /**
      * Process quitGame message
-     * - Inform server that the player has leaved the game server
-     * - Remove the player from the game server
+     * - Informs server that the player has leaved the game server
+     * - Removes the player from the game server
      * - Sends the actualized list of players to the game server players
      * - Sends to all players the actualized list of servers
      *

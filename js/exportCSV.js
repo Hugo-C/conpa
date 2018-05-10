@@ -8,8 +8,8 @@ const CARDS_HEADER = 1;
 const CARD = 2;
 
 /**
- * Generate random name for uploaded csv file
- * Used to face file conflict between users
+ * Generates random names for uploaded csv file
+ * Used to face file conflicts between users
  *
  * @return {string} : random file name with csv extension
  */
@@ -18,15 +18,15 @@ function generateRandomCsvFileName(){
 }
 
 /**
- * Write records into csv file
+ * Writes records into csv file
  *
  * @param {object array} records : data to write in csv file
  * @param {boolean array} familiesExport : current state of the families cards recovery
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  */
 function finalizeWriting(records, familiesExport, onFileReady){
     for(let task = 0; task < familiesExport.length; task++){
-        if(!familiesExport[task]) return; // if all families cards have not been recovered, not write data
+        if(!familiesExport[task]) return; // if all cards's families  have not been recovered, do not writes datas
     }
 
     let csvFileName = generateRandomCsvFileName();
@@ -60,18 +60,18 @@ function writeIntoColumn(records, familyNb, object, content){
     switch (object) {
         case CARD:
             let line = CARD + content["cardNumber"];
-            if(records.length === line){ // no data have been written on this line, we add new one
+            if(records.length === line){ // no data have been written on this line, we add a new one
                 records.push({[family]: content["content"],
                               [infoFamily]: content["information"]});
-            }else{ // we add data on the line
+            }else{ // we the add data on the line
                 records[line][family] = content["content"];
                 records[line][infoFamily] = content["information"];
             }
             break;
-        default: // no data have been written on this line, we add new one
+        default: // no data have been written on this line, we add a new one
             if(records.length < object + 1){
                 records.push({[family]: content});
-            }else{ // we add data on the line
+            }else{ // we add the data on the line
                 records[object][family] = content;
             }
             break;
@@ -79,14 +79,14 @@ function writeIntoColumn(records, familyNb, object, content){
 }
 
 /**
- * Add cards of a game family as data to be written in the csv
+ * Add cards of a game family as datas to be written in the csv
  *
  * @param {error} err : error returned by sql query if this one has failed
- * @param {object array} records : array of data to write in the csv file
+ * @param {object array} records : array of datas to write in the csv file
  * @param {object array} rows : cards to add in the records array
  * @param {integer} column : csv column of the cards family [0-4]
- * @param {boolean array} familiesExport : current state of the families cards recovery
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {boolean array} familiesExport : current state of the families's cards recovery
+ * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  */
 function processFamilyCards(err, records, rows, column, familiesExport, onFileReady){
     if(err){
@@ -108,11 +108,11 @@ function processFamilyCards(err, records, rows, column, familiesExport, onFileRe
  * Retrieves cards of a card game family and call processFamilyCards function to process data
  *
  * @param {unsigned integer} familyId : id of the family for which we want to retrieve cards
- * @param {object array} records : array of data to write in the csv file
+ * @param {object array} records : array of datas to write in the csv file
  * @param {callback} processFamilyCards : function called to process retrieved data
  * @param {integer} destColumn : csv column of the cards family [0-4]
  * @param {boolean array} familiesExport : current state of the families cards recovery
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  */
 function recoverFamilyCards(familyId, records, processFamilyCards, destColumn, familiesExport, onFileReady){
     db.getFamilyCards(familyId, function(err, result){
@@ -125,9 +125,9 @@ function recoverFamilyCards(familyId, records, processFamilyCards, destColumn, f
  * Add card game families as data to be written in the csv
  *
  * @param {error} err : error returned by sql query if this one has failed
- * @param {object array} records : array of data to write in the csv file
+ * @param {object array} records : array of datsa to write in the csv file
  * @param {object array} rows : cards to add in the records array
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  *
  */
 function processFamilies(err, records, rows, onFileReady){
@@ -147,7 +147,7 @@ function processFamilies(err, records, rows, onFileReady){
  * Retrieves families of a card game and call processFamilies function to process data
  *
  * @param {unsigned integer} cardGameId : id of the card game for which we want to retrieve families
- * @param {object array} records : array of data to write in the csv file
+ * @param {object array} records : array of datas to write in the csv file
  * @param {callback} processFamilies : function called to process retrieved data
  * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
  */
@@ -183,7 +183,7 @@ function processCardGame(err, records, rows, onFileReady){
  * @param {string} language : language of card game we want to retrieve
  * @param {object array} records : array of data to write in the csv file
  * @param {callback} processCardGame : function called to process retrieved data
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  */
 function recoverCardGame(cardGame, language, records, processCardGame, onFileReady){
     db.getCardGame(cardGame, language, function(err, result){
@@ -197,7 +197,7 @@ function recoverCardGame(cardGame, language, records, processCardGame, onFileRea
  *
  * @param {string} cardGame : name of card game we want to export
  * @param {string} language : language of card game we want to export
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
+ * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  */
 exports.exportToCSV = function(cardGame, language, onFileReady){
     let records = []; // array used to store retrieved data before to be write into csv file

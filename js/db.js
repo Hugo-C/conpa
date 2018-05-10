@@ -394,11 +394,11 @@ exports.getEmail = function(pseudo, callback){
  * @param {callback} callback : function called to return the pseudo and the hashed token
  */
 let setToken = function(pseudo, token, callback){
-    // create a new date with the current date and add the expiration delay
+    // create a new date coresponding to the current day and add the expiration delay
     let expirationDate = new Date();
     if(token !== null)
         expirationDate.setDate(expirationDate.getDate() + TOKEN_EXPIRATION_DELAY);
-    expirationDate = db.toMysqlDatetime(expirationDate);
+    expirationDate = toMysqlDatetime(expirationDate);
 
     let sql = 'UPDATE ' + keys.USER_TABLE +
         ' SET ' + keys.UT_KEY_TOKEN + ' = ?, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = ?' +
@@ -430,7 +430,7 @@ exports.generateToken = function(pseudo, callback) {
 };
 
 /**
- * Clear the token to the given player
+ * Clear the token of the given player
  *
  * @param {string} pseudo : pseudo of the player for which we want to clear the token
  * @param {callback} callback : function called when the token has been set
@@ -477,7 +477,7 @@ exports.isValidToken = function(token, callback){
 };
 
 /**
- * Function used to connect a player (we move his status flag to 1)
+ * Function used to connect a player (we switch his status flag to 1)
  *
  * @param {string} pseudo : pseudo of the player that we want to be connected
  * @param {callback} callback : function used to return errors
@@ -494,9 +494,9 @@ exports.connectUser = function(pseudo, callback){
 };
 
 /**
- * Function used to disconnect a player (we move his status flag to 0)
+ * Function used to disconnect a player (we switch his status flag to 0)
  *
- * @param {string} pseudo : pseudo of the player that we want to disconnect
+ * @param {string} pseudo : pseudo of the player we want to disconnect
  * @param {callback} callback : function used to return errors
  */
 exports.disconnectUser = function(pseudo, callback){
@@ -513,7 +513,7 @@ exports.disconnectUser = function(pseudo, callback){
 /**
  * Record a new party in the historic of parties
  *
- * @param {string} server : server's name of the party
+ * @param {string} server : server's party name
  * @param {string} animator : name of the party's animator
  * (contains the string "no animator" if there has not had an animator in this party)
  * @param {Date} date : date at which the party has been played
@@ -550,7 +550,7 @@ exports.linkPlayerAndParty = function(pseudo, party, question, callback){
 };
 
 /**
- * Remove an entry in the table hasPlayedIn
+ * Remove an entry in the table 'hasPlayedIn'
  *
  * @param {string} pseudo : pseudo of the player who wants to remove an entry of his historic
  * @param {string} party : name of the party for which concerned by the process
@@ -687,6 +687,7 @@ exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
  * @param {Date} date : the date we want to convert
  * @returns {string}
  */
-exports.toMysqlDatetime = function(date){
+function toMysqlDatetime(date){
     return date.toISOString().substring(0, 19).replace('T', ' '); // convert js Date to mysql DATETIME
-};
+}
+exports.toMysqlDatetime =toMysqlDatetime;
