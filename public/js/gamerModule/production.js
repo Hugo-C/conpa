@@ -33,6 +33,7 @@ class Production {
         // Rectangle manipulation variables
         this.rectCreate = false;
         this.creatingRect = null;
+        this.resizingRect = null;
         this.lastSelectedItem = null;
         this.selectedItem = null;
         this.selectedLink = null;
@@ -151,6 +152,8 @@ class Production {
                     self.dx = coord.x - self.selectedItem.getX();
                     self.dy = coord.y - self.selectedItem.getY();
                 }
+            }else if(document.body.style.cursor === 'se-resize'){
+                self.resizingRect = true;
             }
         };
 
@@ -167,6 +170,22 @@ class Production {
                 self.selectedItem.setX(coord.x - self.dx);
                 self.selectedItem.setY(coord.y - self.dy);
                 self.selectedItem.refreshAttachedLinks();
+            }else if (self.resizingRect){
+                let rectX = self.selectedItem.getX();
+                let rectY = self.selectedItem.getY();
+                if(coord.x >= rectX && coord.y >= rectY){
+                    self.selectedItem.setWidth(coord.x - rectX);  // Demander s'il faut ajouter une limite ? Si oui, laquelle ?
+                    self.selectedItem.setHeight(coord.y - rectY);  //probleme adaptation du texte && curseur ne veut pas changer sur texte
+                }
+                self.selectedItem.refreshAttachedLinks();
+            }
+            else if(self.selectedItem != null){
+                if (self.selectedItem.isAroundBottomRightCorner(coord.x, coord.y) && !($('#moveElement').hasClass('selected'))){
+                    document.body.style.cursor = 'se-resize';
+                }
+                else{
+                    document.body.style.cursor = 'default';
+                }
             }
         };
 
@@ -175,11 +194,14 @@ class Production {
                 self.creatingRect.addTextArea();
                 self.rectCreate = false;
                 self.creatingRect = null;
-            }else if(self.move){
+            } else if(self.move){
                 self.move = false;
                 doPanning = true;  // the panning is reestablished
                 self.dx = null;
                 self.dy = null;
+            } else if (self.resizingRect){
+                self.resizingRect = false;
+                document.body.style.cursor = 'default';
             }
         };
 
