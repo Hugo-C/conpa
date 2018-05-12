@@ -28,8 +28,8 @@ class Rectangle {
     }
 
     /**
-   * Associate a textarea with the rectangle
-   */
+     * Associate a textarea with the rectangle
+     */
     addTextArea(){
         let group = this.prod.master.group(); // use to "bind" the rectangle and the textArea
 
@@ -115,6 +115,7 @@ class Rectangle {
         this.rect.attr('x', x);
         if(this.text != null)
             this.text.setAttribute('x', x);
+        this.refreshAttachedLinks();
     }
 
     /**
@@ -125,6 +126,7 @@ class Rectangle {
         this.rect.attr('y', y);
         if(this.text != null)
             this.text.setAttribute('y', y);
+        this.refreshAttachedLinks();
     }
 
     /**
@@ -133,6 +135,9 @@ class Rectangle {
    */
     setHeight(height){
         this.rect.attr('height', height);
+        if(this.text != null)
+            this.text.setAttribute('height', this.rect.attr('height'));
+        this.refreshAttachedLinks();
     }
 
     /**
@@ -141,6 +146,9 @@ class Rectangle {
    */
     setWidth(width){
         this.rect.attr('width', width);
+        if(this.text != null)
+            this.text.setAttribute('width', this.rect.attr('width'));
+        this.refreshAttachedLinks();
     }
 
     /**

@@ -33,7 +33,7 @@ class Production {
         // Rectangle manipulation variables
         this.rectCreate = false;
         this.creatingRect = null;
-        this.resizingRect = null;
+        this.resizingRect = false;
         this.lastSelectedItem = null;
         this.selectedItem = null;
         this.selectedLink = null;
@@ -169,7 +169,6 @@ class Production {
             }else if(self.move){
                 self.selectedItem.setX(coord.x - self.dx);
                 self.selectedItem.setY(coord.y - self.dy);
-                self.selectedItem.refreshAttachedLinks();
             }else if (self.resizingRect){
                 let rectX = self.selectedItem.getX();
                 let rectY = self.selectedItem.getY();
@@ -177,7 +176,6 @@ class Production {
                     self.selectedItem.setWidth(coord.x - rectX);  // Demander s'il faut ajouter une limite ? Si oui, laquelle ?
                     self.selectedItem.setHeight(coord.y - rectY);  //probleme adaptation du texte && curseur ne veut pas changer sur texte
                 }
-                self.selectedItem.refreshAttachedLinks();
             }
             else if(self.selectedItem != null){
                 if (self.selectedItem.isAroundBottomRightCorner(coord.x, coord.y) && !($('#moveElement').hasClass('selected'))){
