@@ -1,78 +1,78 @@
 div#gameTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-sm-12")
   div(class="tabContent active col-lg-12 col-md-12 col-sm-12")
     div(class="header rowFlexContainer row")
-      h3(class="col-lg-12 col-md-12 col-sm-12") Server list
+      h3(data-i18n="gameTabTitle" class="col-lg-12 col-md-12 col-sm-12")
     div(class="body row")
       div(class="col-lg-12 col-md-12 col-sm-12")
         table#serverList(class="col-lg-12 col-md-12 col-sm-12")
           thead
             tr
-              th Server name
-              th Host
-              th Animator
-              th Players
-              th Status
+              th(data-i18n="gameServerName")
+              th(data-i18n="gameServerHost")
+              th(data-i18n="gameServerAnimator")
+              th(data-i18n="gameServerPlayers")
+              th(data-i18n="gameServerStatus")
           tbody
     div(class="formBottomStyle bottom row")
       div(class="centeredItems col-lg-offset-1 col-lg-6 col-md-offset-1 col-md-6 col-sm-offset-1 col-sm-6")
         span#serverMsg
       div(class="rowFlexContainer col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
-        button#create(class="switch myCustomButton col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4") Create
-        button#join(class="myCustomButton col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4") Join
+        button#create(data-i18n="createGameServer" class="switch myCustomButton col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
+        button#join(data-i18n="joinGameServer" class="myCustomButton col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
   
   div(class="serverManager col-lg-12 col-md-12 col-sm-12")
     div(class="header rowFlexContainer row")
-      h3(class="col-lg-12 col-md-12 col-sm-12") Game Server Manager
+      h3(data-i18n="gameServerManagerTitle" class="col-lg-12 col-md-12 col-sm-12")
     div(class="body row")
       div(class="settingClass col-lg-12 col-md-12 col-sm-12")
-        span(class="col-lg-5 col-md-5 col-sm-5") Basic settings
+        span(data-i18n="gameServerManagerBasicSettings" class="col-lg-5 col-md-5 col-sm-5")
         span(class="errorBasicSettings col-lg-7 col-md-7 col-sm-7")
       div(class="col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-2 col-md-2 col-sm-2") Name
+        label(data-i18n="gsmNameField" class="col-lg-2 col-md-2 col-sm-2")
         input#name(type="text" class="myCustomInput col-lg-3 col-md-3 col-sm-3")
-        label(class="col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4") Number of players
+        label(data-i18n="gsmPlacesField" class="col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
         input#places(type="number" value=1 min=1 class="myCustomInput col-lg-2 col-md-2 col-sm-2")
       div(class="col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-offset-6 col-lg-4 col-md-offset-6 col-md-4 col-sm-offset-6 col-sm-4") Select your role
+        label(data-i18n="gsmRoleField" class="col-lg-offset-6 col-lg-4 col-md-offset-6 col-md-4 col-sm-offset-6 col-sm-4")
         input#role(type="button" value="player" class="myCustomInput col-lg-2 col-md-2 col-sm-2")
       div(class="settingClass col-lg-12 col-md-12 col-sm-12")
-        span(class="col-lg-5 col-md-5 col-sm-5") Card game
+        span(data-i18n="gameServerManagerCardgameSettings" class="col-lg-5 col-md-5 col-sm-5")
         span(class="errorCardGame col-lg-7 col-md-7 col-sm-7")
       div(class="col-lg-12 col-md-12 col-sm-12")
         table#cardgames(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10")
           thead
             tr
-              th(class="col-lg-2 col-md-2 col-sm-2") Name
-              th(class="col-lg-2 col-md-2 col-sm-2") Language
+              th(data-i18n="gsmCardgameNameField" class="col-lg-2 col-md-2 col-sm-2")
+              th(data-i18n="gsmCardgameLanguageField" class="col-lg-2 col-md-2 col-sm-2")
           tbody
       div(class="settingClass col-lg-12 col-md-12 col-sm-12")
-        span(class="col-lg-5 col-md-5 col-sm-5") Timers settings
+        span(data-i18n="gameServerManagerTimersSettings" class="col-lg-5 col-md-5 col-sm-5")
         span(class="errorTimersSettings col-lg-7 col-md-7 col-sm-7")
       div(class="col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-4 col-md-4 col-sm-4") Activate timers ?
+        label(data-i18n="gsmActivateTimersOption" class="col-lg-4 col-md-4 col-sm-4")
         input#timers(type="button" value="no" class="myCustomInput col-lg-2 col-md-2 col-sm-2")
       div(class="timersOption col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-4 col-md-4 col-sm-4") Global Timer
+        label(data-i18n="gsmGlobalTimerField" class="col-lg-4 col-md-4 col-sm-4")
         input#globalTimer(type="number" value=0 min=0 class="myCustomInput col-lg-2 col-md-2 col-sm-2")
       div(class="timersOption col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-4 col-md-4 col-sm-4") Individual Timer
+        label(data-i18n="gsmIndividualTimerField" class="col-lg-4 col-md-4 col-sm-4")
         input#indivTimer(type="number" value=0 min=0 class="myCustomInput col-lg-2 col-md-2 col-sm-2")
       div(class="timersOption col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-4 col-md-4 col-sm-4") Appropriation time
+        label(data-i18n="gsmAppropriationTimeField" class="col-lg-4 col-md-4 col-sm-4")
         input#appropriation(type="number" value=0 min=0 class="myCustomInput col-lg-2 col-md-2 col-sm-2")
       div(class="settingClass col-lg-12 col-md-12 col-sm-12")
-        span(class="col-lg-5 col-md-5 col-sm-5") Advanced settings
+        span(data-i18n="gameServerManagerAdvancedSettings" class="col-lg-5 col-md-5 col-sm-5")
         span(class="error_advanced col-lg-7 col-md-7 col-sm-7")
       div(class="col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-8 col-md-8 col-sm-8") Allow the game to force the end of a turn ?
+        label(data-i18n="gsmForceEndOfTurn" class="col-lg-8 col-md-8 col-sm-8")
         input#forceTurn(type="button" value="no" class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2")
       div(class="forceTurnOption col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-8 col-md-8 col-sm-8") End of a turn after individual timer time multiplied by
+        label(data-i18n="gsmEndOfTurnField" class="col-lg-8 col-md-8 col-sm-8")
         input#forcingTime(type="number" value=2 min=2 class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2")
       div(class="col-lg-12 col-md-12 col-sm-12")
-        label(class="col-lg-8 col-md-8 col-sm-8") Share production each 'X' seconds
+        label(data-i18n="gsmSharingProductionField" class="col-lg-8 col-md-8 col-sm-8")
         input#prodSharing(type="number" value=15 min=5 class="myCustomInput col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2")
     div(class="formBottomStyle bottom row")
       div(class="rowFlexContainer col-lg-offset-6 col-lg-5 col-md-offset-6 col-md-5 col-sm-offset-6 col-sm-5")
-        button#cancel(class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5") Cancel
-        button#validate(class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5") Validate
+        button#cancel(data-i18n="gsmCancel" class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
+        button#validate(data-i18n="gsmValidate" class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")

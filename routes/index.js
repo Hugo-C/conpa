@@ -13,7 +13,6 @@ const exportCSV = require('../js/exportCSV');
 const importCSV = require('../js/importCSV');
 const parse = require('csv-parse/lib/sync');
 const fs = require('fs');
-const i18n_module = require('i18n-nodejs');
 
 router.get('/', function (req, res) {
     res.render('mainWebSitePage');
@@ -239,14 +238,3 @@ router.post('/importCardGame', function (req, res) {
 });
 
 module.exports = router;
-
-// Test to change the language
-let config = {
-    "lang": "en",
-    "langFile": "./../../locale.json"
-};
-
-//init internationalization / localization class
-let i18n = new i18n_module(config.lang, config.langFile);
-console.log(i18n.__('Salut'));
-

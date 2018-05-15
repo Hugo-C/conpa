@@ -101,7 +101,7 @@ $("#leaveAlone").on("click", function(){
 $("#stopGame").on("click", function(){
     socket.emit('processStopGame', null);
     actualizeBorderColor(sessionStorage.pseudo);
-    $('#exitMessage').text('Waiting for other players');
+    $('#exitMessage').text($.i18n("waitingPlayers"));
 });
 
 /**
@@ -110,7 +110,7 @@ $("#stopGame").on("click", function(){
  */
 $("#validateExit").on("click", function(){
     socket.emit('stopGame', {'exit': true}); // sends our answer to the server
-    $('#exitMessage').text('Waiting for other players');
+    $('#exitMessage').text($.i18n("waitingPlayers"));
 });
 
 /**
@@ -135,7 +135,7 @@ $("#cancelExit").on("click", function(){
  * form of received data (playersWhoWantStop) : list of players who want to stop the game
  */
 socket.on('stopGame?', function(playersWhoWantStop){
-    $('#exitPanelTitle').text(playersWhoWantStop[0] + ' wants to stop game, agree ?');
+    $('#exitPanelTitle').text(playersWhoWantStop[0] + $.i18n("stopGame?"));
     // hide "leaveAlone", "stopGame" and "closeExitPanel" buttons
     // When a "Stop Game Processus" is started, we need only the buttons used to answer
     $('#leaveAlone').css('display', 'none');
@@ -169,8 +169,8 @@ socket.on('refreshExitPanel', function(playersWhoWantStop){
  * form of received data : no data is send with this message !
  */
 socket.on('stopGameProcessAborted', function(){
-    $('#exitMessage').text('The game will not be stopped because more than one player wants to continue');
-    $('#exitPanelTitle').text('Exit the game ?');
+    $('#exitMessage').text($.i18n("stopGameProcessAborted?"));
+    $('#exitPanelTitle').text($.i18n("exitGame?"));
     // We are not in a "Stop Game Processus", we display the basic buttons
     $('#leaveAlone').css('display', 'block');
     $('#stopGame').css('display', 'block');

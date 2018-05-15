@@ -44,14 +44,14 @@ function processRegisterAnswer(response){
     removeAllAlerts();
     switch (response) {
         case 'DUP_PSEUDO':
-            $('.error_username').text('pseudo not available');
+            $('.error_username').text($.i18n("pseudoAlert"));
             break;
         case 'DUP_EMAIL':
-            $('.error_email').text('email already used');
+            $('.error_email').text($.i18n("emailAlert"));
             break;
         case 'OK':
             $('.register .linkform').click(); // redirection to the login form
-            alert('registration successful');
+            alert($.i18n("registrationSuccessful"));
             break;
     }
 }
@@ -90,13 +90,13 @@ function processLoginAnswer(response){
     removeAllAlerts();
     switch (response) {
         case 'NO_ACCOUNT':
-            $('.error_login').text('No account');
+            $('.error_login').text($.i18n("noAccountAlert"));
             break;
         case 'MISMATCH':
-            $('.error_login').text('pseudo / password mismatched');
+            $('.error_login').text($.i18n("loginAlert"));
             break;
         case 'ALREADY_CONNECT':
-            $('.error_login').text('You are already connected');
+            $('.error_login').text($.i18n("alreadyConnectedAlert"));
             break;
         case 'OK':
             sessionStorage.pseudo = login_username.val();
@@ -143,7 +143,7 @@ $('input[value="Send reminder"]').on('click', function(){
             console.log("Request Failed, try reloading the page to reset your password");
         },
         success: function(){
-            alert("check your mail box !");
+            alert($.i18n("checkMailBox"));
         }
     });
 });

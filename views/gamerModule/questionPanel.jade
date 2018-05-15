@@ -1,7 +1,7 @@
 div#questionPanel(class="col-lg-12 col-md-12 col-sm-12")
   div(class="rowFlexContainer row")
     div(class="rowFlexContainer stretchedImage col-lg-6 col-md-6 col-sm-6")
-      span(class="myCustomTitle") Choose your question
+      span(data-i18n="questionPanelTitle" class="myCustomTitle")
   div(class="rowFlexContainer stretchedImage row")
     div#playersQuestion(class="col-lg-12 col-md-12 col-sm-12")
     div#guide(class="col-lg-6 col-md-6 col-sm-6")
@@ -21,8 +21,8 @@ div#questionPanel(class="col-lg-12 col-md-12 col-sm-12")
         button#projector(class="col-lg-offset-9 col-lg-1 col-md-offset-9 col-md-1 col-sm-offset-9 col-sm-1")
       div(class="col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2")
         div(class="row")
-          button#validate(class="col-lg-6 col-md-6 col-sm-6") VALIDATE
+          button#validate(data-i18n="validateQuestion" class="col-lg-6 col-md-6 col-sm-6")
         div(class="rowFlexContainer row")
           span#nbReady(class="col-lg-6 col-md-6 col-sm-6")
-          span(class="col-lg-6 col-md-6 col-sm-6") READY
+          span(data-i18n="readyLabel" class="col-lg-6 col-md-6 col-sm-6")
         

@@ -1,4 +1,3 @@
-const ERR_MESSAGE_NO_MORE_CARDS = "ERREUR : il n'y a pas assez de carte, merci de repiocher";
 const LOGO_DIRECTORY = "img/gamerModule/cardGameLogos/";
 
 var cards = {};  // all cards from the deck
@@ -30,7 +29,7 @@ function displayNewCard(family){
         family = familiesId[family % familiesId.length];
     }
     if(cards[family] === undefined || cards[family]['cards'].length === 0){
-        cardTextNode.nodeValue = ERR_MESSAGE_NO_MORE_CARDS;
+        cardTextNode.nodeValue = $.i18n("noMoreCards");
         return false;
     } else {
         let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];

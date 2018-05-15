@@ -2,13 +2,12 @@ div#productionPanel(class="basicContainer col-lg-12 col-md-12 col-sm-12")
   div(class="basicContainer col-lg-1 col-md-1 col-sm-1 col-xs-1")
     div(class="row")
       div(class="basicContainer centeredItems selectedProduction")
-        span(class="playerOnly") My production
-        span(class="animatorOnly") Mosaic
+        span(data-i18n="myProductionAccess" class="playerOnly") My production
+        span(data-i18n="mosaicAccess" class="animatorOnly") Mosaic
     div(class="row playerOnly")
       button#setPrivacy(value="private" class="basicContainer stretchedImage col-lg-12 col-md-12 col-sm-12")
     div(class="rowFlexContainer row")
-      p(class="playerOnly col-lg-12 col-md-12 col-sm-12") Players production
-      p(class="animatorOnly col-lg-12 col-md-12 col-sm-12") Players production
+      p(data-i18n="playersProductionAccess" class="col-lg-12 col-md-12 col-sm-12") Players production
     div#productionList(class="row")
   div(class="basicContainer col-lg-11 col-md-11 col-sm-11 col-xs-11")
     button#displayList(class="basicContainer")

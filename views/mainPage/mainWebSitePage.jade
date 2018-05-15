@@ -23,7 +23,7 @@ html
                 img#profilePicture(src="/img/gamerModule/defaultProfileImage.jpg" class="stretchedImage col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10")
             div(class="userInfos col-lg-7 col-md-7 col-sm-7")
               div(style="height: 25%" class="row")
-                span#pseudoLabel(class="myCustomTitle col-lg-12 col-md-12 col-sm-12") Pseudo
+                span#pseudoLabel(data-i18n="pseudoLabel" class="myCustomTitle col-lg-12 col-md-12 col-sm-12")
               div(style="height: 25%" class="row")
                 span#pseudo(class="col-lg-12 col-md-12 col-sm-12")
               div(style="height: 40%" class="row")
@@ -41,10 +41,10 @@ html
             div(style="height:100%" class="rightPath col-lg-3 col-md-3 col-sm-3")
           div(class="header4 row")
             section(class="tabContainer col-lg-12 col-md-12 col-sm-12")
-              div#Account(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#01B90D") Account
-              div#Editor(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#EFD700") Editor
-              div#Historic(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#035EFB") Historic
-              div#Game(class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#CB1D1D") Game
+              div#Account(data-i18n="accountTab" class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#01B90D")
+              div#Editor(data-i18n="editorTab" class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#EFD700")
+              div#Historic(data-i18n="historicTab" class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#035EFB")
+              div#Game(data-i18n="gameTab" class="tab rowFlexContainer myCustomTitle col-lg-3 col-md-3 col-sm-3" style="color:#CB1D1D")
       div(class="pageContent rowFlexContainer row")
         include gameTab.jade
         include historicTab.jade
@@ -52,6 +52,14 @@ html
             
   script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
   script(src="//code.jquery.com/jquery.min.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.messagestore.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.fallbacks.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.language.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.parser.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.emitter.js")
+  script(src="/bower/jquery.i18n/src/jquery.i18n.emitter.bidi.js")
+  script(src="/js/mainPage/mainPageStaticTexts.js")
   script(src="/scripts/socket.io-client/dist/socket.io.js")
   script(src="/bower/js-md5/src/md5.js")
   script(src="/js/pagePrivileges.js")

@@ -1,82 +1,56 @@
 const Player = require('./Player.js');
 const Game = require('./Game.js');
 const db = require('../js/db');
+const i18n_module = require('i18n-nodejs');
 
-const WAITING_PLAYERS = "waiting for players";
-const QUESTION_TIME = "question time";
-const GAME_TIME = "game time";
-
+const WAITING_PLAYERS = "waitingForPlayers";
+const QUESTION_TIME = "questionTime";
+const GAME_TIME = "gameTime";
 
 var clients = {}; // keeps a link between user's pseudo and socket's id
 var rooms = {}; // list of available servers (rooms)
-
-/**
- * Returns the pseudo associated with the given socket id
- *
- * @param {string} id : id associated with the pseudo we are searching for
- * @return {string} : pseudo associated with the given id
- */
-function getPseudoWithId(id){
-    for(let key in clients){
-        if(clients[key] === id) return key;
-    }
-}
-
-/**
- * Returns an array in which is stored all servers's informations
- * Used to display the list of servers on the client side
- */
-function listAllServers(){
-    data = []; // accumulator
-    for(let room in rooms){
-        let roomData = rooms[room];
-        data.push({'name': room,
-                   'host': roomData.getHost().getPseudo(),
-                   'animate': roomData.getHost().isAnimator() ? 'Yes' : 'No',
-                   'places' : roomData.getNbPlayer() + ' / ' + roomData.getPlaces(),
-                   'status': roomData.getStatus()});
-    }
-    return data;
-}
-
-/**
- * Adds a new entry in the party historic table
- * @param {Game} gameServer : the game server to record
- */
-function recordGameServer(gameServer){
-    let animator = gameServer.getHost().isAnimator() ? gameServer.getHost().getPseudo() : "party without animator";
-    let date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
-    db.recordNewParty(gameServer.getName(), animator, date, function(err, partyId){
-        if(err){
-            console.log(err);
-        }else{
-            console.log(partyId);
-            gameServer.setHistoricId(partyId);
-            gameServer.addPlayersToPartyHistoric();
-        }
-    });
-}
-
-/**
- * Adds a new entry in the hasPlayedIn table
- * Used to keep a track of the player's production in a party
- *
- * @param {string} pseudo : player's pseudo
- * @param {number} partyHistoricId : id which represents the party in the party historic table
- * @param {string} production : a string which describes the svg production
- */
-function recordProduction(pseudo, partyHistoricId, production){
-    console.log(production);
-    db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, production, function(err){
-        if(err) console.log(err);
-    });
-}
 
 module.exports = function(io, socket){
 
     // -----------------------------------------------------------------------------
     // ------------------------------ FUNCTIONS ------------------------------------
     // -----------------------------------------------------------------------------
+
+    /**
+     * Returns the pseudo associated with the given socket id
+     *
+     * @param {string} id : id associated with the pseudo we are searching for
+     * @return {string} : pseudo associated with the given id
+     */
+    function getPseudoWithId(id){
+        for(let key in clients){
+            if(clients[key] === id) return key;
+        }
+    }
+
+    /**
+     * Returns an array in which is stored all servers's informations
+     * Used to display the list of servers on the client side
+     *
+     * @return {object array} : description of the servers
+     * form of the description : { 'name': server's name,
+     *                             'host': server's host,
+     *                             'animate': is there an animator ?,
+     *                             'places': server's capacity,
+     *                             'status': server's status }
+     */
+    function listAllServers(){
+        data = []; // accumulator
+        for(let room in rooms){
+            let roomData = rooms[room];
+            data.push({ 'name': room,
+                        'host': roomData.getHost().getPseudo(),
+                        'animate': roomData.getHost().isAnimator() ? socket.translater.__('yes') : socket.translater.__('no'),
+                        'places' : roomData.getNbPlayer() + ' / ' + roomData.getPlaces(),
+                        'status': socket.translater.__(roomData.getStatus()) });
+        }
+        return data;
+    }
 
     /**
      * Checks if the game server is full and launch the game if it is
@@ -100,11 +74,22 @@ module.exports = function(io, socket){
      * Returns the current state of the question time
      * - the number of players who have defined their questions
      * - the questions of each player
+     *
+     * @param {Game} : the game server for which we want the current state of the game time
+     * @param {object} : { 'ready': number of players who are ready,
+     *                     'playersQuestion': dictionnary of (pseudo, player's question) couple }
      */
     function getQuestionTimeState(server){
         return {'ready': server.nbPlayersReady(), 'playersQuestion': server.getPlayersQuestion()};
     }
 
+    /**
+     * Start the game time
+     * - informs all players that we move to the game time
+     * - records the party in the database
+     *
+     * @param {Game} server : the game server for which the game time starts
+     */
     function startGameTime(server){
         io.sockets.in(server.getName()).emit('allQuestionsDefined', getQuestionTimeState(server));
         io.sockets.in(server.getName())
@@ -148,18 +133,57 @@ module.exports = function(io, socket){
                     'delayBeforeForcing': gameServer.getDelayBeforeForcing()};
         console.log(data);
         io.sockets.in(gameServer.getName()).emit('newTurn', data);
-        sendSystemMessage(gameServer.getName(), "It's the turn of " + data['currentPlayer']);
+        sendSystemMessage(gameServer.getName(), socket.translater.__('currentPlayerMessage') + data['currentPlayer']);
     }
 
+    /**
+     * stops the game server properly and remove it from the active servers list
+     *
+     * @param {Game} server : the game server we want to stop
+     */
     function removeServer(server){
         clearInterval(server.inactivePlayerManager);
         clearInterval(server.productionSharingManager);
-        delete rooms[server.getName()]; // if server is empty, we destroy it
+        delete rooms[server.getName()];
     }
 
     function productionSharingManager(serverName){
         console.log("--> Sharing productions");
         io.sockets.in(serverName).emit('shareYourProduction', null);
+    }
+
+    /**
+     * Adds a new entry in the party historic table
+     *
+     * @param {Game} gameServer : the game server to record
+     */
+    function recordGameServer(gameServer){
+        let animator = gameServer.getHost().isAnimator() ? gameServer.getHost().getPseudo() : socket.translater.__('partyWithoutAnimator');
+        let date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
+        db.recordNewParty(gameServer.getName(), animator, date, function(err, partyId){
+            if(err){
+                console.log(err);
+            }else{
+                console.log(partyId);
+                gameServer.setHistoricId(partyId);
+                gameServer.addPlayersToPartyHistoric();
+            }
+        });
+    }
+
+    /**
+     * Adds a new entry in the hasPlayedIn table
+     * Used to keep a track of the player's production in a party
+     *
+     * @param {string} pseudo : player's pseudo
+     * @param {number} partyHistoricId : id which represents the party in the party historic table
+     * @param {string} production : a string which describes the svg production
+     */
+    function recordProduction(pseudo, partyHistoricId, production){
+        console.log(production);
+        db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, production, function(err){
+            if(err) console.log(err);
+        });
     }
 
     /**
@@ -178,6 +202,7 @@ module.exports = function(io, socket){
             || io.sockets.connected[clients[server.inactivePlayer[index]]].room == null){
 
                 server.removePlayerByPseudo(server.inactivePlayer[index]);
+                sendSystemMessage(server.getName(), server.inactivePlayer[index] + socket.translater.__('playerLeavingMessage'));
                 console.log(server.inactivePlayer[index] + ' is removed');
 
                 // a player has been removed, we need to inform clients
@@ -219,6 +244,19 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Initialize the client's translater with the his browser language
+     */
+    function initTranslater(){
+        let config = {
+            "lang": socket.handshake.headers['accept-language'].split(',')[0],
+            "langFile": "./../../locale.json"
+        };
+        //init internationalization / localization class
+        socket.translater = new i18n_module(config.lang, config.langFile);
+        console.log(socket.translater.__('Salut'));
+    }
+
     // -----------------------------------------------------------------------------
     // --------------------------- SOCKET LISTENERS --------------------------------
     // -----------------------------------------------------------------------------
@@ -234,6 +272,7 @@ module.exports = function(io, socket){
         console.log('==> New player : ' + data['pseudo']);
         clients[data["pseudo"]] = socket.id;
         socket.room = null;
+        initTranslater();
         io.sockets.emit('serverListUpdate', listAllServers());
     });
 
@@ -267,17 +306,22 @@ module.exports = function(io, socket){
                                   data["server"]["delayBeforeForcing"],
                                   data["server"]["sharingInterval"],
                                   WAITING_PLAYERS);
+            server.inactivePlayerManager = setInterval(inactivePlayerManager, 10000, server);
 
             rooms[data["server"]["name"]] = server;
             socket.room = data["server"]["name"];
             socket.join(socket.room);
 
-            socket.emit('serverCreated', {'error': false, 'msg': null}); // informs the creator that the server has been created successfully
-            io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
-            startGameOnServerFull(server.getName()); // try to start the game
-            server.inactivePlayerManager = setInterval(inactivePlayerManager, 10000, server);
+            // informs the creator that the server has been created successfully
+            socket.emit('serverCreated', {'error': false, 'msg': null});
+            // refresh servers list
+            io.sockets.emit('serverListUpdate', listAllServers());
+            // try to start the game
+            startGameOnServerFull(server.getName());
         }else{
-            socket.emit('serverCreated', {'error': true, 'msg': 'server name not available'}); // informs the creator that the server's name is not available
+            // informs the creator that the server's name is not available
+            socket.emit('serverCreated', { 'error': true,
+                                           'msg': socket.translater.__('serverNameNotAvailableMessage') });
         }
     });
 
@@ -317,9 +361,7 @@ module.exports = function(io, socket){
      * form of received data : {'server': [destination server's name]}
      */
     socket.on('joinServer', function(data){
-
         let server = rooms[data["server"]];
-
         if(server != null){ // to prevent reception of bad data
             if(server.getNbPlayer() < server.getPlaces()
             && !(server.isInServer(getPseudoWithId(socket.id)))
@@ -333,8 +375,10 @@ module.exports = function(io, socket){
                 socket.room = server.getName();
                 socket.join(socket.room);
 
-                io.sockets.emit('serverListUpdate', listAllServers()); // refresh servers list
-                startGameOnServerFull(server.getName()); // there is a new player, try to start the game
+                 // refresh servers list
+                io.sockets.emit('serverListUpdate', listAllServers());
+                // there is a new player, try to start the game
+                startGameOnServerFull(server.getName());
 
             }else if(server.isInServer(getPseudoWithId(socket.id))
                   && socket.room == null){ // case of reconnection (if a player has lost his connection)
@@ -343,7 +387,7 @@ module.exports = function(io, socket){
                 socket.join(socket.room);
 
             }else{
-                socket.emit('serverUnreachable', {'msg': 'You can not join this server ( server full or in game )'});
+                socket.emit('serverUnreachable', {'msg': socket.translater.__('serverUnreachableMessage')});
             }
         }
     });
@@ -355,12 +399,14 @@ module.exports = function(io, socket){
      */
     socket.on('exitServer', function(data){
         console.log('==> ' + getPseudoWithId(socket.id) + ' leaved ' + socket.room);
+        let server = rooms[data['server']];
+        if(server != null){
+            server.removePlayerByPseudo(getPseudoWithId(socket.id));
+            socket.leave(server.getName());
+            socket.room = null;
 
-        rooms[data['server']].removePlayerByPseudo(getPseudoWithId(socket.id));
-        socket.leave(data['server']);
-        socket.room = null;
-
-        io.sockets.emit('serverListUpdate', listAllServers());
+            io.sockets.emit('serverListUpdate', listAllServers());
+        }
     });
 
     /**
@@ -373,15 +419,14 @@ module.exports = function(io, socket){
      */
     socket.on('joinGame', function(data){
         console.log('--> ' + data['pseudo'] + ' joined ' + data['server']);
-
         let server = rooms[data['server']];
-
         if(server != null){
             let player = server.getPlayer(data['pseudo']);
             if(player != null){
                 socket.room = server.getName();
                 socket.join(socket.room);
                 clients[player.getPseudo()] = socket.id;
+                initTranslater();
 
                 socket.emit('downloadCardGame', {'cardGameName': server.getCardGameName(),
                                                  'cardGameLanguage': server.getCardGameLanguage()});
@@ -412,13 +457,14 @@ module.exports = function(io, socket){
      */
     socket.on('recordMyQuestion', function(data){
         console.log('--> ' + getPseudoWithId(socket.id) + ' recorded his question');
-
         let server = rooms[socket.room];
-        server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
-        if(server.isAllQuestionsDefined()){ // all questions are defined, we can starts the game
-            startGameTime(server);
-        }else{
-            io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
+        if(server != null){
+            server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
+            if(server.isAllQuestionsDefined()){ // all questions are defined, we can starts the game
+                startGameTime(server);
+            }else{
+                io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
+            }
         }
     });
 
@@ -432,14 +478,25 @@ module.exports = function(io, socket){
     socket.on('animatorValidation', function(data){
         console.log('--> ' + socket.room + ' : received animator validation');
         let server = rooms[socket.room];
-        server.setAnimReady();
-        startGameTime(server);
+        if(server != null){
+            server.setAnimReady();
+            startGameTime(server);
+        }
     });
 
+    /**
+     * Process 'endOfTurn' message
+     * Players sends this message when they have finished their turn
+     * When this message his received server ask to the next player to play
+     *
+     * form of received data : no data are send with this message (null)
+     */
     socket.on('endOfTurn', function(data){
         console.log('--> ' + getPseudoWithId(socket.id) + ' finished his turn');
         let server = rooms[socket.room];
-        newTurn(server);
+        if(server != null){
+            newTurn(server);
+        }
     });
 
     /**
@@ -495,12 +552,16 @@ module.exports = function(io, socket){
     socket.on('processStopGame', function(data){
         console.log('--> ' + getPseudoWithId(socket.id) + ' started a stop game process');
         let server = rooms[socket.room];
-        server.exitBuffer.push(getPseudoWithId(socket.id));
-        if(server.exitBuffer.length === server.getNbPlayer()){
-            io.sockets.in(server.getName()).emit('gameEnd', null); // only one player in the game, stoped the game
-        }else{
-            socket.broadcast.to(server.getName())
-                            .emit('stopGame?', server.exitBuffer); // ask to all players if they agree
+        if(server != null){
+            server.exitBuffer.push(getPseudoWithId(socket.id));
+            if(server.exitBuffer.length === server.getNbPlayer()){
+                // only one player in the game, stoped the game
+                io.sockets.in(server.getName()).emit('gameEnd', null);
+            }else{
+                // ask to all players if they agree
+                socket.broadcast.to(server.getName())
+                                .emit('stopGame?', server.exitBuffer);
+            }
         }
     });
 
@@ -513,16 +574,18 @@ module.exports = function(io, socket){
     socket.on('stopGame', function(data){
         console.log('--> ' + getPseudoWithId(socket.id) + ' wants to stop game ? : ' + data['exit']);
         let server = rooms[socket.room];
-        if(data['exit']){
-            server.exitBuffer.push(getPseudoWithId(socket.id));
-            if(server.exitBuffer.length === server.getNbPlayer()){ // all players have accepted to stop the game
-                io.sockets.in(server.getName()).emit('gameEnd', null);
-            }else{  // another player has accepted to stop the game
-                io.to(server.getName()).emit('refreshExitPanel', server.exitBuffer);
+        if(server != null){
+            if(data['exit']){
+                server.exitBuffer.push(getPseudoWithId(socket.id));
+                if(server.exitBuffer.length === server.getNbPlayer()){ // all players have accepted to stop the game
+                    io.sockets.in(server.getName()).emit('gameEnd', null);
+                }else{  // another player has accepted to stop the game
+                    io.to(server.getName()).emit('refreshExitPanel', server.exitBuffer);
+                }
+            }else{ // a player has refused to stop  the game
+                io.to(server.getName()).emit('stopGameProcessAborted', null);
+                server.exitBuffer = [];
             }
-        }else{ // a player has refused to stop  the game
-            io.to(server.getName()).emit('stopGameProcessAborted', null);
-            server.exitBuffer = [];
         }
     });
 
@@ -538,23 +601,24 @@ module.exports = function(io, socket){
      */
     socket.on('quitGame', function(data){
         console.log('--> ' + data['pseudo'] + ' leaved game server ' + socket.room);
-
         let server = rooms[data['server']];
-        let currentPlayer = server.getCurrentPlayer();
+        if(server != null){
+            let currentPlayer = server.getCurrentPlayer();
 
-        server.removePlayerByPseudo(data['pseudo']);
-        socket.leave(data['server']);
-        socket.room = null;
-        recordProduction(data['pseudo'], server.getHistoricId(), data['production']);
+            server.removePlayerByPseudo(data['pseudo']);
+            socket.leave(data['server']);
+            socket.room = null;
+            recordProduction(data['pseudo'], server.getHistoricId(), data['production']);
 
-        if(server.getNbPlayer() === 0){
-            removeServer(server);
-        }else{
-            io.sockets.in(server.getName())
-                      .emit('changeDuringGameTime', {'players': server.getActivePlayers()});
-            sendSystemMessage(server.getName(), data['pseudo'] + " leaved the game !");
-            if(currentPlayer === data['pseudo']) newTurn(server);
+            if(server.getNbPlayer() === 0){
+                removeServer(server);
+            }else{
+                io.sockets.in(server.getName())
+                          .emit('changeDuringGameTime', {'players': server.getActivePlayers()});
+                sendSystemMessage(server.getName(), data['pseudo'] + socket.translater.__('playerLeavingMessage'));
+                if(currentPlayer === data['pseudo']) newTurn(server);
+            }
+            io.sockets.emit('serverListUpdate', listAllServers());
         }
-        io.sockets.emit('serverListUpdate', listAllServers());
     });
 };

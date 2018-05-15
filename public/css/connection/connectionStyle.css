@@ -84,8 +84,8 @@ form.forgot_password .bottom {
 }
 
 span[class^="error"] {
-  margin-left: 10px;
-  font-size: 12px;
+  padding: 0;
+  font-size: 0.8vw;
   color: red;
   font-weight: bold;
 }
@@ -93,7 +93,6 @@ span[class^="error"] {
 span.myTooltip {
   position: fixed;
   margin-left: 5px;
-  margin-top: 1.6em;
   font-size: 0.8vw;
   color: black;
   display: inline-block;
@@ -123,8 +122,8 @@ span.myTooltip {
 }
 
 .form_wrapper label{
-	display:block;
   padding: 0;
+  font-size: 1vw;
 }
 
 .form_wrapper input[type="text"],

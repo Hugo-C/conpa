@@ -90,7 +90,7 @@ $('#cancelImport').on('click', function(){
     let myImport = $('#import');
     myImport.attr('type', ''); // reset input(type="file") content
     myImport.attr('type', 'file');
-    $('#importButton').text('No file chosen'); // no selected file
+    $('#importButton').text($.i18n("importedFile")); // no selected file
     $('#importAlertMessage').text(''); // reset alert displayer
     displayCardGamePage();
 });

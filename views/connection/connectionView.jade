@@ -11,80 +11,92 @@ body(class="rowFlexContainer")
   div#form_wrapper(class="form_wrapper formWrapperStyle")
     form(class="register col-lg-12 col-md-12 col-sm-12")
       div(class="formHeader centeredItems")
-        h3 Register
+        h3(data-i18n="registerForm")
       div(class="formContent")
         div(class="row")
-          label(class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") Username:
-            span(class="error_username")
+          div(class="row centeredItems")
+            label(data-i18n="usernameLabel" class="col-lg-offset-2 col-lg-3 col-md-offset-2 col-md-3 col-sm-offset-2 col-sm-3")
+            span(class="error_username col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
           input(type="text" class="myCustomInput" name="username" pattern="^[A-Za-z0-9]{4,}$" required
                 class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
-          span(class="myTooltip") Username must contain at least 4 characters
+          span(data-i18n="usernameTooltip" class="myTooltip")
         div(class="row")
-          label(class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") Email:
-            span(class="error_email")
+          div(class="row centeredItems")
+            label(data-i18n="emailLabel" class="col-lg-offset-2 col-lg-3 col-md-offset-2 col-md-3 col-sm-offset-2 col-sm-3")
+            span(class="error_email col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
           input(type="email" class="myCustomInput" name="email" required
                 class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
-          span(class="myTooltip") Your email is not a valid email
+          span(data-i18n="emailTooltip" class="myTooltip")
         div(class="row")
-          label(class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") Password:
-            span(class="error_password")
+          div(class="row centeredItems")
+            label(data-i18n="passwordLabel" class="col-lg-offset-2 col-lg-3 col-md-offset-2 col-md-3 col-sm-offset-2 col-sm-3")
+            span(class="error_password col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
           input(type="password" class="myCustomInput" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$" required 
                 class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
-          span(class="myTooltip") Password must contain at least 8 characters, 1 Uppercase letter and 1 number
+          span(data-i18n="passwordTooltip" class="myTooltip")
       div(class="bottom formBottomStyle")
         div(class="row centeredItems")
           input(type="checkbox")
-          span Send me updates
+          span(data-i18n="sendUpdateFormOption")
         div(class="row")
           input(type="submit" value="Register" class="myCustomButton")
         div(class="row")
-          a(href="connection" rel="login" class="linkform") You have an account already? Log in here
+          a(data-i18n="alreadyAccountLink" href="connection" rel="login" class="linkform")
         div(class="clear")
             
     form(class="login active")
       div(class="formHeader centeredItems")
-        h3 Login
+        h3(data-i18n="loginForm")
       div(class="formContent")
         div(class="row")
-          label(class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") Username:
-            span(class="error_login") 
+          div(class="row centeredItems")
+            label(data-i18n="usernameLabel" class="col-lg-offset-2 col-lg-4 col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4")
+            span(class="error_login col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5") 
           input(type="text" class="myCustomInput" name="username" required
                 class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
         div(class="row")
-          label(class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") Password: 
+          label(data-i18n="passwordLabel" class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") 
           input(type="password" class="myCustomInput" name="password" required
                 class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
       div(class="bottom formBottomStyle")
         div(class="row centeredItems")
           input(type="checkbox")
-          span Keep me logged in
+          span(data-i18n="loginOptionForm")
         div(class="row")
           input(type="submit" value="Login" class="myCustomButton col-lg-offset-6 col-lg-4 col-md-offset-6 col-md-4")
         div(class="row")
-          a(href="connection" rel="register" class="linkform") You don't have an account yet? Register here
+          a(data-i18n="createAccountLink" href="connection" rel="register" class="linkform")
         div(class="row")
-          a(href="connection" rel="forgot_password" class="linkform") Forgot your password?
+          a(data-i18n="forgotPasswordLink" href="connection" rel="forgot_password" class="linkform")
         div(class="clear")
         
     form(class="forgot_password")
       div(class="formHeader centeredItems")
-        h3 Forgot Password
+        h3(data-i18n="forgotPasswordForm")
       div(class="formContent")
         div(class="row")
-          label(class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8") Email:
+          label(data-i18n="emailLabel" class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
           input(type="email" class="myCustomInput" name="email" required
                 class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8")
       div(class="bottom formBottomStyle")
         div(class="row")
           input(type="submit" value="Send reminder" class="myCustomButton")
         div(class="row")
-          a(href="connection" rel="login" class="linkform") Suddenly remebered? Log in here
+          a(data-i18n="loginLink" href="connection" rel="login" class="linkform")
         div(class="row")
-          a(href="connection" rel="register" class="linkform") You don't have an account? Register here
+          a(data-i18n="createAccountLink" href="connection" rel="register" class="linkform")
         div(class="clear")
     
     script(src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
     script(src="/bower/js-md5/src/md5.js")
     script(src="//code.jquery.com/jquery.min.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.messagestore.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.fallbacks.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.language.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.parser.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.emitter.js")
+    script(src="/bower/jquery.i18n/src/jquery.i18n.emitter.bidi.js")
+    script(src="/js/connection/connectionFormsStaticTexts.js")
     script(src="/js/connection/pageManager.js")
     script(src="/js/connection/formProcess.js")

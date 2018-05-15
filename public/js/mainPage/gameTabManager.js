@@ -1,6 +1,6 @@
-const WAITING_PLAYERS = "waiting for players";
-const QUESTION_TIME = "question time";
-const GAME_TIME = "game time";
+const WAITING_PLAYERS = 'waitingForPlayers';
+const QUESTION_TIME = "questionTime";
+const GAME_TIME = "gameTime";
 
 // connection with the server socket
 var socket = io();
@@ -67,9 +67,10 @@ $('#serverList').on('click', 'tbody tr', function(){
     $('#serverMsg').text(''); // remove alerts
     $('#serverList tbody .selected').removeClass('selected');
     $(this).addClass('selected'); // selected class is used to know which server client want to join
+    console.log($.i18n('waitingForPlayers'));
     if($(this).children()[0].innerHTML === sessionStorage.server
     && $(this).children()[1].innerHTML === sessionStorage.pseudo
-    && $(this).children()[4].innerHTML === WAITING_PLAYERS){
+    && $(this).children()[4].innerHTML === $.i18n(WAITING_PLAYERS)){
         $('#join').text('Remove'); // if it's his own server and if the game has not started, he can remove it
     }else if($(this).children()[0].innerHTML === sessionStorage.server
           && sessionStorage.unload === 'false'){
@@ -309,7 +310,7 @@ $("#join").on("click", function(){
     if(selectedServer != null){ // look at the onclick listener on "serverList" to have more details about the below code
         if(selectedServer[0].innerHTML === sessionStorage.server
         && selectedServer[1].innerHTML === sessionStorage.pseudo
-        && selectedServer[4].innerHTML === WAITING_PLAYERS){
+        && selectedServer[4].innerHTML === $.i18n(WAITING_PLAYERS)){
             socket.emit('removeServer', {'server': selectedServer[0].innerHTML});
             sessionStorage.server = null;
             sessionStorage.role = null;
