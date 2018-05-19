@@ -78,7 +78,12 @@ function refreshMosaic(){
     let playersProduction = clientGame.getPlayersProduction();
     for(let pseudo in playersProduction){
         clientGame.getMosaicProduction(pseudo).clearSVG();
-        clientGame.getMosaicProduction(pseudo).restoreProduction(playersProduction[pseudo]);
+        if(playersProduction[pseudo] == ''){
+            $('#' + pseudo + '_production').css('background-image', 'url("/img/gamerModule/privateContent.png")');
+        }else{
+            $('#' + pseudo + '_production').css('background-image', '');
+            clientGame.getMosaicProduction(pseudo).restoreProduction(playersProduction[pseudo]);
+        }
     }
 }
 
@@ -216,6 +221,8 @@ function addElementToRow(parent, player){
     let prod = document.createElement('div');
     prod.setAttribute('id', player + '_production');
     prod.setAttribute('style', 'width: 50%; height: 100%;');
+    prod.classList.add('imageBackground');
+    prod.style.backgroundImage = 'url("/img/gamerModule/privateContent.png")';
     parent.appendChild(prod);
     // create a tool bar for channel tools
     let bar = document.createElement('div');
@@ -459,6 +466,13 @@ $("#startDice").on("click", function(){
     hideDice();
 });
 
+$('#endOfTurn').on('click', function(){
+    if(clientGame.getCurrentPlayer() === sessionStorage.pseudo){
+        socket.emit('endOfTurn', null);
+        hideDice();
+    }
+});
+
 // ---------------------------------------------------------------------
 // ----------------------- SOCKET LISTENERS ----------------------------
 // ---------------------------------------------------------------------
@@ -469,7 +483,9 @@ socket.on('initGameTime', function(data){
     createPlayersProductionList(data['players']);
     actualizeChatPlayersList(data['players']);
     if(sessionStorage.role === 'animator'){
+        clearMosaic();
         createMosaic(data['players']);
+        $('#globalTimer').css('border-right', '2px solid black');
     }
     if(data['useTimer']){
         clientGame.startGolbalTimer(data['globalTimer']);
@@ -549,13 +565,6 @@ socket.on('newTurn', function(data){
     }
 });
 
-$('#endOfTurn').on('click', function(){
-    if(clientGame.getCurrentPlayer() === sessionStorage.pseudo){
-        socket.emit('endOfTurn', null);
-        hideDice();
-    }
-});
-
 // ---------------------------------------------------------------------
 // ---------------------- SVG TOOLS LISTENERS --------------------------
 // ---------------------------------------------------------------------
@@ -627,6 +636,26 @@ $("#fullScreen").on("click", function(){
         $(this).addClass('off');
         exitFullscreenProduction();
     }
+});
+
+$('#question > div').on('mouseover', function(){
+    if($(this)[0].offsetHeight < $(this)[0].scrollHeight){
+        $(this).css('height', $(this)[0].scrollHeight + 'px');
+        $(this).css('background-color', 'white');
+        $(this).css('border-bottom', '2px solid black');
+        $(this).css('overflow-y', 'hidden');
+        $(this).parent().css('border-left', 'none');
+        $(this).css('border-left', '2px solid black');
+    }
+});
+
+$('#question > div').on('mouseleave', function(){
+    $(this).css('height', '');
+    $(this).css('background-color', '');
+    $(this).css('border-bottom', '');
+    $(this).css('overflow-y', 'auto');
+    $(this).parent().css('border-left', '');
+    $(this).css('border-left', '');
 });
 
 // ---------------------------------------------------------------------

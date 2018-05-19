@@ -9,6 +9,57 @@ socket.emit('joinGame', {'pseudo': sessionStorage.pseudo,
                          'server': sessionStorage.server});
 
 // -----------------------------------------------------------------------------
+// ------------------------- INTERFACE LISTENERS -------------------------------
+// -----------------------------------------------------------------------------
+
+// Display the questions guide
+$('#projector').on('click', function(){
+    let image_on = '/img/gamerModule/power_on.png'; // used to check if projector is on (and to change button's image)
+    let image_off = '/img/gamerModule/power_off.png'; // used to check if projector is off (and to change button's image)
+    let guide = $('#guide');
+    if($('#projector').css('background-image').includes(image_off)){ // projector is off, we turn it on
+        $('#projector').css('background-image', 'url("' + image_on + '")');
+        guide.css('visibility', 'visible');
+        guide.css('opacity', 1);
+    }else{ // projector is on, we turn it off
+        $('#projector').css('background-image', 'url("' + image_off + '")');
+        guide.css('opacity', 0);
+        guide.css('visibility', 'hidden');
+    }
+});
+
+/**
+ * Catch click event on the validate button
+ * On click in this button, we send our question to the server
+ */
+$('#validate').on('click', function(){
+    let question = $('#myQuestion').val();
+    if(sessionStorage.role === 'player'
+    && $.trim(question) !== ''
+    && !question.match(/^Write your question here !/)){
+        socket.emit('recordMyQuestion', {'question': question});
+    }else if(sessionStorage.role === 'animator'){
+        socket.emit('animatorValidation', null);
+    }
+});
+
+$('#myQuestion').on("focus", function(){
+    let value = $("input#myQuestion").val();
+    if(value.match(/^Write your question here !/)){
+        $("input#myQuestion").val("");
+    }
+});
+
+// displays default text if the area is empty and has not the focus
+$("#myQuestion").focusout(function(){
+    let value = $("input#myQuestion").val();
+    value = $.trim(value);
+    if(value === ""){
+        $("input#myQuestion").val("Write your question here !");
+    }
+});
+
+// -----------------------------------------------------------------------------
 // ------------------------------- FUNCTIONS -----------------------------------
 // -----------------------------------------------------------------------------
 
@@ -37,22 +88,6 @@ function setPP(pseudo){
     });
 }
 
-// Display the questions guide
-$('#projector').on('click', function(){
-    let image_on = '/img/gamerModule/power_on.png'; // used to check if projector is on (and to change button's image)
-    let image_off = '/img/gamerModule/power_off.png'; // used to check if projector is off (and to change button's image)
-    let guide = $('#guide');
-    if($('#projector').css('background-image').includes(image_off)){ // projector is off, we turn it on
-        $('#projector').css('background-image', 'url("' + image_on + '")');
-        guide.css('visibility', 'visible');
-        guide.css('opacity', 1);
-    }else{ // projector is on, we turn it off
-        $('#projector').css('background-image', 'url("' + image_off + '")');
-        guide.css('opacity', 0);
-        guide.css('visibility', 'hidden');
-    }
-});
-
 /**
  * Create a "box" to represent a player
  * A player is represented by a box containing his profil image and his pseudo
@@ -60,12 +95,12 @@ $('#projector').on('click', function(){
  * @param {string} pseudo : player's pseudo
  */
 function addPlayerBox(pseudo){
-    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-2 col-md-2">' +
+    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-2 col-md-2 col-sm-2">' +
                       '<div class="row">' +
-                          '<img class="col-lg-12 col-md-12"/>' +
+                          '<img class="col-lg-12 col-md-12 col-sm-12"/>' +
                       '</div>' +
                       '<div class="row">' +
-                          '<div class="col-lg-12 col-md-12">' +
+                          '<div class="col-lg-12 col-md-12 col-sm-12">' +
                               '<span>' + pseudo + '</span>' +
                           '</div>' +
                       '</div>' +
@@ -87,13 +122,17 @@ function addTwoPlayers(player1, player2){
     let parentTag = $('#playersQuestion');
     let html ='<div class="questionsDisplayer rowFlexContainer">' +
                   addPlayerBox(player1) +
-                  '<div class="col-lg-8 col-md-8">' +
+                  '<div class="col-lg-8 col-md-8 col-sm-8">' +
                       '<div class="row">' +
-                          '<div id="question' + player1 + '" class="rowFlexContainer col-lg-8 col-md-8 oval-thought-left">' +
-                              '<span class="col-lg-12 col-md-12"></span>' +
+                          '<div id="question' + player1 + '" class="rowFlexContainer col-lg-8 col-md-8 col-sm-8 oval-thought-left">' +
+                              '<div class="col-lg-12 col-md-12 col-sm-12">' +
+                                  '<span class="col-lg-12 col-md-12 col-sm-12"></span>' +
+                              '</div>' +
                           '</div>' +
-                          '<div id="question' + player2 + '" class="rowFlexContainer col-lg-offset-4 col-lg-8 col-md-offset-4 col-md-8 oval-thought-right">' +
-                              '<span class="col-lg-12 col-md-12"></span>' +
+                          '<div id="question' + player2 + '" class="rowFlexContainer col-lg-offset-4 col-lg-8 col-md-offset-4 col-md-8 col-sm-offset-4 col-sm-8 oval-thought-right">' +
+                              '<div class="col-lg-12 col-md-12 col-sm-12">' +
+                                  '<span class="col-lg-12 col-md-12 col-sm-12"></span>' +
+                              '</div>' +
                           '</div>' +
                       '</div>' +
                   '</div>' +
@@ -115,16 +154,18 @@ function addOnePlayer(player){
     let parentTag = $('#playersQuestion');
     let html ='<div class="questionsDisplayer rowFlexContainer">' +
                   addPlayerBox(player) +
-                  '<div class="col-lg-8 col-md-8">' +
+                  '<div class="col-lg-8 col-md-8 col-sm-8">' +
                       '<div class="row">' +
-                          '<div id="question' + player + '" class="rowFlexContainer col-lg-8 col-md-8 oval-thought-left">' +
-                              '<span class="col-lg-12 col-md-12"></span>' +
+                          '<div id="question' + player + '" class="rowFlexContainer col-lg-8 col-md-8 col-sm-8 oval-thought-left">' +
+                              '<div class="col-lg-12 col-md-12 col-sm-12">' +
+                                  '<span class="col-lg-12 col-md-12 col-sm-12"></span>' +
+                              '</div>' +
                           '</div>' +
-                          '<div class="col-lg-8 col-md-8 oval-thought-left" style="visibility: hidden"/>' +
+                          '<div class="col-lg-8 col-md-8 col-sm-8 oval-thought-left" style="visibility: hidden"/>' +
                       '</div>' +
                   '</div>' +
 
-                  '<div class="col-lg-2 col-md-2" style="visibility: hidden"/>' +
+                  '<div class="col-lg-2 col-md-2 col-sm-2" style="visibility: hidden"/>' +
               '</div>';
     parentTag.append(html);
 }
@@ -142,19 +183,6 @@ function actualizeNbReady(ready, total){
 }
 
 /**
- * Catch click event on the validate button
- * On click in this button, we send our question to the server
- */
-$('#validate').on('click', function(){
-    let question = $('#myQuestion').val();
-    if(sessionStorage.role === 'player' && question !== ''){
-        socket.emit('recordMyQuestion', {'question': question});
-    }else if(sessionStorage.role === 'animator'){
-        socket.emit('animatorValidation', null);
-    }
-});
-
-/**
  * Display player's question
  * Used to refresh a question when a player change his question
  *
@@ -163,7 +191,7 @@ $('#validate').on('click', function(){
  */
 function actualizePlayerQuestion(pseudo, question){
     console.log(pseudo + ' : ' + question);
-    $('#question' + pseudo + ' > span').text(question);
+    $('#question' + pseudo + ' span').text(question);
 }
 
 /**
@@ -185,7 +213,7 @@ function actualizeBorderColor(pseudo){
 function displayMyQuestion(playersQuestion){
     for(let index = 0; index < playersQuestion.length; index++){
         if(playersQuestion[index]['player'] === sessionStorage.pseudo){
-            $('span#question').text(playersQuestion[index]['question']);
+            $('#question span').text(playersQuestion[index]['question']);
         }
     }
 }
@@ -226,8 +254,16 @@ socket.on('initQuestionTime', function(data){
         }
     }
 
+    if(data['animator'] == null){
+        $('#animatorProfil').css('display', 'none');
+    }else{
+        $('#animatorProfil').css('display', 'block');
+        $('#animatorProfil span').text(data['animator']);
+    }
+
     if(sessionStorage.role === 'animator'){
         $('#validate').css('display', 'none');
+        $('.playerOnly').css('display', 'none');
     }
 });
 
@@ -267,5 +303,5 @@ socket.on('allQuestionsDefined', function(data){
     $('#questionContent').css('display', 'none'); // hide question page
     $('#gameContent').css('display', 'block'); // display gamer module page
     displayMyQuestion(data['playersQuestion']);
-    $("#pseudo").text(sessionStorage.pseudo); // displays pseudo on the screen
+    $("#pseudo span").text(sessionStorage.pseudo); // displays pseudo on the screen
 });

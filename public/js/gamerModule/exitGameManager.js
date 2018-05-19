@@ -169,7 +169,7 @@ socket.on('refreshExitPanel', function(playersWhoWantStop){
  * form of received data : no data is send with this message !
  */
 socket.on('stopGameProcessAborted', function(){
-    $('#exitMessage').text($.i18n("stopGameProcessAborted?"));
+    $('#exitMessage').text($.i18n("stopGameProcessAborted"));
     $('#exitPanelTitle').text($.i18n("exitGame?"));
     // We are not in a "Stop Game Processus", we display the basic buttons
     $('#leaveAlone').css('display', 'block');

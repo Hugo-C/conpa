@@ -64,7 +64,7 @@ function shareMyCard(family, card) {
  */
 socket.on('cardPicked', function(data){
     displayCard(data['family'], data['cardContent']);
-    $('#playerQuestion > span').text(data['question']);
+    $('#playerQuestion span').text(data['question']);
     $('#playerTurn > span').text(data['pseudo']);
 });
 

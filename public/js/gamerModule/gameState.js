@@ -44,10 +44,10 @@ class GameState {
     globalTimerManager(){
         if(this.globalTimer > 0){
             this.globalTimer--;
-            $('span.globalTimerField').text(GameState.timerToString(this.globalTimer));
+            $('#globalTimer span').text(GameState.timerToString(this.globalTimer));
         }else{
             this.overtime++;
-            let globalTimerField = $('span.globalTimerField');
+            let globalTimerField = $('#globalTimer span');
             globalTimerField.text(' - ' + GameState.timerToString(this.overtime));
             if(!globalTimerField.parent().hasClass('timeover')){
                 globalTimerField.parent().addClass('timeover');
@@ -120,9 +120,17 @@ class GameState {
         }
     }
 
+    /**
+     * Register all players who are in the players list
+     * When a player is registered, the online status is associated to him
+     *
+     * @param {string array} players : players list ( pseudo of all players )
+     */
     setPlayers(players){
         for(let index = 0; index < players.length; index++){
-            this.players.push({'pseudo': players[index], 'state': 'online'});
+            if(!this.playerExists(players[index])){
+                this.players.push({'pseudo': players[index], 'state': 'online'});
+            }
         }
     }
 
@@ -135,6 +143,14 @@ class GameState {
 
     getPlayers(){
         return this.players;
+    }
+
+    getPlayersPseudo(){
+        let pseudos = [];
+        for(let index = 0; index < this.players.length; index++){
+            pseudos.push(this.players[index]['pseudo']);
+        }
+        return pseudos;
     }
 
     getOnlinePlayers(){
@@ -205,8 +221,26 @@ class GameState {
         }
     }
 
+    playerExists(pseudo){
+        for(let index = 0; index < this.players.length; index++){
+            if(pseudo == this.players[index]['pseudo']){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    restorePlayersList(players){
+        for(let index = 0; index < players.length; index++){
+            if(!this.playerExists(players[index]['pseudo'])){
+                this.players.push(players[index]);
+            }
+        }
+    }
+
     saveGameState(){
         sessionStorage.animator = this.animator;
+        sessionStorage.players = JSON.stringify(this.players);
         sessionStorage.playersProduction = JSON.stringify(this.playersProduction);
         sessionStorage.productionData = JSON.stringify(this.production.saveProduction());
         sessionStorage.state = JSON.stringify(this.state);
@@ -223,7 +257,8 @@ class GameState {
 
     restoreGameState(){
         this.animator = sessionStorage.animator === "" ? null : sessionStorage.animator;
-        createPlayersProductionList(this.getOnlinePlayers());
+        this.restorePlayersList(JSON.parse(sessionStorage.players));
+        createPlayersProductionList(this.getPlayersPseudo());
         this.playersProduction = JSON.parse(sessionStorage.playersProduction);
         actualizeChatPlayersList(this.getOnlinePlayers());
         this.production.restoreProduction(JSON.parse(sessionStorage.productionData));
@@ -256,8 +291,10 @@ class GameState {
             individualTimerColor('black', 'grey');
         }
         actualizePlayersProductionList();
+        updatePlayersState();
 
         delete sessionStorage.animator;
+        delete sessionStorage.players;
         delete sessionStorage.playersProduction;
         delete sessionStorage.productionData;
         delete sessionStorage.state;

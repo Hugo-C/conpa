@@ -22,6 +22,7 @@
 
 #questionPanel > :nth-child(2) {
   height: 75%;
+  padding-top: 2%;
   box-shadow: 0px 0px 15px 15px rgba(0, 0, 0, 0.9) inset;
   background-image: url('/img/gamerModule/deskBackground.jpeg');
 }
@@ -44,7 +45,11 @@
   color: black;
 }
 
-#questionPanel > :nth-child(2) > :first-child {
+#animatorProfil {
+  height: 30%;
+}
+
+#playersQuestion {
   height: 100%;
   padding-top: 2%;
   padding-bottom: 1%;
@@ -53,7 +58,7 @@
   overflow-y: auto;
 }
 
-#questionPanel > :nth-child(2) > :last-child {
+#guide {
   position: absolute;
   height: 50%;
   border: 2px solid black;
@@ -143,7 +148,7 @@
 /* Question displayer style */
 
 .questionsDisplayer {
-  height: 30%;
+  height: 33%;
   margin-bottom: 2%;
 }
 
@@ -160,18 +165,25 @@
 
 .questionsDisplayer > :nth-child(2n) > div > div {
   height: 40%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-right: 4%;
 }
 
-.questionsDisplayer > :nth-child(2) > div > div > span {
+.questionsDisplayer > :nth-child(2n) > div > div > div {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.questionsDisplayer > :nth-child(2) span {
   font-size: 1.2vw;
-  font-family: fantasy sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
   color: black;
   overflow: hidden;
   text-overflow: ellipsis;
   word-wrap: break-word;
   max-height: inherit;
   line-height: 1.2vw;
-  text-align: center;
 }
 
 /* Question bubble */

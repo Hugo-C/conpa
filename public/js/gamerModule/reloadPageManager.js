@@ -6,8 +6,8 @@ function saveCurrentState(){
     sessionStorage.cards = JSON.stringify(cards);
     sessionStorage.currentCardLogo = $('#familyLogoText').text();
     sessionStorage.currentCardContent = $('#cardContent').text();
-    sessionStorage.currentPlayer = $('#playerTurn > span').text();
-    sessionStorage.currentQuestion = $('#playerQuestion > span').text();
+    sessionStorage.currentPlayer = $('#playerTurn span').text();
+    sessionStorage.currentQuestion = $('#playerQuestion span').text();
 }
 
 function restoreCurrentState(){
@@ -21,8 +21,8 @@ function restoreCurrentState(){
         displayCard(sessionStorage.currentCardLogo, sessionStorage.currentCardContent);
     }
     // restore the current question
-    $('#playerQuestion > span').text(sessionStorage.currentQuestion);
-    $('#playerTurn > span').text(sessionStorage.currentPlayer);
+    $('#playerQuestion span').text(sessionStorage.currentQuestion);
+    $('#playerTurn span').text(sessionStorage.currentPlayer);
 
     delete sessionStorage.tchat;
     delete sessionStorage.cards;

@@ -103,11 +103,11 @@ div#chatInfos {
 }
 
 #gamePanel > :nth-child(1) > * {
-  border-right: 2px solid black;
+  border-left: 2px solid black;
 }
 
-#gamePanel > :nth-child(1) > :last-child {
-  border-right: none;
+#gamePanel > :nth-child(1) > :first-child {
+  border-left: none;
 }
 
 #gamePanel > :nth-child(1) > :nth-child(1) {
@@ -118,15 +118,29 @@ div#chatInfos {
 .globalTimerField.stretchedImage { background-image: url('/img/gamerModule/timer.svg'); }
 .questionField.stretchedImage { background-image: url('/img/gamerModule/question.svg'); }
 
-#gamePanel > :nth-child(1) > div > span {
-  font-size: 1.2vw;
+#gamePanel #question > div {
+  height: 100%;
+  padding: 3px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+}
+
+#gamePanel > :nth-child(1) span {
+  font-size: 1vw;
   font-family: fantasy sans-serif;
   color: black;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  max-height: inherit;
-  line-height: 1.4vw;
+}
+#gamePanel #question span {
+  padding-bottom: 3px;
+  font-size: 0.8vw;
+  position: inherit;
+  top: 0;
+  left: 0;
+  cursor: text;
 }
 
 /* -------------------------------------------------------------------------- */
