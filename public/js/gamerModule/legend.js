@@ -53,11 +53,12 @@ class Legend{  // static class
 
             let strokeColor = link.getColor();
             // change the color if it's black in order to contrast with the overlay
-            if("#000000" <= strokeColor && strokeColor <= "#333333")
+            console.log("COULEUR : " + strokeColor);
+            if(strokeColor ===  "#333333")
                 strokeColor ="#acacac";
             svgLine.stroke({
                 width: link.getWidth(),
-                color: "#acacac",
+                color: strokeColor,
                 dasharray: link.getDasharray()
             });
             overlay.append(divTmp);
@@ -152,7 +153,7 @@ class Legend{  // static class
                 resColor = "blue";
                 break;
             case "#d5d5d5":
-                resColor = "gray";
+                resColor = "white";
                 break;
             case "#a531ff":
                 resColor = "purple";
