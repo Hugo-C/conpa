@@ -10,31 +10,31 @@
     },
     "questionTime": {
         "en": "question time",
-        "fr-FR": "question time"
+        "fr-FR": "formulation des questions"
     },
     "gameTime": {
         "en": "game time",
-        "fr-FR": "game time"
+        "fr-FR": "en jeu"
     },
     "partyWithoutAnimator": {
         "en": "party without animator",
-        "fr-FR": "party without animator"
+        "fr-FR": "partie sans animateur"
     },
     "currentPlayerMessage": {
         "en": "It's the turn of ",
-        "fr-FR": "It's the turn of "
+        "fr-FR": "C'est le tour de "
     },
     "serverNameNotAvailableMessage": {
-        "en": "server name not available",
-        "fr-FR": "server name not available"
+        "en": "server name unavailable",
+        "fr-FR": "nom du serveur indisponible"
     },
     "serverUnreachableMessage": {
-        "en": "You can not join this server ( server full or in game )",
-        "fr-FR": "You can not join this server ( server full or in game )"
+        "en": "You can't join this server ( server full or in game )",
+        "fr-FR": "Vous ne pouvez pas rejoindre ce serveur(serveur plein ou en jeu)"
     },
     "playerLeavingMessage": {
         "en": " left the game !",
-        "fr-FR": " left the game !"
+        "fr-FR": " a quitté le jeu !"
     },
     "yes": {
         "en": "Yes",
