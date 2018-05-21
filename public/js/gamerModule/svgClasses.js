@@ -1,4 +1,5 @@
 const STROKE_WIDTH = "4";
+const STROKE_COLOR = "#333333";
 const CORNER_DETECTION_MARGIN = 25;
 
 class Rectangle {
@@ -215,7 +216,6 @@ class Rectangle {
     linkRect(e){
         if(!this.isLinkedTo(e)){
             let link = new Link(this, e, this.prod);
-  	        link.line.stroke({color:"#333333"});
             this.addLink(link);
             e.addLink(link);
         }
@@ -295,7 +295,7 @@ class Link {
         this.navigability = null;
         let pos1 = e1.center();
         let pos2 = e2.center();
-        this.line = prod.master.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
+        this.line = prod.master.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH, color: STROKE_COLOR});
         this.line.back();
         prod.myLinks.push(this);
         Legend.refresh(this.prod.myElements, this.prod.myLinks);
@@ -495,6 +495,7 @@ class Link {
         if(this.navigability != null){
             this.navigability.remove();
 			this.navigability = null;
+            this.refreshPosition(); // the line need to go a bit further
         }
   	}
 
