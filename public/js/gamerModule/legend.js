@@ -53,9 +53,8 @@ class Legend{  // static class
 
             let strokeColor = link.getColor();
             // change the color if it's black in order to contrast with the overlay
-            console.log("COULEUR : " + strokeColor);
             if(strokeColor ===  "#333333")
-                strokeColor ="#acacac";
+                strokeColor = "#666666";
             svgLine.stroke({
                 width: link.getWidth(),
                 color: strokeColor,
@@ -124,7 +123,16 @@ class Legend{  // static class
                 i++
             }
         }
-        console.log("legend cleared");
+    }
+
+    static show(){
+        let overlay =  document.getElementById("overlay");
+        overlay.style.display = "block";
+    }
+
+    static hide(){
+        let overlay =  document.getElementById("overlay");
+        overlay.style.display = "none";
     }
 
     /**

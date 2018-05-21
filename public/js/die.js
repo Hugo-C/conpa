@@ -104,6 +104,7 @@ function deleteScene() {
     console.log("dice : " + numeroFace(verticesList));
     displayNewCard(numeroFace(verticesList));
     divDie.removeChild(divDie.lastChild);
+    Legend.show();
 }
 
 function handleDie() {
@@ -121,6 +122,7 @@ function throwDie() {
         Math.random() * Math.PI
     );
     scene.add(box);
+    Legend.hide();
 
     vectAngularVelocity = new THREE.Vector3(
         Math.random() * Math.PI,
