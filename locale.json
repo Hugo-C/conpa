@@ -9,25 +9,32 @@
         "fr-FR": "en attente de joueurs"
     },
     "questionTime": {
-        "en": "question time"
+        "en": "question time",
+        "fr-FR": "question time"
     },
     "gameTime": {
-        "en": "game time"
+        "en": "game time",
+        "fr-FR": "game time"
     },
     "partyWithoutAnimator": {
-        "en": "party without animator"
+        "en": "party without animator",
+        "fr-FR": "party without animator"
     },
     "currentPlayerMessage": {
-        "en": "It's the turn of "
+        "en": "It's the turn of ",
+        "fr-FR": "It's the turn of "
     },
     "serverNameNotAvailableMessage": {
-        "en": "server name not available"
+        "en": "server name not available",
+        "fr-FR": "server name not available"
     },
     "serverUnreachableMessage": {
-        "en": "You can not join this server ( server full or in game )"
+        "en": "You can not join this server ( server full or in game )",
+        "fr-FR": "You can not join this server ( server full or in game )"
     },
     "playerLeavingMessage": {
-        "en": " left the game !"
+        "en": " left the game !",
+        "fr-FR": " left the game !"
     },
     "yes": {
         "en": "Yes",
