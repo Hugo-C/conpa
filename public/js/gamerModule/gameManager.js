@@ -495,6 +495,16 @@ $('#endOfTurn').on('click', function(){
     }
 });
 
+$('#legend').on('click', function(){
+    if($(this).val() == 'visible'){
+        $('#overlay').css('display', 'none');
+        $(this).val('hide');
+    }else{
+        $('#overlay').css('display', 'block');
+        $(this).val('visible');
+    }
+});
+
 // ---------------------------------------------------------------------
 // ----------------------- SOCKET LISTENERS ----------------------------
 // ---------------------------------------------------------------------

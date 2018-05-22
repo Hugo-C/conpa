@@ -205,6 +205,9 @@ div#svgMenu > button#color[value="white"] { background-image: url("/img/gamerMod
 div#svgMenu > button#color[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
 div#svgMenu > button#color[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
 
+div#svgMenu > button#legend[value="visible"] { background-image: url("/img/gamerModule/legende-.png"); }
+div#svgMenu > button#legend[value="hide"] { background-image: url("/img/gamerModule/legende+.png"); }
+
 div#svgMenu > button#moveElement { background-image: url("/img/gamerModule/move.png"); }
 div#svgMenu > button#fullScreen { background-image: url("/img/gamerModule/fullscreen.png"); }
 
