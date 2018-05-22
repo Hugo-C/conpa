@@ -489,7 +489,7 @@ class Link {
   	removeNavigability(){
         if(this.navigability != null){
             this.navigability.remove();
-			this.navigability = null;
+           this.navigability = null;
         }
   	}
 
