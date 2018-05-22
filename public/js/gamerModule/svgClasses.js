@@ -1,8 +1,6 @@
 const STROKE_WIDTH = "4";
+const STROKE_COLOR = "#333333";
 const CORNER_DETECTION_MARGIN = 25;
-
-var myElements = []; // list all elements in the svg
-var myLinks = []; // list all links in the svg
 
 class Rectangle {
 
@@ -12,7 +10,8 @@ class Rectangle {
      * @param {float} y : y coordinate
      * @param {integer} width : rectangle's width
      * @param {integer} height : rectangle's height
-     * @param parent {SVGSVGElement | SVGGElement} : the parent svg Element
+     * @param {String} fill : the hex code of the color that will fill the rectangle
+     * @param {Production} prod : the production we want this rectangle into
      */
     constructor(x, y, width, height, fill, prod) {
         this.prod = prod;
@@ -25,6 +24,7 @@ class Rectangle {
         this.text = null;
         this.links = [];
         this.prod.myElements.push(this);
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -157,6 +157,7 @@ class Rectangle {
    */
     setFillColor(color){
         this.rect.attr('fill', color);
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -215,7 +216,6 @@ class Rectangle {
     linkRect(e){
         if(!this.isLinkedTo(e)){
             let link = new Link(this, e, this.prod);
-  	        link.line.stroke({color:"#333333"});
             this.addLink(link);
             e.addLink(link);
         }
@@ -264,6 +264,7 @@ class Rectangle {
             l.myRemove();
         }
         removeFromArray(this.prod.myElements, this);
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -283,7 +284,6 @@ class Link {
      * @param {Rectangle} e1 : first element to link
      * @param {Rectangle} e2 : second element to link
      * @param {SVGSVGElement | SVGGElement} prod : the parent svg Element
-     * @param {number} delta : used to shift the navigeability
      */
     constructor(e1, e2, prod) {
         this.e1 = e1;
@@ -295,9 +295,10 @@ class Link {
         this.navigability = null;
         let pos1 = e1.center();
         let pos2 = e2.center();
-        this.line = prod.master.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH});
+        this.line = prod.master.line(pos1.x, pos1.y, pos2.x, pos2.y).stroke({width: STROKE_WIDTH, color: STROKE_COLOR});
         this.line.back();
         prod.myLinks.push(this);
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -355,6 +356,7 @@ class Link {
     setDasharray(dasharrayValue){
         this.dasharray = dasharrayValue;
         this.line.stroke({dasharray: dasharrayValue});
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -367,6 +369,7 @@ class Link {
             this.delta = widthValue*2 + 10;
     	    this.addNavigability();
         }
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -378,6 +381,7 @@ class Link {
     		if(this.navigability != null){
     			   this.setNavigabilityColor(colorValue);
         }
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -415,6 +419,7 @@ class Link {
         this.e1.removeLink(this);
         this.e2.removeLink(this);
         removeFromArray(this.prod.myLinks, this);
+        Legend.refresh(this.prod.myElements, this.prod.myLinks);
     }
 
     /**
@@ -489,7 +494,8 @@ class Link {
   	removeNavigability(){
         if(this.navigability != null){
             this.navigability.remove();
-           this.navigability = null;
+			this.navigability = null;
+            this.refreshPosition(); // the line need to go a bit further
         }
   	}
 

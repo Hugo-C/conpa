@@ -1,4 +1,5 @@
 const LOGO_DIRECTORY = "img/gamerModule/cardGameLogos/";
+const DEFAULT_LOGO = "noLogo.svg";
 
 var cards = {};  // all cards from the deck
 var cardTextNode = document.createTextNode("");
@@ -78,17 +79,17 @@ socket.on('downloadCardGame', function(data){
  * @param text {String} : the content of the card picked
  */
 function displayCard(family, text){
-    let cardContent = document.getElementById('cardContent');
+    let cardContent = document.getElementById("cardContent");
     triggerCssAnimation(cardContent);
-    //cardFamilyNode.nodeValue = family;
     cardTextNode.nodeValue = text;
     if(cards[family]["logo"] != null){
-        document.getElementById("cardFamilyLogo").style.display = 'block';
+        document.getElementById("cardFamilyLogo").style.display = "block";
         document.getElementById("cardFamilyLogo").src = LOGO_DIRECTORY + cards[family]["logo"];
     }else{
-        document.getElementById("cardFamilyLogo").style.display = 'none';
+        document.getElementById("cardFamilyLogo").style.display = "block";
+        document.getElementById("cardFamilyLogo").src = LOGO_DIRECTORY + DEFAULT_LOGO;
     }
-    document.getElementById("familyLogoDiv").style.display = 'inline-block';
+    document.getElementById("familyLogoDiv").style.display = "inline-block";
     document.getElementById("familyLogoText").textContent = family;
 }
 

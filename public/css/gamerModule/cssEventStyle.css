@@ -88,6 +88,10 @@ div#familyLogoDiv:hover img{
   filter: grayscale(100%) blur(3px);
 }
 
+#overlay:hover{
+  opacity: 0.85;
+}
+
 foreignObject > textarea {
   outline: 0;
 }
