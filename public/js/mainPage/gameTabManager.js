@@ -80,53 +80,30 @@ $('#serverList').on('click', 'tbody tr', function(){
     }
 });
 
-/**
- * Displays card games in the card games table
- *
- * @param {dictionnary list} cardGames : list of dictionnaries
- * dictionnaries are formed like that :
- * {'name': card game name, 'language': card game language}
- */
-function displayAvailableCardGames(cardGames){
-    let cardGamesTable = $('#cardgames').find('tbody');
-    cardGamesTable.children().remove(); // we will replace old data by the data we have received
-    for(let entry in cardGames){
-        cardGamesTable.append($('<tr>')
-            .append($('<td>' + cardGames[entry]['name'] + '</td>'))
-            .append($('<td>' + cardGames[entry]['language'] + '</td>')));
-    }
+function populateSMTable(data){
+    displayCardGames('gameTab', 'cardgames', data);
 }
 
-function searchCardGames(){
-    $.ajax({
-        type: 'POST',
-        url: '/getCardGames',
-        data: null,
-        error: function(){
-            console.log("card games retrieving has failed");
-        },
-        success: function(response){
-            if(response === 'ERROR'){
-                console.log("card games retrieving has failed");
-            }else{
-                console.log(response);
-                displayAvailableCardGames(response);
-            }
-        }
-    });
-}
+$('#gameTab .cardgameInfoPanel button').on('click', function(){
+    displayServerManager();
+});
 
-/** displays game server creator window */
-$("#create").on("click", function(){
-    $(".tabContent").css("display", "none");
-    $(".serverManager").animate({"display": "block"}, 1000, function(){
-        $(".serverManager").css("display", "block");
+function displayServerManager(){
+    $("#gameTab > div").css("display", "none");
+    $("#serverManager").animate({"display": "block"}, 1000, function(){
+        $("#serverManager").css("display", "block");
     });
 
     let gameTab = $("#gameTab");
     gameTab.css('height', '90%');
     gameTab.css('width', '50%');
-    searchCardGames();
+}
+
+/** displays game server creator window */
+$("#create").on("click", function(){
+    displayServerManager();
+    refreshCardGames([], populateSMTable);
+    refreshTags($('#serverManager select'));
     removeAllAlerts(); // in case of player have already try to create a server and he has been errors
 });
 
@@ -135,6 +112,19 @@ $('#cardgames').on('click', 'tbody tr', function(){
     $('#cardgames tbody .selected').removeClass('selected');
     $(this).addClass('selected');
 });
+
+$('#serverManager button.filter').on('click', function(){
+    var selected = $("#serverManager select option:selected");
+    var tags = [];
+    selected.each(function () {
+        tags.push($(this).val());
+    });
+    refreshCardGames(tags, populateSMTable);
+});
+
+function sortSMTable(n){
+    sortTable(n, 'cardgames');
+}
 
 function displayTimersOption(display){
     $('.timersOption').css('display', display ? 'block' : 'none');
@@ -179,7 +169,7 @@ $('#forceTurn').on('click', function(){
 
 /** displays server list */
 $("#cancel").on("click", function(){
-    $(".serverManager").css("display", "none");
+    $("#serverManager").css("display", "none");
     $(".tabContent").animate({"display": "block"}, 1000, function(){
         $(".tabContent").css("display", "block");
     });

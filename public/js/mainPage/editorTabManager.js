@@ -1,40 +1,27 @@
-/**
- * Displays card games in the card games table
- *
- * @param {dictionnary list} cardGames : list of dictionnaries
- * dictionnaries are formed like that :
- * {'name': card game name, 'language': card game language}
- */
-function displayCardGames(cardGames){
-    let cardGamesTable = $('#myCardgames').find('tbody');
-    cardGamesTable.children().remove(); // we will replace old data by the data we have received
-    for(let entry in cardGames){
-        cardGamesTable.append($('<tr>')
-            .append($('<td>' + cardGames[entry]['name'] + '</td>'))
-            .append($('<td>' + cardGames[entry]['language'] + '</td>')));
+function populateEditorTable(data){
+    displayCardGames('editorTab', 'myCardgames', data);
+}
+
+refreshCardGames([], populateEditorTable);
+refreshTags($('.tabContent select'));
+
+$('#editorTab button.filter').on('click', function(){
+        var selected = $(".tabContent select option:selected");
+        var tags = [];
+        selected.each(function () {
+            tags.push($(this).val());
+        });
+        refreshCardGames(tags, populateEditorTable);
+});
+
+$('.tabContent select').on('click', function(){
+    console.log('click');
+    if($('.tabContent select .multiselect-item').css('display') == 'none'){
+        $('.tabContent select .multiselect-item').css('display', 'block');
+    }else{
+        $('.tabContent select .multiselect-item').css('display', 'none');
     }
-}
-
-function refreshCardGames(){
-    $.ajax({
-        type: 'POST',
-        url: '/getCardGames',
-        data: null,
-        error: function(){
-            console.log("card games retrieving has failed");
-        },
-        success: function(response){
-            if(response === 'ERROR'){
-                console.log("card games retrieving has failed");
-            }else{
-                console.log(response);
-                displayCardGames(response);
-            }
-        }
-    });
-}
-
-refreshCardGames();
+})
 
 /** allows to select a row in the server list */
 $('#myCardgames').on('click', 'tbody tr', function(){
@@ -61,12 +48,12 @@ $('#exportCardGame').on('click', function(){
 /** Display the form used to import a card game in the database */
 function displayImportPage(){
     $("#editorTab > .tabContent").css("display", "none");
-    $(".importPage").animate({"display": "block"}, 1000, function(){
-        $(".importPage").css("display", "block");
+    $("#importPage").animate({"display": "block"}, 1000, function(){
+        $("#importPage").css("display", "block");
         $("#editorTab > .tabContent").css("display", "none");
     });
     let editorTab = $("#editorTab");
-    editorTab.css('height', '30%');
+    editorTab.css('height', '45%');
     editorTab.css('width', '30%');
 }
 
@@ -76,7 +63,7 @@ $('#importCardGame').on('click', function(){
 
 /** Display the main card game editor page */
 function displayCardGamePage(){
-    $(".importPage").css("display", "none");
+    $("#editorTab > div").css("display", "none");
     $("#editorTab > .tabContent").animate({"display": "block"}, 1000, function(){
         $("#editorTab > .tabContent").css("display", "block");
     });
@@ -102,3 +89,11 @@ $('#importButton').on('click', function(){
 $('#import').on('change', function(){
     $('#importButton').text($(this).val());
 });
+
+$('#editorTab .cardgameInfoPanel button').on('click', function(){
+    displayCardGamePage();
+});
+
+function sortEditorTable(n){
+    sortTable(n, 'myCardgames');
+}

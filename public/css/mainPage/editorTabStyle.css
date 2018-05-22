@@ -11,39 +11,196 @@
   padding: 0;
 }
 
-#editorTab > .importPage {
+#editorTab > .tabContent > .body > :first-child {
+  height: 10%;
+  padding-left: 5%;
+  padding-right: 5%;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-bottom: 2%;
+  border: 2px solid black;
+  box-shadow: 2px 0px 8px 0px;
+}
+
+#editorTab > .tabContent > .body > :first-child label {
+  margin-bottom: 0;
+}
+#editorTab > .tabContent > .body > :first-child button.filter {
+  height: 80%;
+  font-size: 1vw;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+}
+#editorTab > .tabContent > .body > :first-child select {
+  display: block;
+}
+#editorTab > .tabContent > .body > :first-child button[type="button"] {
+  padding: 1%;
+  padding-left: 3%;
+  padding-right: 5%;
+  font-size: 1vw;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+}
+#editorTab > .tabContent > .body > :last-child table {
+  box-shadow: 2px 2px 8px 0px;
+}
+
+/* ************************************************************************** */
+/* **************************** IMPORT FORM ********************************* */
+/* ************************************************************************** */
+
+#editorTab > #importPage {
   height: 100%;
+  padding: 0;
   display: none;
 }
 
-#editorTab > .importPage > .header {
-  height: 25%;
+#editorTab > #importPage > .header {
+  height: 20%;
 }
 
-#editorTab > .importPage > .body {
-  height: 50%;
+#editorTab > #importPage > .body {
+  height: 60%;
   padding-top: 2%;
   padding-bottom: 2%;
   padding-left: 2%;
   padding-right: 2%;
 }
 
-#editorTab > .importPage > .body > :first-child {
-  height: 40%;
+#importPage > .body > :first-child {
+  height: 50%;
+}
+#importPage > .body > :first-child > div {
+  padding: 0;
+}
+#importPage > .body > :first-child label {
+  padding: 0;
+  font-size: 1vw;
 }
 
-#editorTab > .importPage > .body > :last-child {
-  height: 60%;
+#importPage > .body > :nth-child(2) {
+  height: 15%;
 }
 
-#editorTab > .importPage > .body > :last-child > button {
+#importPage > .body > :last-child {
+  height: 35%;
+}
+
+#importPage > .body > :last-child > button {
   height: 80%;
 }
 
-#editorTab > .importPage > .body > :last-child > input {
+#importPage > .body > :last-child > input {
   display: none;
 }
 
-#editorTab > .importPage > .bottom {
-  height: 25%;
+#importPage > .bottom {
+  height: 20%;
+}
+
+#importAlertMessage {
+  font-size: 1vw;
+  font-weight: bold;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+  text-align: center;
+}
+
+/* ************************************************************************** */
+/* ************************ UPDATE CARDGAME FORM **************************** */
+/* ************************************************************************** */
+
+#editorTab > .tabContent {
+  display: block;
+}
+
+#tagsPanel {
+  height: 100%;
+  display: none;
+}
+
+#tagsPanel > .header {
+  height: 10%;
+}
+
+#tagsPanel > .body {
+  height: 80%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+#tagsPanel > .body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#tagsPanel > .body  label {
+  font-size: 1vw;
+}
+#tagsPanel > .body  label,
+#tagsPanel > .body  div {
+  padding: 0;
+}
+#tagsPanel > .body  textarea {
+  resize: none;
+  height: 95%;
+}
+
+#tagsPanel > .body > div > div {
+  height: 100%;
+  overflow-y: auto;
+}
+
+#tagsPanel > .body > :first-child {
+  height: 45%;
+  padding-bottom: 2%;
+  border-bottom: 1px solid black;
+}
+#tagsPanel > .body > :first-child > :first-child > div {
+  height: 20%;
+}
+#tagsPanel > .body > :first-child > :last-child > :first-child {
+  height: 20%;
+}
+#tagsPanel > .body > :first-child > :last-child > :last-child {
+  height: 80%;
+}
+#tagsPanel > .body > :first-child input {
+  height: 90%;
+}
+
+#tagsPanel > .body > :last-child {
+  height: 55%;
+  padding-top: 2%;
+}
+#tagsPanel > .body > :last-child > :first-child > :first-child {
+  height: 20%;
+}
+#tagsPanel > .body > :last-child > :first-child > :nth-child(2) {
+  height: 50%;
+}
+#tagsPanel > .body > :last-child > :first-child > :last-child {
+  height: 20%;
+}
+#tagsPanel > .body > :last-child > :first-child > :last-child > button {
+  height: 100%;
+  padding: 0;
+  font-size: 1vw;
+}
+#tagsPanel > .body > :last-child table th {
+  padding: 5px;
+}
+
+#tagsPanel > .bottom {
+  height: 10%;
+}
+
+/* ************************************************************************** */
+/* ****************************** ALERT FORM ******************************** */
+/* ************************************************************************** */
+
+#editorTab > .alert {
+  height: 100%;
+  display: none;
 }

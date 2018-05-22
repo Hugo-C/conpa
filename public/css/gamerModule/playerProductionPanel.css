@@ -213,6 +213,16 @@ div#production {
   overflow: hidden;
 }
 
+button#wizz {
+  width: 30%;
+  height: 8%;
+  top: 80%;
+  left: 35%;
+  font-size: 1vw;
+  float: none;
+  display: none;
+}
+
 div#mosaic {
   width: 99%;
   overflow: hidden;

@@ -1,0 +1,49 @@
+.cardgameInfoPanel {
+  height: 100%;
+  display: none;
+}
+
+.cardgameInfoPanel > .header {
+  height: 10%;
+}
+
+.cardgameInfoPanel > .body {
+  height: 80%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.cardgameInfoPanel textarea {
+  height: 100%;
+  resize: none;
+  font-size: 0.8vw;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+}
+.cardgameInfoPanel label {
+  padding: 0;
+}
+
+.cardgameInfoPanel > .body > :first-child {
+  height: 15%;
+  margin-bottom: 10%;
+}
+.cardgameInfoPanel > .body > :first-child > div {
+  height: 50%;
+}
+
+.cardgameInfoPanel > .body > :nth-child(2) {
+  height: 25%;
+  margin-bottom: 10%;
+}
+.cardgameInfoPanel > .body > :nth-child(2) > :first-child {
+  height: 15%;
+}
+.cardgameInfoPanel > .body > :nth-child(2) > :last-child {
+  height: 85%;
+}
+
+.cardgameInfoPanel > .bottom {
+  height: 10%;
+}

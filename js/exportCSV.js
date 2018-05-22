@@ -36,8 +36,7 @@ function finalizeWriting(records, familiesExport, onFileReady){
         onFileReady(csvFileName); // call alert function when file is ready
     });
 
-    csv.write(records, {headers:["nom jeu", "langue",
-                                 "famille 1", "info sup famille 1",
+    csv.write(records, {headers:["famille 1", "info sup famille 1",
                                  "famille 2", "info sup famille 2",
                                  "famille 3", "info sup famille 3",
                                  "famille 4", "info sup famille 4",
@@ -159,24 +158,6 @@ function recoverFamilies(cardGameId, records, processFamilies, onFileReady){
 }
 
 /**
- * Add card game informations as data to be written in the csv
- *
- * @param {error} err : error returned by sql query if this one has failed
- * @param {object array} records : array of data to write in the csv file
- * @param {object array} rows : cards to add in the records array
- * @param {callback} onFileReady : function charged of alerting that csv file is ready to be downloaded
- */
-function processCardGame(err, records, rows, onFileReady){
-    if(err){
-        console.log(err);
-    }else{
-        records.push({"nom jeu" : rows[0][keys.CGT_KEY_NAME],
-                      "langue" : rows[0][keys.CGT_KEY_LANGUAGE]}); // adding name and card game language as data to be written
-        recoverFamilies(rows[0][keys.CGT_KEY_ID], records, processFamilies, onFileReady);
-    }
-}
-
-/**
  * Retrieves card game informations and call processCardGame function to process data
  *
  * @param {string} cardGame : name of card game we want to retrieve
@@ -185,10 +166,10 @@ function processCardGame(err, records, rows, onFileReady){
  * @param {callback} processCardGame : function called to process retrieved data
  * @param {callback} onFileReady : function charged of alerting that the csv file is ready to be downloaded
  */
-function recoverCardGame(cardGame, language, records, processCardGame, onFileReady){
+function recoverCardGameId(cardGame, language, records, onFileReady){
     db.getCardGame(cardGame, language, function(err, result){
-        if(err) processCardGame(err);
-        else processCardGame(null, records, result, onFileReady);
+        if(err) console.log(err);
+        else recoverFamilies(result[0][keys.CGT_KEY_ID], records, processFamilies, onFileReady);
     });
 }
 
@@ -201,5 +182,5 @@ function recoverCardGame(cardGame, language, records, processCardGame, onFileRea
  */
 exports.exportToCSV = function(cardGame, language, onFileReady){
     let records = []; // array used to store retrieved data before to be write into csv file
-    recoverCardGame(cardGame, language, records, processCardGame, onFileReady);
+    recoverCardGameId(cardGame, language, records, onFileReady);
 };

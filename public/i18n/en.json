@@ -142,5 +142,6 @@
   "serverUnreachableMessage" : "You can't join this server ( server full or in game )",
   "playerLeavingMessage" : " left the game !",
   "yes" : "Yes",
-  "no" : "No"
+  "no" : "No",
+  "wizz" : "Can I consult your production ?"
 }

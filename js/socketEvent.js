@@ -133,6 +133,7 @@ module.exports = function(io, socket){
                     'delayBeforeForcing': gameServer.getDelayBeforeForcing()};
         console.log(data);
         io.sockets.in(gameServer.getName()).emit('newTurn', data);
+        console.log(socket.translater.__('currentPlayerMessage'));
         sendSystemMessage(gameServer.getName(), socket.translater.__('currentPlayerMessage') + data['currentPlayer']);
     }
 
@@ -218,7 +219,7 @@ module.exports = function(io, socket){
                         }else{
                             console.log('updating question time');
                             io.sockets.in(server.getName())
-                                      .emit('initQuestionTime', {'players': server.getPlayers()});
+                                      .emit('initQuestionTime', {'players': server.getPlayers(), 'animator': server.getAnimatorPseudo()});
                             io.sockets.in(server.getName())
                                       .emit('actualizeQuestions', getQuestionTimeState(server));
                         }
@@ -439,7 +440,7 @@ module.exports = function(io, socket){
                     socket.broadcast.to(server.getName())
                                     .emit('changeDuringGameTime', {'players': server.getActivePlayers()});
                 }else{
-                    socket.emit('initQuestionTime', {'players': server.getPlayers()});
+                    socket.emit('initQuestionTime', {'players': server.getPlayers(), 'animator': server.getAnimatorPseudo()});
                     socket.emit('actualizeQuestions', getQuestionTimeState(server));
                 }
             }

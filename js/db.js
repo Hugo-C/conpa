@@ -96,6 +96,42 @@ exports.getFamilies = function(cardGameId, callback){
     });
 };
 
+function getWhereClauseFromTags(tags){
+    let whereClause = ' WHERE ';
+    for(let index = 0; index < tags.length; index++){
+        if(index == tags.length - 1){
+            whereClause += 'id IN ( SELECT ' + keys.HTT_KEY_CARDGAME_ID +
+                                  ' FROM ' + keys.HAS_TAGS_TABLE +
+                                  ' WHERE ' + keys.HTT_KEY_TAG + ' = "' + tags[index] + '")';
+        }else{
+            whereClause += 'id IN ( SELECT ' + keys.HTT_KEY_CARDGAME_ID +
+                                  ' FROM ' + keys.HAS_TAGS_TABLE +
+                                  ' WHERE ' + keys.HTT_KEY_TAG + ' = "' + tags[index] + '") AND ';
+        }
+    }
+    return whereClause;
+}
+
+/**
+ * Retrieves all card game stored in database
+ *
+ * @param {callback} callback : function called to process on retrieved data
+ */
+exports.getCardGamesByTags = function(tags, callback){
+    let whereClause = tags.length > 0 ? getWhereClauseFromTags(tags) : '';
+    let sql = 'SELECT DISTINCT ' + keys.CGT_KEY_NAME + ' , ' + keys.CGT_KEY_LANGUAGE +
+              ' , ' + keys.CGT_KEY_AUTHOR + ', ' + keys.CGT_KEY_DESCRIPTION +
+              ' FROM ' + keys.CARD_GAME_TABLE +
+              ' LEFT JOIN ' + keys.HAS_TAGS_TABLE +
+              ' ON ' + keys.CGT_KEY_ID + ' = ' + keys.HTT_KEY_CARDGAME_ID +
+              whereClause + ';';
+
+    state.pool.query(sql, null, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+};
+
 /**
  * Retrieves card game informations (id, name and language)
  *
@@ -108,6 +144,8 @@ exports.getCardGame = function(cardGame, language, callback){
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
               ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
     let values = [cardGame, language];
+    console.log(sql);
+    console.log(values);
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -197,12 +235,13 @@ exports.cardGameExists = function(name, language, callback){
     let values = [name, language];
     state.pool.query(sql, values, function(err, result){
         if(err){
-            callback(false);
+            console.log(err);
+            callback(err);
         }else{
             if(result.length > 0){
-                callback(true);
+                callback(null, true);
             }else{
-                callback(false);
+                callback(null, false);
             }
         }
     });
@@ -226,6 +265,20 @@ exports.removeCardGame = function(name, language, callback){
     });
 };
 
+exports.removeCardGameFamilies = function(name, language, callback){
+    let sql = 'DELETE cft' +
+              ' FROM ' + keys.CARD_FAMILY_TABLE + ' AS ' + ' cft' +
+              ' INNER JOIN ' + keys.CARD_GAME_TABLE + ' AS ' + 'cgt' +
+              ' ON cft.' + keys.CFT_KEY_CARD_GAME + ' = cgt.' + keys.CGT_KEY_ID +
+              ' WHERE cgt.' + keys.CGT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
+    let values = [name, language];
+    state.pool.query(sql, values, function(err){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
+
 /**
  * Add a new cardgame in the database (the cardgame mustn't already exist)
  *
@@ -233,16 +286,111 @@ exports.removeCardGame = function(name, language, callback){
  * @param {string} language : cardgame's language
  * @param {callback} callback : function use to throw errors and return cardgame id
  */
-exports.addCardGame = function(name, language, callback){
+exports.addCardGame = function(name, language, author, callback){
     let sql = 'INSERT INTO ' + keys.CARD_GAME_TABLE +
-              ' (' + keys.CGT_KEY_NAME + ', ' + keys.CGT_KEY_LANGUAGE + ')' +
-              ' VALUES (? , ?);';
+              ' (' + keys.CGT_KEY_NAME + ', ' + keys.CGT_KEY_LANGUAGE + ', ' + keys.CGT_KEY_AUTHOR + ')' +
+              ' VALUES (?, ?, ?);';
+    let values = [name, language, author];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+};
+
+exports.getAllTags = function(callback){
+    let sql = 'SELECT *' +
+              ' FROM ' + keys.TAGS_TABLE + ';';
+    state.pool.query(sql, null, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+}
+
+exports.existsTag = function(tag, callback){
+    let sql = 'SELECT *' +
+              ' FROM ' + keys.TAGS_TABLE +
+              ' WHERE ' + keys.TT_KEY_TAG + ' = ?';
+    let value = [tag];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            if(result.length == 0) callback(null, false);
+            else callback(null, true);
+        }
+    });
+}
+
+exports.addANewTag = function(tag, callback){
+    let sql = 'INSERT INTO ' + keys.TAGS_TABLE +
+              '(' + keys.TT_KEY_TAG + ')' +
+              ' VALUE(?);';
+    let value = [tag];
+    state.pool.query(sql, value, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
+
+exports.addANewTagToCardgame = function(cardgameId, tag, callback){
+    let sql = 'INSERT INTO ' + keys.HAS_TAGS_TABLE +
+              '(' + keys.HTT_KEY_CARDGAME_ID + ', ' + keys.HTT_KEY_TAG + ')' +
+              ' VALUE(?, ?);';
+    let values = [cardgameId, tag];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
+
+exports.removeATagFromCardgame = function(cardgameId, tag, callback){
+    let sql = 'DELETE FROM ' + keys.HAS_TAGS_TABLE +
+              ' WHERE ' + keys.HTT_KEY_CARDGAME_ID + ' = ?' +
+              ' AND ' + keys.HTT_KEY_TAG + ' = ?;';
+    let values = [cardgameId, tag];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
+
+exports.getCardGameTags = function(name, language, callback){
+    let sql = 'SELECT ' + keys.HTT_KEY_TAG +
+              ' FROM ' + keys.HAS_TAGS_TABLE +
+              ' INNER JOIN ' + keys.CARD_GAME_TABLE +
+              ' ON ' + keys.CGT_KEY_ID + ' = ' + keys.HTT_KEY_CARDGAME_ID +
+              ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
     let values = [name, language];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
     });
 };
+
+exports.getCardGameDescription = function(name, language, callback){
+    let sql = 'SELECT ' + keys.CGT_KEY_DESCRIPTION +
+              ' FROM ' + keys.CARD_GAME_TABLE +
+              ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
+    let values = [name, language];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null, result);
+    });
+}
+
+exports.updateCardgameDescription = function(name, language, description, callback){
+    let sql = 'UPDATE ' + keys.CARD_GAME_TABLE +
+              ' SET ' + keys.CGT_KEY_DESCRIPTION + ' = ?' +
+              ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
+    let values = [description, name, language];
+    state.pool.query(sql, values, function(err, result){
+        if(err) callback(err);
+        else callback(null);
+    });
+}
 
 /**
  * Add a new player in the database
@@ -352,8 +500,8 @@ exports.setPassword = function(pseudo, password, callback){
  */
 exports.getUser = function(email, callback){
     let sql = 'SELECT ' + keys.UT_KEY_PSEUDO +
-        ' FROM ' + keys.USER_TABLE +
-        ' WHERE ' + keys.UT_KEY_EMAIL + ' = ?;';
+              ' FROM ' + keys.USER_TABLE +
+              ' WHERE ' + keys.UT_KEY_EMAIL + ' = ?;';
     let value = [email];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
@@ -373,8 +521,8 @@ exports.getUser = function(email, callback){
  */
 exports.getEmail = function(pseudo, callback){
     let sql = 'SELECT ' + keys.UT_KEY_EMAIL +
-        ' FROM ' + keys.USER_TABLE +
-        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+              ' FROM ' + keys.USER_TABLE +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
@@ -401,8 +549,8 @@ let setToken = function(pseudo, token, callback){
     expirationDate = toMysqlDatetime(expirationDate);
 
     let sql = 'UPDATE ' + keys.USER_TABLE +
-        ' SET ' + keys.UT_KEY_TOKEN + ' = ?, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = ?' +
-        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+              ' SET ' + keys.UT_KEY_TOKEN + ' = ?, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = ?' +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [md5(token + TOKEN_SALT), expirationDate, pseudo];
     state.pool.query(sql, value, function(err){
         if(err){
@@ -437,8 +585,8 @@ exports.generateToken = function(pseudo, callback) {
  */
 exports.clearToken = function(pseudo, callback) {
     let sql = 'UPDATE ' + keys.USER_TABLE +
-        ' SET ' + keys.UT_KEY_TOKEN + ' = NULL, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = NULL' +
-        ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
+              ' SET ' + keys.UT_KEY_TOKEN + ' = NULL, ' + keys.UT_KEY_TOKEN_EXPIRATION + ' = NULL' +
+              ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [pseudo];
     state.pool.query(sql, value, function(err) {
         if(err) callback(err);
@@ -454,8 +602,8 @@ exports.clearToken = function(pseudo, callback) {
 exports.isValidToken = function(token, callback){
     token = md5(token + TOKEN_SALT);
     let sql = 'SELECT ' + keys.UT_KEY_PSEUDO + ', ' + keys.UT_KEY_TOKEN_EXPIRATION +
-        ' FROM ' + keys.USER_TABLE +
-        ' WHERE ' + keys.UT_KEY_TOKEN + ' = ?;';
+              ' FROM ' + keys.USER_TABLE +
+              ' WHERE ' + keys.UT_KEY_TOKEN + ' = ?;';
     let value = [token];
     state.pool.query(sql, value, function(err, result){
         if(err)callback(err);
@@ -580,8 +728,6 @@ exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
         }
     });
 };
-
-
 
 /**
  * Record a player's production in the historic of the party

@@ -142,5 +142,6 @@
     "serverUnreachableMessage" : "Vous ne pouvez pas rejoindre ce serveur(serveur plein ou en jeu)",
     "playerLeavingMessage" : " a quitté la partie !",
     "yes" : "Oui",
-    "no" : "Non"
+    "no" : "Non",
+    "wizz" : "Puis-je consulter ta production ?" 
 }

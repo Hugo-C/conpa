@@ -1,6 +1,7 @@
 const fs = require("fs");
 const parse = require('csv-parse/lib/sync');
 const db = require('../js/db');
+const keys = require('../js/dbConstants');
 
 /**
  * Import the cards of the family to the database
@@ -19,7 +20,7 @@ function addCards(records, family, familyId) {
             if(err){
                 console.log("err : " + err.message);
             }else{
-                console.log("I added a card");
+                //console.log("I added a card");
             }
         });
         j++;
@@ -54,10 +55,10 @@ function addFamily(records, family, cardGameId, addCards) {
  * @param {int} cardGameId : The id of the card game
  */
 const processFamilies = function(records, cardGameId) {
-    let nbrFamilies = (Object.keys(records[0]).length - 1) / 2;
+    let nbrFamilies = (Object.keys(records[0]).length) / 2;
     // divided by 2 since we don't want supplement informations to be counted as families
 
-    for (let i = 1; i < nbrFamilies; i++){
+    for (let i = 1; i <= nbrFamilies; i++){
         let family = "famille " + i;
         addFamily(records, family, cardGameId, addCards);
     }
@@ -69,9 +70,9 @@ const processFamilies = function(records, cardGameId) {
  * @param {Array.<string, string>} records : The records of elements to add
  * @param {callback} processFamilies : The function to process the families of the card game
  */
-function addCardGame(records, processFamilies) {
+function addCardGame(name, language, author, records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
-    db.addCardGame(records[0]['nom jeu'], records[0]['langue'], function(err, result){
+    db.addCardGame(name, language, author, function(err, result){
         if (err) {
             console.log("err : " + err.message);
         } else {
@@ -87,13 +88,23 @@ function addCardGame(records, processFamilies) {
  * @param {Array.<string, string>} records : The records of elements to add
  * @param {function} processFamilies : The function to process the families of the card game
  */
-function updateCardGame(records, processFamilies) {
+function updateCardGame(name, language, author, records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
-    db.removeCardGame(records[0]['nom jeu'], records[0]['langue'], function(err){
+    console.log(name);
+    console.log(language);
+    db.removeCardGameFamilies(name, language, function(err){
         if(err){
             console.log(err);
         }else{
-            addCardGame(records, processFamilies);
+            //addCardGame(name, language, author, records, processFamilies);
+            db.getCardGame(name, language, function(err, result){
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log(result);
+                    processFamilies(records, result[0][keys.CGT_KEY_ID]);
+                }
+            });
         }
     });
 }
@@ -104,13 +115,16 @@ function updateCardGame(records, processFamilies) {
  * @param {string} path - The path to the file to import
  * @param {boolean} newCardGame : indicate if adding card game already exists in the database
  */
-exports.importFromCsv = function(path, newCardGame){
+exports.importFromCsv = function(name, language, author, path, newCardGame){
     fs.readFile(path, function(err, data) {
-        let records = parse(data, {columns: true});
-        console.log(records);
-        if(records.length > 0){
-            if(newCardGame) addCardGame(records, processFamilies);
-            else updateCardGame(records, processFamilies);
+        try{
+            let records = parse(data, {columns: true});
+            if(records.length > 0){
+                if(newCardGame) addCardGame(name, language, author, records, processFamilies);
+                else updateCardGame(name, language, author, records, processFamilies);
+            }
+        }catch(error){
+            console.log(error);
         }
         fs.unlinkSync(path);
     });

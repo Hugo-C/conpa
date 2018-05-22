@@ -2,6 +2,15 @@ exports.CARD_GAME_TABLE = "CardGame";
 exports.CGT_KEY_ID = 'id';
 exports.CGT_KEY_NAME = "name";
 exports.CGT_KEY_LANGUAGE = "language";
+exports.CGT_KEY_AUTHOR = "author";
+exports.CGT_KEY_DESCRIPTION = "description";
+
+exports.TAGS_TABLE = "Tags";
+exports.TT_KEY_TAG = "tag";
+
+exports.HAS_TAGS_TABLE = "HasTags";
+exports.HTT_KEY_CARDGAME_ID = "cardGame";
+exports.HTT_KEY_TAG = "tag";
 
 exports.CARD_FAMILY_TABLE = "Family";
 exports.CFT_KEY_ID = "id";

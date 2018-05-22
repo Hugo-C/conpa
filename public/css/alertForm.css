@@ -1,0 +1,22 @@
+.alert > .header {
+  height: 20%;
+}
+
+.alert > .body {
+  height: 60%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.alert .body span {
+  font-size: 1.5vw;
+  font-weight: bold;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+  text-align: center;
+}
+
+.alert > .bottom {
+  height: 20%;
+}

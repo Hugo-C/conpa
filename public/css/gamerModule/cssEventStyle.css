@@ -23,11 +23,7 @@ button#bouton[value="blue"]:focus { background-image: url("/img/gamerModule/text
 button#bouton[value="white"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_white.png");}
 
 button#exit:hover {
-  background-image: url('/img/gamerModule/exitOnHover.svg');
-}
-
-button#exit:active {
-  background-image: url('/img/gamerModule/exitOnClick.svg');
+  background-color: darkgrey;
 }
 
 button#sendButton:hover {

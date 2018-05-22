@@ -153,7 +153,9 @@ function processChangeForPlayer(currentProduction, targetedProduction){
     // production is private, display an image to inform the player
     if(playersProduction[targetedProduction[0].id.split('_')[0]] === ''){
         clientGame.getProduction().productionPrivate();
+        $('#wizz').css('display', 'block');
     }else{ // production is public, we display it
+        $('#wizz').css('display', 'none');
         clientGame.getProduction().productionPublic();
         clientGame.getProduction().restoreProduction(playersProduction[targetedProduction[0].id.split('_')[0]]);
         clientGame.getProduction().centerSVGToDefaultPosition();
@@ -177,7 +179,9 @@ function processChangeForAnimator(currentProduction, targetedProduction){
         // production is private, display an image to inform the player
         if(playersProduction[targetedProduction[0].id.split('_')[0]] === ''){
             clientGame.getProduction().productionPrivate();
+            $('#wizz').css('display', 'block');
         }else{ // production is public, we display it
+            $('#wizz').css('display', 'none');
             clientGame.getProduction().productionPublic();
             clientGame.getProduction().restoreProduction(playersProduction[targetedProduction[0].id.split('_')[0]]);
             clientGame.getProduction().centerSVGToDefaultPosition();
@@ -208,6 +212,11 @@ function changeDisplayedProduction(id){
     currentProduction.removeClass('selectedProduction');
     target.addClass('selectedProduction');
 }
+
+$('#wizz').on('click', function(){
+    let targetedPlayer = $('.selectedProduction')[0].id.split('_')[0];
+    socket.emit('message', {'dest': targetedPlayer, 'msg': 'I would like to consult your production'});
+});
 
 /**
  * Add a new "channel" to the mosaic
@@ -382,6 +391,10 @@ function skipTurn(){
     $('#endOfTurn').click();
 }
 
+function rollTheDice(){
+  $('#startDice').click();
+}
+
 // ---------------------------------------------------------------------
 // ----------------------- BUTTONS LISTENER ----------------------------
 // ---------------------------------------------------------------------
@@ -464,6 +477,15 @@ $("#startDice").on("click", function(){
     initScene();
     throwDie();
     hideDice();
+    clientGame.stopWaitsForDiceProcess();
+    $('circle.hourglassStroke')[0].classList.remove('rollTheDice');
+    if(clientGame.getUseTimer()){
+        let data = clientGame.getTimersData();
+        clientGame.startIndivTimer(0, data['indivTimer']);
+        if(data['forceEndOfTurn'] && data['currentPlayer'] === sessionStorage.pseudo){
+            clientGame.forceEndOfTurn(data['delayBeforeForcing'], skipTurn);
+        }
+    }
 });
 
 $('#endOfTurn').on('click', function(){
@@ -553,15 +575,14 @@ socket.on('newTurn', function(data){
         showDice();
         activateNextPlayerButton();
         individualTimerColor('#1F5473', '#0AA6E1');
+        clientGame.startDiceDelay(10, rollTheDice);
+        $('circle.hourglassStroke')[0].classList.add('rollTheDice');
     }else{
         deactivateNextPlayerButton();
         individualTimerColor('black', 'grey');
     }
     if(data['useTimer']){
-        clientGame.startIndivTimer(0, data['indivTimer']);
-        if(data['forceEndOfTurn'] && data['currentPlayer'] === sessionStorage.pseudo){
-            clientGame.forceEndOfTurn(data['delayBeforeForcing'], skipTurn);
-        }
+        clientGame.setTimersData(data);
     }
 });
 

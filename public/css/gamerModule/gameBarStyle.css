@@ -97,3 +97,42 @@ div#gameBar > div > div:nth-child(7) > div.box > div.row:last-child > button {
   pointer-events: none;
   cursor: default;
 }
+
+@-webkit-keyframes rollTheDice {
+  0%{stroke: #FF0303;}
+  25%{stroke:#AF0000;}
+  50%{stroke:#6E0000;}
+  75%{stroke:#AF0000;}
+  100%{stroke:#FF0300;}
+}
+@-moz-keyframes rollTheDice {
+  0%{stroke: #FF0303;}
+  25%{stroke:#AF0000;}
+  50%{stroke:#6E0000;}
+  75%{stroke:#AF0000;}
+  100%{stroke:#FF0303;}
+}
+@keyframes rollTheDice {
+  0%{stroke: #FF0303;}
+  25%{stroke:#AF0000;}
+  50%{stroke:#6E0000;}
+  75%{stroke:#AF0000;}
+  100%{stroke:#FF0303;}
+}
+
+.rollTheDice {
+  -webkit-animation-name: rollTheDice;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+
+  -moz-animation-name: rollTheDice;
+  -moz-animation-duration: 4s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-timing-function: linear;
+
+  animation-name: rollTheDice;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}

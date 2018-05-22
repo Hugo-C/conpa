@@ -110,13 +110,18 @@ div#chatInfos {
   border-left: none;
 }
 
-#gamePanel > :nth-child(1) > :nth-child(1) {
-  background-image: url('/img/gamerModule/exit.svg');
+button#exit {
+  background-color: grey;
 }
-
-.pseudoField.stretchedImage { background-image: url('/img/gamerModule/player.svg'); }
-.globalTimerField.stretchedImage { background-image: url('/img/gamerModule/timer.svg'); }
-.questionField.stretchedImage { background-image: url('/img/gamerModule/question.svg'); }
+.pseudoField, .globalTimerField, .questionField {
+    background-color: darkgreen;
+}
+.pseudoField > span, .globalTimerField > span, .questionField > span, button#exit {
+  font-size: 1vw;
+  font-weight: bold;
+  color: black;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+}
 
 #gamePanel #question > div {
   height: 100%;
@@ -131,7 +136,7 @@ div#chatInfos {
 
 #gamePanel > :nth-child(1) span {
   font-size: 1vw;
-  font-family: fantasy sans-serif;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
   color: black;
 }
 #gamePanel #question span {

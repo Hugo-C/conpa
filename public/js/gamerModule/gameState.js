@@ -17,6 +17,9 @@ class GameState {
         this.indivTimerControler = null;
         this.countdown = 0;
         this.forceEndOfTurnControler = null;
+        this.delayForRollingTheDice = 0;
+        this.waitsForDice = null;
+        this.timersData;
     }
 
     setAnimator(animator){
@@ -25,6 +28,18 @@ class GameState {
 
     getAnimator(){
         return this.animator;
+    }
+
+    getUseTimer(){
+        return this.useTimer;
+    }
+
+    setTimersData(data){
+        this.timersData = data;
+    }
+
+    getTimersData(){
+        return this.timersData;
     }
 
     static timerToString(timer){
@@ -56,6 +71,7 @@ class GameState {
     }
 
     startGolbalTimer(timer){
+        this.useTimer = true;
         if(this.globalTimerControler == null){
             this.globalTimer = timer;
             this.globalTimerControler = setInterval(this.globalTimerManager.bind(this), 1000);
@@ -98,6 +114,29 @@ class GameState {
             this.forceEndOfTurnControler = null;
         }
         this.forceEndOfTurnControler = setInterval(this.forceEndOfTurnProcess.bind(this), 1000, callback);
+    }
+
+    stopWaitsForDiceProcess(){
+        clearInterval(this.waitsForDice);
+        this.waitsForDice = null;
+    }
+
+    waitsForDiceProcess(callback){
+        if(this.delayForRollingTheDice > 0){
+            this.delayForRollingTheDice--;
+        }else{
+            this.stopWaitsForDiceProcess();
+            callback();
+        }
+    }
+
+    startDiceDelay(delay, callback){
+        this.delayForRollingTheDice = delay;
+        if(this.waitsForDice != null){
+            clearInterval(this.waitsForDice);
+            this.waitsForDice = null;
+        }
+        this.waitsForDice = setInterval(this.waitsForDiceProcess.bind(this), 1000, callback);
     }
 
     playersOffline(){

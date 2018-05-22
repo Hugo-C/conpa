@@ -20,7 +20,7 @@ div#gameTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-sm-
         button#create(data-i18n="createGameServer" class="switch myCustomButton col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
         button#join(data-i18n="joinGameServer" class="myCustomButton col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
   
-  div(class="serverManager col-lg-12 col-md-12 col-sm-12")
+  div#serverManager(class="col-lg-12 col-md-12 col-sm-12")
     div(class="header rowFlexContainer row")
       h3(data-i18n="gameServerManagerTitle" class="col-lg-12 col-md-12 col-sm-12")
     div(class="body row")
@@ -38,13 +38,21 @@ div#gameTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-sm-
       div(class="settingClass col-lg-12 col-md-12 col-sm-12")
         span(data-i18n="gameServerManagerCardgameSettings" class="col-lg-5 col-md-5 col-sm-5")
         span(class="errorCardGame col-lg-7 col-md-7 col-sm-7")
-      div(class="col-lg-12 col-md-12 col-sm-12")
-        table#cardgames(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10")
-          thead
-            tr
-              th(data-i18n="gsmCardgameNameField" class="col-lg-2 col-md-2 col-sm-2")
-              th(data-i18n="gsmCardgameLanguageField" class="col-lg-2 col-md-2 col-sm-2")
-          tbody
+      div(class="columnFlexContainer col-lg-12 col-md-12 col-sm-12")
+        div(class="centeredItems col-lg-12 col-md-12 col-sm-12")
+          div(class="centeredItems col-lg-offset-1 col-lg-7 col-md-offset-1 col-md-7 col-sm-offset-1 col-sm-7")
+            select(multiple="multiple")
+          div(class="centeredItems col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3")
+            button(class="filter") Filtrer
+        div(class="col-lg-12 col-md-12 col-sm-12")
+          table#cardgames(class="col-lg-12 col-md-12 col-sm-12")
+            thead
+              tr
+                th(data-i18n="cardgameName" onclick="sortSMTable(0)" class="col-lg-3 col-md-3 col-sm-3")
+                th(data-i18n="cardgameLanguage" onclick="sortSMTable(1)" class="col-lg-3 col-md-3 col-sm-3")
+                th(data-i18n="cardgameAuteur" onclick="sortSMTable(2)" class="col-lg-3 col-md-3 col-sm-3")
+                th(data-i18n="cardgameInfo" class="col-lg-3 col-md-3 col-sm-3")
+            tbody
       div(class="settingClass col-lg-12 col-md-12 col-sm-12")
         span(data-i18n="gameServerManagerTimersSettings" class="col-lg-5 col-md-5 col-sm-5")
         span(class="errorTimersSettings col-lg-7 col-md-7 col-sm-7")
@@ -76,3 +84,5 @@ div#gameTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-sm-
       div(class="rowFlexContainer col-lg-offset-6 col-lg-5 col-md-offset-6 col-md-5 col-sm-offset-6 col-sm-5")
         button#cancel(data-i18n="gsmCancel" class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
         button#validate(data-i18n="gsmValidate" class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
+
+  include cardgameInfo.jade

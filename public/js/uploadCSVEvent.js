@@ -1,19 +1,27 @@
 // Array of regex use to check csv conformity
-var modelCSV = [/nom jeu,langue(,(famille [1-5]),info sup \2){5}/g,
-                  /(.*[A-Za-z].*,){2}(.*[A-Za-z].*,.*,){4}(.*[A-Za-z].*,.*)/g,
-                  /,(,cartes famille [1-5],){5}/g,
-                  /,,(.*[A-Za-z].*,.*,){4}(.*[A-Za-z].*,.*)/g];
+var modelCSV = [/((famille [1-5]),info sup \2,?){5}/g,
+                /(.*[A-Za-z].*,.*,?){5}/g,
+                /(cartes famille [1-5],.*,?){5}/g,
+                /(.*[A-Za-z].*,.*,?){5}/g];
 
+function isImportFormValid(){
+    let files = $('#import')[0].files;
+    let name = $('#importPage input[name="cardgameName"]').val();
+    let language = $('#importPage input[name="cardgameLanguage"]').val();
+    if(files.length == 0 || name == '' || name == null
+    || language == '' || language == null){
+        return false;
+    }
+    return true;
+}
 
 $("#valideImport").on("click", function(){
     let csvImport = $('#import');
-    if(csvImport[0].files.length > 0){
+    if(isImportFormValid()){
+        $('#importAlertMessage').text('Please wait !'); // reset alert displayer
         handleFiles(csvImport[0].files);
-        csvImport.attr('type', ''); // reset input(type="file") content
-        csvImport.attr('type', 'file');
-        csvImport.text('No file chosen'); // no selected file
     }else{
-        $('#importAlertMessage').text('No file selected');
+        $('#importAlertMessage').text('Some fields are empty !');
     }
 });
 
@@ -40,7 +48,6 @@ function getAsText(fileToRead){
 
     reader.onload = (function () {
         return function (e) {
-            console.log(e.target.result);
             loadHandler(e, fileToRead);
         };
     })();
@@ -91,12 +98,10 @@ function processData(csv){
  * @param {string array} row : csv lines array
  */
 function checkConformity(row){
-    console.log(row);
     if(row.length < modelCSV.length) return false; // csv count less lines than the model
     let success = true; // csv conformity state
     let test = 0; // line to be tested
     while(test < modelCSV.length && success){
-        console.log(modelCSV[test] + ' match with ' + row[test]);
         success = modelCSV[test].test(row[test]);
         test++;
     }
@@ -112,6 +117,189 @@ function errorHandler(event){
     console.log(event.target.error.name);
 }
 
+function overwriteCardgame(overwrite){
+    $('#importAlertMessage').text('Please wait !'); // reset alert displayer
+    $.ajax({
+        type: 'POST',
+        url: '/updateCardGame',
+        data: {
+            name: $('#importPage input[name="cardgameName"]').val(),
+            language: $('#importPage input[name="cardgameLanguage"]').val(),
+            author: sessionStorage.pseudo,
+            update: overwrite,
+            csv: sessionStorage.tempCSV
+        },
+        error: function(){
+            alert("Request failed");
+            displayCardGamePage();
+        },
+        success: function(response){
+            if(response['send'] === 'OK'){
+                displayTagsPanel();
+                refreshTagsPanel(response);
+            }else{
+                console.log(response['send']);
+                displayCardGamePage();
+            }
+        }
+    });
+    delete sessionStorage.tempCSV;
+}
+
+$('#editorTab .alert .confirm').on('click', function(){
+    if($('#editorTab .alert').hasClass('overwrite')){
+        overwriteCardgame("yes");
+    }else if($('#editorTab .alert').hasClass('access')){
+        displayCardGamePage();
+    }
+    $('#importAlertMessage').text(''); // reset alert displayer
+});
+
+$('#editorTab .alert .cancel').on('click', function(){
+    overwriteCardgame("no");
+    $('#importAlertMessage').text(''); // reset alert displayer
+});
+
+function displayAlert(type, message, button){
+    $("#editorTab > div").css("display", "none");
+    $(".alert").animate({"display": "block"}, 1000, function(){
+        $(".alert").css("display", "block");
+        $("#editorTab > div:not(.alert)").css("display", "none");
+    });
+    $('#editorTab .alertTitle').text('Alert !');
+    $('#editorTab .alertMessage').text(message);
+
+    $('#editorTab .alert').addClass(type);
+    if(button == 'confirm'){
+        $('#editorTab .alert .cancel').css('display', 'none');
+    }
+
+    let editorTab = $("#editorTab");
+    editorTab.css('height', '40%');
+    editorTab.css('width', '35%');
+}
+
+function refreshTagsDatalist(tags){
+    let tagsDatalist = $('#tags');
+    tagsDatalist.children().remove(); // we will replace old data by the data we have received
+    for(let index = 0; index < tags.length; index++){
+        tagsDatalist.append('<option value="' + tags[index] + '"/>');
+    }
+}
+
+function refreshTagsPanel(data){
+    $('#tagsPanel input[name="cardgameName"]').val(data['name']);
+    $('#tagsPanel input[name="cardgameLanguage"]').val(data['language']);
+    let desc = data['description'] == null ? 'No description' : data['description'];
+    $('#tagsPanel textarea').val(desc);
+
+    refreshCardgameTagsList('tagsPanel', data['tags']);
+
+    refreshTagsDatalist(data['allTags']);
+
+}
+
+$('#tagsPanel textarea').on('focus', function(){
+    if($('#tagsPanel textarea').val() == 'No description'){
+        $('#tagsPanel textarea').val('');
+    }
+});
+
+function displayTagsPanel(){
+    $("#editorTab > div").css("display", "none");
+    $("#tagsPanel").animate({"display": "block"}, 1000, function(){
+        $("#tagsPanel").css("display", "block");
+        $("#editorTab > div:not(#tagsPanel)").css("display", "none");
+    });
+    let editorTab = $("#editorTab");
+    editorTab.css('height', '85%');
+    editorTab.css('width', '60%');
+}
+
+$('#addTag').on('click', function(){
+    console.log('add a new tag');
+    let tagToAdd =  $('#tagsPanel input[name="cardgameTag"]').val();
+    if(tagToAdd != null && tagToAdd != ''){
+        console.log('adding a new tag');
+        $.ajax({
+            type: 'POST',
+            url: '/addATag',
+            data: {
+                name: $('#tagsPanel input[name="cardgameName"]').val(),
+                language: $('#tagsPanel input[name="cardgameLanguage"]').val(),
+                tag: tagToAdd
+            },
+            error: function(){
+                console.log('request failed');
+            },
+            success: function(response){
+                if(response['msg'] === 'OK'){
+                    refreshCardgameTagsList('tagsPanel', response['tags']);
+                }else{
+                    console.log(response['msg']);
+                }
+            }
+        });
+    }
+});
+
+$('#removeTag').on('click', function(){
+    let tagToAdd =  $('#tagsPanel input[name="cardgameTag"]').val();
+    if(tagToAdd != null && tagToAdd != ''){
+        $.ajax({
+            type: 'POST',
+            url: '/removeATag',
+            data: {
+                name: $('#tagsPanel input[name="cardgameName"]').val(),
+                language: $('#tagsPanel input[name="cardgameLanguage"]').val(),
+                tag: tagToAdd
+            },
+            error: function(){
+                console.log('request failed');
+            },
+            success: function(response){
+                if(response['msg'] === 'OK'){
+                    refreshCardgameTagsList('tagsPanel', response['tags']);
+                }else{
+                    console.log(response['msg']);
+                }
+            }
+        });
+    }
+});
+
+$('#valideUpdate').on('click', function(){
+    let updatedDescription = $('#tagsPanel textarea').val();
+    console.log(updatedDescription);
+    if(updatedDescription != '' && updatedDescription != 'No description'){
+        $.ajax({
+            type: 'POST',
+            url: '/updateCardgameDescription',
+            data: {
+                name: $('#tagsPanel input[name="cardgameName"]').val(),
+                language: $('#tagsPanel input[name="cardgameLanguage"]').val(),
+                description: updatedDescription
+            },
+            error: function(){
+                console.log('request failed');
+            },
+            success: function(response){
+                if(response === 'OK'){
+                    displayCardGamePage();
+                }else{
+                    console.log(response);
+                }
+            }
+        });
+    }else{
+        displayCardGamePage();
+    }
+});
+
+$('#cancelUpdate').on('click', function(){
+    displayCardGamePage();
+});
+
 /**
  * Uploads csv file to the server and ask it to import card game into database
  * If server answers that card game already exists, a confirmation is send to
@@ -121,38 +309,27 @@ function uploadCSV(csvFile){
     let formData = new FormData();
     formData.append("uploadCSV", csvFile);
 
-    var request = new XMLHttpRequest();
+    let request = new XMLHttpRequest();
     request.onload = function(){
-        let regex = /\.csv$/;
-        if(request.responseText === 'OK'){
-            $('#importAlertMessage').text("import successful");
-        }else if(request.responseText != null && regex.test(request.responseText)){
-            let updateCardGame = confirm("This card game already exists !\nWould you overwrite it ?");
-            $.ajax({
-                type: 'POST',
-                url: '/updateCardGame',
-                data: {
-                    update: updateCardGame ? "yes" : "no",
-                    csv: request.responseText
-                },
-                error: function(){
-                    $('#importAlertMessage').text("Request failed");
-                },
-                success: function(response){
-                    if(response === 'OK'){
-                        $('#importAlertMessage').text("Import successful");
-                    }else if(response === 'NO UPDATE'){
-                        $('#importAlertMessage').text("Data has not been updated");
-                    }else{
-                        $('#importAlertMessage').text("Request failed");
-                    }
-                }
-            });
+        let response = JSON.parse(request.responseText);
+        if(response['msg'] === 'OK'){
+            displayTagsPanel();
+            refreshTagsPanel(response);
+        }else if(response['msg'] === 'UPDATE?'){
+            sessionStorage.tempCSV = response['file'];
+            displayAlert('overwrite', 'This card game already exists !\nWould you overwrite it ?', 'both');
+        }else if(response['msg'] === 'UNAUTHORIZED'){
+            displayAlert('access', 'This cardgame already exists and you are not allowed to overwrite it !', 'confirm');
         }else{
-            $('#importAlertMessage').text("import has failed");
+            console.log(response['msg']);
+            displayCardGamePage();
         }
     };
 
-    request.open("post", "/importCardGame", true);
+    let query = "/importCardGame?author=" + sessionStorage.pseudo +
+                "&name=" + $('#importPage input[name="cardgameName"]').val() +
+                "&language=" + $('#importPage input[name="cardgameLanguage"]').val();
+
+    request.open("post", query, true);
     request.send(formData);
 }

@@ -3,12 +3,19 @@ div#editorTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-s
     div(class="header rowFlexContainer ow")
       h3(data-i18n="editorTabTitle" class="col-lg-12 col-md-12 col-sm-12")
     div(class="body row")
+      div(class="centeredItems")
+        div(class="col-lg-offset-1 col-lg-7 col-md-offset-1 col-md-7 col-sm-offset-1 col-sm-7")
+          select(multiple="multiple")
+        div(class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3")
+          button(class="filter") Filtrer
       div(class="col-lg-12 col-md-12 col-sm-12")
         table#myCardgames(class="col-lg-12 col-md-12 col-sm-12")
           thead
             tr
-              th(data-i18n="cardgameName" class="col-lg-2 col-md-2 col-sm-2")
-              th(data-i18n="cardgameLanguage" class="col-lg-2 col-md-2 col-sm-2")
+              th(data-i18n="cardgameName" onclick="sortEditorTable(0)" class="col-lg-3 col-md-3 col-sm-3")
+              th(data-i18n="cardgameLanguage" onclick="sortEditorTable(1)" class="col-lg-3 col-md-3 col-sm-3")
+              th(data-i18n="cardgameAuteur" onclick="sortEditorTable(2)" class="col-lg-3 col-md-3 col-sm-3")
+              th(data-i18n="cardgameInfo" class="col-lg-3 col-md-3 col-sm-3")
           tbody
     div(class="formBottomStyle bottom row")
       div(class="rowFlexContainer col-lg-12 col-md-12 col-sm-12")
@@ -19,10 +26,21 @@ div#editorTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-s
           button#createCardGame(data-i18n="createCardgame" class="myCustomButton col-lg-5 col-md-5 col-sm-5")
           button#editCardGame(data-i18n="editCardgame" class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
 
-  div(class="importPage col-lg-12 col-md-12 col-sm-12")
+  div#importPage(class="col-lg-12 col-md-12 col-sm-12")
     div(class="header rowFlexContainer row")
       h3(data-i18n="importCSVFormTitle" class="col-lg-12 col-md-12 col-sm-12")
     div(class="body row")
+      div(class="centeredItems")
+        div(class="col-lg-offset-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-1")
+          div(class="row")
+            label(class="col-lg-12 col-md-12 col-sm-12") Cardgame name :
+          div(class="row")
+            input(name="cardgameName" class="myCustomInput col-lg-12 col-md-12 col-sm-12")
+        div(class="col-lg-offset-2 col-lg-4 col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-1")
+          div(class="row")
+            label(class="col-lg-12 col-md-12 col-sm-12") Language :
+          div(class="row")
+            input(name="cardgameLanguage" list="languages" class="myCustomInput col-lg-12 col-md-12 col-sm-12")
       div(class="rowFlexContainer row")
         span#importAlertMessage
       div(class="rowFlexContainer row")
@@ -30,5 +48,61 @@ div#editorTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-s
         input#import(data-i18n="" type="file" accept=".csv")
     div(class="formBottomStyle bottom row")
       div(class="rowFlexContainer col-lg-12 col-md-12 col-sm-12")
-        button#cancelImport(data-i18n="cancelImport" class="myCustomButton col-lg-offset-4 col-lg-3 col-md-offset-4 col-md-3 col-sm-offset-4 col-sm-3")
-        button#valideImport(data-i18n="validateImport" class="myCustomButton col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3")
+        button#cancelImport(data-i18n="cancel" class="myCustomButton col-lg-offset-4 col-lg-3 col-md-offset-4 col-md-3 col-sm-offset-4 col-sm-3")
+        button#valideImport(data-i18n="confirm" class="myCustomButton col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3")
+        
+  datalist(id="languages")
+    option(value="Français")
+    option(value="English")
+    option(value="Deutsch")
+    option(value="Español")
+    option(value="Italiano")
+    option(value="中文")
+    option(value='العربية')
+    option(value="日本語")
+        
+  div#tagsPanel(class="col-lg-12 col-md-12 col-sm-12")
+    div(class="header rowFlexContainer row")
+      h3(data-i18n="cardgameData" class="col-lg-12 col-md-12 col-sm-12")
+    div(class="body row")
+      div(class="row")
+        div(class="col-lg-5 col-md-5 col-sm-5")
+          div(class="row centeredItems")
+            label(data-i18n="cardgameName" class="col-lg-offset-2 col-lg-9 col-md-offset-2 col-md-9 col-sm-offset-2 col-sm-9")
+          div(class="row")
+            input(name="cardgameName" readonly class="myCustomInput col-lg-offset-2 col-lg-6 col-md-offset-2 col-md-6 col-sm-offset-2 col-sm-6")
+          div(class="row centeredItems")
+            label(data-i18n="cardgameLanguage" class="col-lg-offset-2 col-lg-9 col-md-offset-2 col-md-9 col-sm-offset-2 col-sm-9")
+          div(class="row")
+            input(name="cardgameLanguage" readonly class="myCustomInput col-lg-offset-2 col-lg-6 col-md-offset-2 col-md-6 col-sm-offset-2 col-sm-6")
+        div(class="col-lg-7 col-md-7 col-sm-7")
+          div(class="row centeredItems")
+            label(data-i18n="cardgameDescription" class="col-lg-offset-1 col-lg-9 col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9")
+          div(class="row")
+            textarea(class="col-lg-offset-1 col-lg-9 col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9")
+      div(class="row")
+        div(class="col-lg-5 col-md-5 col-sm-5")
+          div(class="row centeredItems")
+            label(data-i18n="addTags" class="col-lg-offset-2 col-lg-9 col-md-offset-2 col-md-9 col-sm-offset-2 col-sm-9")
+          div(class="row")
+            input(name="cardgameTag" list="tags" class="myCustomInput col-lg-offset-2 col-lg-9 col-md-offset-2 col-md-9 col-sm-offset-2 col-sm-9")
+          div(class="row centeredItems")
+            button#addTag(data-i18n="addTag" class="myCustomButton col-lg-offset-2 col-lg-4 col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4")
+            button#removeTag(data-i18n="removeTag" class="myCustomButton col-lg-offcol-1 col-lg-4 col-md-offset-1 col-md-4 col-sm-offset-1 col-sm-4")
+        div(class="col-lg-7 col-md-7 col-sm-7")
+          table(class="tagsTable col-lg-offset-1 col-lg-9 col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9")
+            thead
+              tr
+                th(data-i18n="TAGS" class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10")
+            tbody      
+    div(class="formBottomStyle bottom row")
+      div(class="rowFlexContainer col-lg-12 col-md-12 col-sm-12")
+        button#cancelUpdate(data-i18n="cancel" class="myCustomButton col-lg-offset-4 col-lg-2 col-md-offset-4 col-md-2 col-sm-offset-4 col-sm-2")
+        button#valideUpdate(data-i18n="confirm" class="myCustomButton col-lg-offset-1 col-lg-2 col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2")
+        
+    datalist(id="tags")
+    
+  include cardgameInfo.jade
+
+  include ../alertForm.jade
+    
