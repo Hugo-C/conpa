@@ -1,3 +1,4 @@
+const compression = require('compression');
 const express = require('express');
 const app = express();
 const server = app.listen(8080);
@@ -8,6 +9,8 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+
+app.use(compression());
 
 // the different accessible routes
 const index = require('./routes/index');
