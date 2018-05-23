@@ -151,7 +151,7 @@ router.post('/setPassword', urlencodedParser, function(req, res) {
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'testconpa@gmail.com',
+        user: 'testconpa2@gmail.com',
         pass: 'testTest'
     }
 });
