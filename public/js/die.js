@@ -2,11 +2,12 @@
 Physijs.scripts.worker = 'js/lib/physijs_worker.js';
 Physijs.scripts.ammo = 'ammo.js';
 
-var divDie = $('#productionPanel > :nth-child(2)')[0];
-var render, loader, box_geometry, box, material,
+var divDie;
+var render, req, loader, box_geometry, box, material,
     renderer, scene, ground_material, ground, camera, selected, vectAngularVelocity, diceLoop;
 
-function initScene(){
+function initScene() {
+    divDie = $('#scene')[0];
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(divDie.offsetWidth, divDie.offsetHeight);
     renderer.shadowMap.enabled = true;
@@ -14,11 +15,11 @@ function initScene(){
     divDie.appendChild(renderer.domElement);
 
     // Scene
-    scene = new Physijs.Scene;
-    scene.setGravity(new THREE.Vector3(0, 0, 0));
-    scene.addEventListener('update', function () {
-        scene.simulate(undefined, 1);
-    });
+    if (scene == null) {
+        scene = new Physijs.Scene;
+        scene.setGravity(new THREE.Vector3(0, 0, 0));
+    }
+    scene.addEventListener('update', updateScene);
 
     // Camera
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
@@ -30,10 +31,12 @@ function initScene(){
     loader = new THREE.TextureLoader();
 
     // Ground
-    ground_material = Physijs.createMaterial(new THREE.MeshBasicMaterial({transparent: true}), 0.8, 0.3);
+    let mesh = new THREE.MeshBasicMaterial({ transparent: true });
+    ground_material = Physijs.createMaterial( mesh, 0.8, 0.3);
     ground = new Physijs.BoxMesh(new THREE.BoxGeometry(1000, 0.5, 1000), ground_material, 0 );
     ground.depthWrite = false;
-    scene.add( ground );
+    scene.add(ground);
+    doDispose(mesh);
 
     // Die
     box_geometry = new THREE.BoxGeometry( 12, 12, 12 );
@@ -45,7 +48,8 @@ function initScene(){
         new THREE.MeshBasicMaterial({map:loader.load("img/die/5.png")}),
         new THREE.MeshBasicMaterial({map:loader.load("img/die/6.png")})
     ]);
-    material = Physijs.createMaterial( color, 0.6, 0.3 );
+    material = Physijs.createMaterial(color, 0.6, 0.3);
+    doDispose(color);
     box = new Physijs.BoxMesh( box_geometry, material);
     box.collisions = 0;
     box.position.set(8, 55, 8);
@@ -57,14 +61,43 @@ function initScene(){
     scene.add( box );
 
     // Update
-    requestAnimationFrame( render );
+    req = requestAnimationFrame( render );
     scene.simulate();
 }
 
 render = function () {
-    requestAnimationFrame(render);
+    req = requestAnimationFrame(render);
     renderer.render(scene, camera);
 };
+
+function updateScene() {
+    scene.simulate(undefined, 1);
+}
+
+// clear all the obj's ressources
+function doDispose(obj) {
+    if (obj !== null) {
+        if (obj.children != null) {
+            for (var i = 0; i < obj.children.length; i++) {
+                doDispose(obj.children[i]);
+            }
+        }
+        
+        if (obj.geometry) {
+            obj.geometry.dispose();
+            obj.geometry = undefined;
+        }
+        if (obj.material) {
+            if (obj.material.map) {
+                obj.material.map.dispose();
+                obj.material.map = undefined;
+            }
+            obj.material.dispose();
+            obj.material = undefined;
+        }
+    }
+    obj = undefined;
+}
 
 // Returns the number of the face of the die according to the vertices colliding with the ground
 function numeroFace(arrayV){
@@ -84,7 +117,7 @@ function numeroFace(arrayV){
 }
 
 // Display the card and delete the scene of the die
-function deleteScene() {
+function deleteScene(callback) {
 
     // Research the vertices colliding with the ground
     let verticesList = [];
@@ -103,18 +136,31 @@ function deleteScene() {
     }
     console.log("dice : " + numeroFace(verticesList));
     displayNewCard(numeroFace(verticesList));
+    cancelAnimationFrame(req);
+
+    doDispose(renderer)
+    doDispose(loader);
+    scene.remove(ground);
+    scene.remove(box);
+    scene.remove(camera);
+
+    scene.removeEventListener('update', updateScene, false);
+    
+    //camera = loader = box = material = renderer = ground_material = ground = selected = vectAngularVelocity = diceLoop = null;
+
     divDie.removeChild(divDie.lastChild);
+    callback();
     Legend.show();
 }
 
-function handleDie() {
+function handleDie(callback) {
     if(box.position.y < 6.3) {
         clearInterval(diceLoop);
-        setTimeout(deleteScene, 1500);
+        setTimeout(deleteScene, 1500, callback);
     }
 }
 
-function throwDie() {
+function throwDie(callback) {
     box.position.set(8, 55, 8);
     box.rotation.set(
         Math.random() * Math.PI,
@@ -133,5 +179,5 @@ function throwDie() {
 
     scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
     scene.simulate();
-    diceLoop = setInterval(handleDie, 100);
+    diceLoop = setInterval(handleDie, 100, callback);
 }

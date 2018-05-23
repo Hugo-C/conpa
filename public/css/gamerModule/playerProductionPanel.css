@@ -111,12 +111,12 @@ button#setPrivacy {
   font-style: italic;
 }
 
-#productionPanel > :last-child {
+#divProduction {
   display: flex;
   justify-content: flex-start;
 }
 
-#productionPanel > :last-child > button#displayList {
+#divProduction > button#displayList {
   width: 1%;
   border-right: 1px solid black;
   background-color: grey;

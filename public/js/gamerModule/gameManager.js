@@ -392,7 +392,28 @@ function skipTurn(){
 }
 
 function rollTheDice(){
-  $('#startDice').click();
+    $('#startDice').click();
+}
+
+function displayScene() {
+    //$('#scene').css('display', 'flex');
+    $('#divProduction').css('display', 'none');
+    let parentScene = document.getElementById('productionPanel');
+    let scene = document.createElement('div');
+    scene.id = 'scene';
+    scene.style.display = 'flex';
+    scene.style.height = '100%';
+    parentScene.insertBefore(scene, null);
+}
+
+function hideScene() {
+    //$('#scene').css('display', 'none');
+    $('#divProduction').css('display', 'flex');
+    $('#scene').remove();
+}
+
+function processHideScene() {
+    hideScene();
 }
 
 // ---------------------------------------------------------------------
@@ -473,9 +494,10 @@ $("#inputBox").focusout(function(){
     }
 });
 
-$("#startDice").on("click", function(){
+$("#startDice").on("click", function () {
+    displayScene();
     initScene();
-    throwDie();
+    throwDie(processHideScene);
     hideDice();
     clientGame.stopWaitsForDiceProcess();
     $('circle.hourglassStroke')[0].classList.remove('rollTheDice');
