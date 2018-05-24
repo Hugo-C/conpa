@@ -5,6 +5,11 @@
   transition: width 1s, height 1s;
 }
 
+#gameTab .header,
+#gameTab .bottom {
+	background-color: #CB1D1D;
+}
+
 #gameTab > div {
   padding: 0;
 }
