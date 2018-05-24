@@ -7,6 +7,12 @@
   transition: width 1s, height 1s;
 }
 
+#editorTab .header,
+#editorTab .bottom {
+	background-color: #035EFB;
+}
+
+
 #editorTab > div {
   padding: 0;
 }
