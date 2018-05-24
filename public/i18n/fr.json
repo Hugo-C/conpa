@@ -38,6 +38,7 @@
     "whiteColor" : "Blanc",
     "purpleColor" : "Violet",
     "brownColor" : "Marron",
+    "blackColor" : "Noir",
     "turnLabel" :"Tour",
     "questionLabel" : "Question",
     "cardLabel" : "Carte",
@@ -143,5 +144,8 @@
     "playerLeavingMessage" : " a quitté la partie !",
     "yes" : "Oui",
     "no" : "Non",
-    "wizz" : "Puis-je consulter ta production ?" 
+    "wizz" : "Puis-je consulter ta production ?",
+    "rectangle" : "rectangle",
+    "link" : "lien",
+    "withDash" : "pointillé"
 }

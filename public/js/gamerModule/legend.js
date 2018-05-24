@@ -30,7 +30,7 @@ class Legend{  // static class
             div.setAttribute("style", "width: 70%; float:right");
             let text = document.createElement("textarea");
             let color = Legend.colorToText(r.getFillColor());
-            text.setAttribute("placeholder", color + " rectangle" );
+            text.setAttribute("placeholder", $.i18n(color) + " " + $.i18n("rectangle"));
             text.setAttribute("class", "legend");
             div.appendChild(text);
             overlay.append(div);
@@ -67,9 +67,9 @@ class Legend{  // static class
             div.setAttribute("style", "width: 70%; float:right");
             let text = document.createElement("textarea");
             let color = Legend.colorToText(link.getColor());
-            let placeholder = color + " link";
+            let placeholder = $.i18n(color) + " " +  $.i18n("link");
             if(link.getDasharray())
-                placeholder += " with dash";
+                placeholder += " " + $.i18n("withDash");
             text.setAttribute("placeholder", placeholder);
             text.setAttribute("class", "legend");
             div.appendChild(text);
@@ -142,32 +142,32 @@ class Legend{  // static class
      * @return {string}
      */
     static colorToText(color){
-        let resColor = "black";
+        let resColor = "blackColor";
         switch (color){
             case "#333333":
             case "#000000":
-                resColor = "black";
+                resColor = "blackColor";
                 break;
             case "#ed1723":
-                resColor = "red";
+                resColor = "redColor";
                 break;
             case "#0fb32d":
-                resColor = "green";
+                resColor = "greenColor";
                 break;
             case "#ffee24":
-                resColor = "yellow";
+                resColor = "yellowColor";
                 break;
             case "#3344ff":
-                resColor = "blue";
+                resColor = "blueColor";
                 break;
             case "#d5d5d5":
-                resColor = "white";
+                resColor = "whiteColor";
                 break;
             case "#a531ff":
-                resColor = "purple";
+                resColor = "purpleColor";
                 break;
             case "#8c5b35":
-                resColor = "brown";
+                resColor = "brownColor";
                 break;
             default:
                 console.log("this color doesn't look like anything to me : " + color);
