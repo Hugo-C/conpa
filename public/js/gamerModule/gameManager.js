@@ -508,11 +508,11 @@ $('#endOfTurn').on('click', function(){
 });
 
 $('#legend').on('click', function(){
-    if($(this).val() == 'visible'){
-        $('#overlay').css('display', 'none');
+    if($(this).val() === 'visible'){
+        Legend.forceHide();
         $(this).val('hide');
     }else{
-        $('#overlay').css('display', 'block');
+        Legend.forceShow();
         $(this).val('visible');
     }
 });

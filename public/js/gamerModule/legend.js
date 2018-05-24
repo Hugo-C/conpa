@@ -8,10 +8,12 @@ $(document).ready(function() {
     });
 });
 
+let overlay =  document.getElementById("overlay");
+let isForcedHide = false;
+
 class Legend{  // static class
 
     static addRectangles(rectangles){
-        let overlay =  document.getElementById("overlay");
         for(let r of rectangles){
             // Svg
             let divTmp = document.createElement("div");
@@ -29,7 +31,7 @@ class Legend{  // static class
             let div = document.createElement("div");
             div.setAttribute("style", "width: 70%; float:right");
             let text = document.createElement("textarea");
-            let color = Legend.colorToText(r.getFillColor());
+            let color = this.colorToText(r.getFillColor());
             text.setAttribute("placeholder", $.i18n(color) + " " + $.i18n("rectangle"));
             text.setAttribute("class", "legend");
             div.appendChild(text);
@@ -38,7 +40,6 @@ class Legend{  // static class
     }
 
     static addLinks(links){
-        let overlay =  document.getElementById("overlay");
         for(let link of links){
             // Svg
             let divTmp = document.createElement("div");
@@ -66,7 +67,7 @@ class Legend{  // static class
             let div = document.createElement("div");
             div.setAttribute("style", "width: 70%; float:right");
             let text = document.createElement("textarea");
-            let color = Legend.colorToText(link.getColor());
+            let color = this.colorToText(link.getColor());
             let placeholder = $.i18n(color) + " " +  $.i18n("link");
             if(link.getDasharray())
                 placeholder += " " + $.i18n("withDash");
@@ -78,7 +79,7 @@ class Legend{  // static class
     }
 
     static refresh(rectangles, links){
-        Legend.clear();
+        this.clear();
         // Rectangles
         let rectSet = [];  // list of different rectangles
         for(let r1 of rectangles) {
@@ -91,7 +92,7 @@ class Legend{  // static class
             if(keep)
                 rectSet.push(r1);
         }
-        Legend.addRectangles(rectSet);
+        this.addRectangles(rectSet);
 
         // Links
         let linksSet = [];  // list of different rectangles
@@ -106,14 +107,13 @@ class Legend{  // static class
             if(keep)
                 linksSet.push(l1);
         }
-        Legend.addLinks(linksSet);
+        this.addLinks(linksSet);
     }
 
     /**
      * Clear all entries in the legend
      */
     static clear(){
-        let overlay =  document.getElementById("overlay");
         // Remove previous html except hidden div used for resizing
         let nodes = overlay.childNodes;
         for (let i = 0; i < nodes.length;) {
@@ -126,13 +126,22 @@ class Legend{  // static class
     }
 
     static show(){
-        let overlay =  document.getElementById("overlay");
-        overlay.style.display = "block";
+        if(!isForcedHide)
+            overlay.style.display = "block";
     }
 
     static hide(){
-        let overlay =  document.getElementById("overlay");
         overlay.style.display = "none";
+    }
+
+    static forceShow(){
+        isForcedHide = false;
+        this.show();
+    }
+
+    static forceHide(){
+        isForcedHide = true;
+        this.hide();
     }
 
     /**
