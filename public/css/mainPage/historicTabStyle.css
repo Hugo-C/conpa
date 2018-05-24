@@ -7,6 +7,12 @@
   transition: width 1s, height 1s;
 }
 
+#historicTab .header,
+#historicTab .bottom {
+	background-color: #035EFB;
+}
+
+
 #historicTab > div {
   padding: 0;
 }
