@@ -406,16 +406,6 @@ function displayScene() {
     parentScene.insertBefore(scene, null);
 }
 
-function hideScene() {
-    //$('#scene').css('display', 'none');
-    $('#divProduction').css('display', 'flex');
-    $('#scene').remove();
-}
-
-function processHideScene() {
-    hideScene();
-}
-
 // ---------------------------------------------------------------------
 // ----------------------- BUTTONS LISTENER ----------------------------
 // ---------------------------------------------------------------------
@@ -497,7 +487,7 @@ $("#inputBox").focusout(function(){
 $("#startDice").on("click", function () {
     displayScene();
     initScene();
-    throwDie(processHideScene);
+    throwDie();
     hideDice();
     clientGame.stopWaitsForDiceProcess();
     $('circle.hourglassStroke')[0].classList.remove('rollTheDice');
