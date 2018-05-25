@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const keys = require('./dbConstants');
+const logger = require('../js/logger.js');
 const crypto = require('crypto');
 const md5 = require('md5');
 
@@ -144,8 +145,8 @@ exports.getCardGame = function(cardGame, language, callback){
               ' WHERE ' + keys.CGT_KEY_NAME + ' = ?' +
               ' AND ' + keys.CGT_KEY_LANGUAGE + ' = ?;';
     let values = [cardGame, language];
-    console.log(sql);
-    console.log(values);
+    logger.debug(sql);
+    logger.debug(values);
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result);
@@ -235,7 +236,7 @@ exports.cardGameExists = function(name, language, callback){
     let values = [name, language];
     state.pool.query(sql, values, function(err, result){
         if(err){
-            console.log(err);
+            logger.error(err);
             callback(err);
         }else{
             if(result.length > 0){
@@ -421,10 +422,10 @@ exports.userExists = function(user, callback){
     let sql = 'SELECT *' +
               ' FROM ' + keys.USER_TABLE +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-    console.log(sql);
+    logger.debug(sql);
     let value = [user];
     state.pool.query(sql, value, function(err, result){
-        console.log(result);
+        logger.debug(result);
         if(err) callback(false);
         else callback(result.length > 0);
     });
@@ -440,10 +441,10 @@ exports.isConnected = function(user, callback){
     let sql = 'SELECT ' + keys.UT_CONNECT +
               ' FROM ' + keys.USER_TABLE +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-    console.log(sql);
+    logger.debug(sql);
     let value = [user];
     state.pool.query(sql, value, function(err, result){
-        console.log(result);
+        logger.debug(result);
         if(err) callback(false);
         else callback(result[0][keys.UT_CONNECT] === '1');
     });
@@ -459,7 +460,7 @@ exports.getPassword = function(pseudo, callback){
     let sql = 'SELECT ' + keys.UT_KEY_PASSWORD +
               ' FROM ' + keys.USER_TABLE +
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-    console.log(sql);
+    logger.debug(sql);
     let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err){
@@ -484,7 +485,7 @@ exports.setPassword = function(pseudo, password, callback){
     let sql = 'UPDATE ' + keys.USER_TABLE +
         ' SET ' + keys.UT_KEY_PASSWORD + ' = ?' +
         ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
-    console.log(sql);
+    logger.debug(sql);
     let value = [password, pseudo];
     state.pool.query(sql, value, function(err){
         if(err) callback(err);
@@ -554,7 +555,7 @@ let setToken = function(pseudo, token, callback){
     let value = [md5(token + TOKEN_SALT), expirationDate, pseudo];
     state.pool.query(sql, value, function(err){
         if(err){
-            console.log(err);
+            logger.debug(err);
             callback(pseudo, null);
         } else {
             callback(pseudo, token);
@@ -759,7 +760,7 @@ exports.recordPlayerProduction = function(pseudo, serverName, date, production, 
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
     let values = [production, pseudo, serverName, date];
     state.pool.query(sql, values, function(err){
-        console.log(err);
+        logger.debug(err);
         if(err) callback(err);
         else callback(null);
     });
@@ -805,7 +806,7 @@ exports.getProduction = function(pseudo, party, date, callback){
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
     let values = [party, date, pseudo];
     state.pool.query(sql, values, function(err, result){
-        console.log(result);
+        logger.debug(result);
         if(err) callback(err);
         else callback(null, result[0][keys.HPT_KEY_PRODUCTION]);
     });
@@ -822,7 +823,7 @@ exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
     let values = [party, date, pseudo];
     state.pool.query(sql, values, function(err, result){
-        console.log(result);
+        logger.debug(result);
         if(err) callback(err);
         else callback(null, result);
     });

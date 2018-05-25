@@ -9,10 +9,10 @@ const db = require('../js/db');
  * Return the email of a given user
  */
 router.post('/email', urlencodedParser, function(req, res) {
-    console.log("PSEUDO : " + req.body.username);
+    logger.debug("retrieving the email for user : " + req.body.username);
     db.getEmail(req.body.username, function(err, pp){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.sendStatus(500);
         }else{
             let myRes = {pp: pp};

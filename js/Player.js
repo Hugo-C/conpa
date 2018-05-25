@@ -1,4 +1,5 @@
 const db = require('../js/db');
+const logger = require('../js/logger');
 
 module.exports = class Player {
 
@@ -79,7 +80,7 @@ module.exports = class Player {
 
     recordPlayer(party){
         db.linkPlayerAndParty(this.pseudo, party, this.question, function(err){
-            if(err) console.log(err);
+            if(err) logger.error(err);
         });
     }
 };

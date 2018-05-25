@@ -4,6 +4,7 @@ const multer = require('multer');
 const upload = multer().single('uploadProduction');
 const querystring = require('querystring');
 const url = require('url');
+const logger = require('../js/logger.js');
 const db = require('../js/db');
 const keys = require('../js/dbConstants');
 const fs = require('fs');
@@ -13,7 +14,7 @@ const fs = require('fs');
  * Return a Json of cards of the specified cardGame
  */
 router.get('/cards', function(req, res) {
-    console.log("on m'a demandé des cartes");
+    logger.debug("cards requested");
     let response = {};
     let nbFamilyTreated = 0;
     let nbFamilyToTreat;
@@ -46,10 +47,12 @@ router.get('/cards', function(req, res) {
                 delete response[familyId[i]];
             }
             res.send(response);
+            logger.debug("cards send : " + response);
         }
     };
     if(params["cardGame"] === undefined || params["language"] === undefined){
         res.status(500).send({ error: "invalid parameters, please specify the cardGame value and language value" });
+        logger.warn("cards requested with invalid parameters : " + params["cardGame"] + ", " + params["language"]);
     } else {
         db.getCardGame(params["cardGame"], params["language"], processCardGame);
     }
@@ -62,17 +65,18 @@ router.get('/', function(req, res) {
 router.post('/uploadProduction', function(req, res){
     upload(req, res, function(err){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.send('ERROR');
         }else{
             let file = req.file;
             let dest = "./upload/" + file.originalname;
             fs.writeFile(dest, file.buffer, function(err){
                 if(err){
-                    console.log(err);
+                    logger.error(err);
                     res.send('ERROR');
                 }else{
                     res.send('OK');
+                    logger.log("silly", "production uploaded");
                 }
             });
         }

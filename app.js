@@ -3,10 +3,10 @@ const express = require('express');
 const app = express();
 const server = app.listen(8080);
 const io = require('socket.io').listen(server);
+const logger = require('./js/logger.js');
 const db = require('./js/db');
 const path = require('path');
 const favicon = require('serve-favicon');
-const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
@@ -28,7 +28,6 @@ app.set('views', [path.join(__dirname, 'views/'),
 app.set('view engine', 'jade');
 
 app.use(favicon(path.join(__dirname, 'public', 'img', 'favicon.ico')));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -51,7 +50,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-    console.log(err);
+    logger.error(err);
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -64,10 +63,10 @@ app.use(function(err, req, res, next) {
 // connect to MySQL on start
 db.connect(db.MODE_TEST, function(err){
     if(err){
-        console.log('Unable to connect to MySQL');
+        logger.error('Unable to connect to MySQL');
         process.exit(1);
     }else{
-        console.log('Connected to MySQL');
+        logger.info('Connected to MySQL');
     }
 });
 

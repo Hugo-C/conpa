@@ -1,3 +1,4 @@
+const logger = require("../js/logger");
 
 module.exports = class Game {
     constructor(name, places, host, cardGameName, cardGameLanguage, useTimers,
@@ -131,13 +132,13 @@ module.exports = class Game {
      */
     isAllQuestionsDefined(){
         if(this.host.isAnimator()){
-            console.log("nb players ready : " + this.nbPlayersReady());
-            console.log("nb of players : " + this.players.length);
-            console.log("Is anim ready : " + this.host.isReady());
+            logger.verbose("nb players ready : " + this.nbPlayersReady());
+            logger.verbose("nb of players : " + this.players.length);
+            logger.verbose("Is anim ready : " + this.host.isReady());
             return this.nbPlayersReady() === this.players.length && this.host.isReady();
         }else{
-            console.log("nb players ready : " + this.nbPlayersReady());
-            console.log("nb of players : " + this.getNbPlayer());
+            logger.verbose("nb players ready : " + this.nbPlayersReady());
+            logger.verbose("nb of players : " + this.getNbPlayer());
             return this.nbPlayersReady() === this.getNbPlayer();
         }
     }
@@ -251,7 +252,7 @@ module.exports = class Game {
      * @return {number}
      */
     getSharingInterval(){
-        console.log('SHARING INTERVAL : ' + this.sharingInterval * 1000);
+        logger.debug('SHARING INTERVAL : ' + this.sharingInterval * 1000);
         return this.sharingInterval * 1000;
     }
 

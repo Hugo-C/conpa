@@ -2,6 +2,7 @@ const fs = require("fs");
 const parse = require('csv-parse/lib/sync');
 const db = require('../js/db');
 const keys = require('../js/dbConstants');
+const logger = require('../js/logger');
 
 /**
  * Import the cards of the family to the database
@@ -18,9 +19,9 @@ function addCards(records, family, familyId) {
         // TODO add the cards by batch
         db.addCard(records[j][family], records[j]["info sup " + family], familyId, function(err){
             if(err){
-                console.log("err : " + err.message);
+                logger.error("err : " + err.message);
             }else{
-                //console.log("I added a card");
+                logger.debug("I added a card");
             }
         });
         j++;
@@ -39,9 +40,9 @@ function addFamily(records, family, cardGameId, addCards) {
 
     function onFamilyAdded(err, result){
         if (err) {
-            console.log("err family : " + err.message);
+            logger.error("err family : " + err.message);
         }else {
-            console.log("I added a cardFamily : " + family);
+            logger.debug("I added a cardFamily : " + family);
             addCards(records, family, result.insertId);
         }
     }
@@ -74,9 +75,9 @@ function addCardGame(name, language, author, records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
     db.addCardGame(name, language, author, function(err, result){
         if (err) {
-            console.log("err : " + err.message);
+            logger.error("err : " + err.message);
         } else {
-            console.log("I added a new CardGame");
+            logger.debug("I added a new CardGame");
             processFamilies(records, result.insertId);
         }
     });
@@ -90,18 +91,18 @@ function addCardGame(name, language, author, records, processFamilies) {
  */
 function updateCardGame(name, language, author, records, processFamilies) {
     // TODO we may want to handle errors in a way that failed request revert DB to a previous state
-    console.log(name);
-    console.log(language);
+    logger.debug("silly", name);
+    logger.debug("silly", language);
     db.removeCardGameFamilies(name, language, function(err){
         if(err){
-            console.log(err);
+            logger.error(err);
         }else{
             //addCardGame(name, language, author, records, processFamilies);
             db.getCardGame(name, language, function(err, result){
                 if(err){
-                    console.log(err);
+                    logger.error(err);
                 }else{
-                    console.log(result);
+                    logger.debug(result);
                     processFamilies(records, result[0][keys.CGT_KEY_ID]);
                 }
             });
@@ -124,7 +125,7 @@ exports.importFromCsv = function(name, language, author, path, newCardGame){
                 else updateCardGame(name, language, author, records, processFamilies);
             }
         }catch(error){
-            console.log(error);
+            logger.error(err);
         }
         fs.unlinkSync(path);
     });

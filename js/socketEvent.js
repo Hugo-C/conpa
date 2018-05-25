@@ -1,6 +1,7 @@
 const Player = require('./Player.js');
 const Game = require('./Game.js');
 const db = require('../js/db');
+const logger = require('../js/logger');
 const i18n_module = require('i18n-nodejs');
 
 const WAITING_PLAYERS = "waitingForPlayers";
@@ -66,7 +67,7 @@ module.exports = function(io, socket){
                                   'players': server.getActivePlayers()});
             server.setStatus(QUESTION_TIME);
             io.sockets.emit('serverListUpdate', listAllServers());
-            console.log('==> A game start : ' + server.getName());
+            logger.info('A game start : ' + server.getName());
         }
     }
 
@@ -123,7 +124,7 @@ module.exports = function(io, socket){
      * @param {Game} gameServer : game server for which we want to start a new turn
      */
     function newTurn(gameServer){
-        console.log('--> New turn for the server ' + gameServer.getName() + ' : ');
+        logger.debug("New turn for the server " + gameServer.getName());
         gameServer.newTurn();
         let data = {'currentPlayer': gameServer.getCurrentPlayer(),
                     'nextPlayer': gameServer.getNextPlayer(),
@@ -131,9 +132,9 @@ module.exports = function(io, socket){
                     'indivTimer': gameServer.getIndividualTimer(),
                     'forceEndOfTurn': gameServer.getForceEndOfTurn(),
                     'delayBeforeForcing': gameServer.getDelayBeforeForcing()};
-        console.log(data);
+        logger.log("silly", data);
         io.sockets.in(gameServer.getName()).emit('newTurn', data);
-        console.log(socket.translater.__('currentPlayerMessage'));
+        logger.log("silly", socket.translater.__('currentPlayerMessage'));
         sendSystemMessage(gameServer.getName(), socket.translater.__('currentPlayerMessage') + data['currentPlayer']);
     }
 
@@ -149,7 +150,7 @@ module.exports = function(io, socket){
     }
 
     function productionSharingManager(serverName){
-        console.log("--> Sharing productions");
+        logger.debug("Sharing productions");
         io.sockets.in(serverName).emit('shareYourProduction', null);
     }
 
@@ -163,9 +164,9 @@ module.exports = function(io, socket){
         let date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
         db.recordNewParty(gameServer.getName(), animator, date, function(err, partyId){
             if(err){
-                console.log(err);
+                logger.error(err);
             }else{
-                console.log(partyId);
+                logger.log("silly", partyId);
                 gameServer.setHistoricId(partyId);
                 gameServer.addPlayersToPartyHistoric();
             }
@@ -181,9 +182,9 @@ module.exports = function(io, socket){
      * @param {string} production : a string which describes the svg production
      */
     function recordProduction(pseudo, partyHistoricId, production){
-        console.log(production);
+        logger.log("silly", production);
         db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, production, function(err){
-            if(err) console.log(err);
+            if(err) logger.error(err);
         });
     }
 
@@ -204,27 +205,27 @@ module.exports = function(io, socket){
 
                 server.removePlayerByPseudo(server.inactivePlayer[index]);
                 sendSystemMessage(server.getName(), server.inactivePlayer[index] + socket.translater.__('playerLeavingMessage'));
-                console.log(server.inactivePlayer[index] + ' is removed');
+                logger.verbose(server.inactivePlayer[index] + ' is removed');
 
                 // a player has been removed, we need to inform clients
                 if(server.getNbPlayer() === 0){
                     removeServer(server);
                 }else{
-                    console.log('updating server data');
+                    logger.verbose('updating server data');
                     if(server.getStatus() === QUESTION_TIME){
-                        console.log('question time');
+                        logger.verbose('question time');
                         if(server.isAllQuestionsDefined()){
-                            console.log('all questions are defined !');
+                            logger.verbose('all questions are defined !');
                             startGameTime(server);
                         }else{
-                            console.log('updating question time');
+                            logger.verbose('updating question time');
                             io.sockets.in(server.getName())
                                       .emit('initQuestionTime', {'players': server.getPlayers(), 'animator': server.getAnimatorPseudo()});
                             io.sockets.in(server.getName())
                                       .emit('actualizeQuestions', getQuestionTimeState(server));
                         }
                     }else if(server.getStatus() === GAME_TIME){
-                        console.log('updating game time');
+                        logger.verbose('updating game time');
                         io.sockets.in(server.getName())
                                   .emit('changeDuringGameTime', {'players': server.getActivePlayers()});
                     }
@@ -240,7 +241,7 @@ module.exports = function(io, socket){
             if(io.sockets.connected[clients[players[index]]] == null
             || io.sockets.connected[clients[players[index]]].room == null){
                 server.inactivePlayer.push(players[index]);
-                console.log(players[index] + ' is inactive');
+                logger.verbose(players[index] + ' is inactive');
             }
         }
     }
@@ -255,7 +256,7 @@ module.exports = function(io, socket){
         };
         //init internationalization / localization class
         socket.translater = new i18n_module(config.lang, config.langFile);
-        console.log(socket.translater.__('Salut'));
+        logger.verbose(socket.translater.__("i18n module initialised"));
     }
 
     // -----------------------------------------------------------------------------
@@ -270,7 +271,7 @@ module.exports = function(io, socket){
      * form of received data : { 'pseudo': value }
      */
     socket.on('pseudo', function(data){
-        console.log('==> New player : ' + data['pseudo']);
+        logger.info("New player : " + data['pseudo']);
         clients[data["pseudo"]] = socket.id;
         socket.room = null;
         initTranslater();
@@ -292,7 +293,7 @@ module.exports = function(io, socket){
      */
     socket.on('createServer', function(data){
         if(!(data["server"]["name"] in rooms)){
-            console.log('==> New game server : ' + data["server"]["name"]);
+            logger.verbose("New game server : " + data["server"]["name"]);
 
             let player = new Player(getPseudoWithId(socket.id), data["role"]);
             let server = new Game(data["server"]["name"],
@@ -338,7 +339,7 @@ module.exports = function(io, socket){
         // A player can only remove his own server if the game hasn't started
         if(server != null && server.getStatus() === WAITING_PLAYERS
         && server.getHost().getPseudo() === getPseudoWithId(socket.id)){
-            console.log('==> Removing game server : ' + server.getName());
+            logger.verbose('Removing game server : ' + server.getName());
 
             io.sockets.in(socket.room).emit('serverRemoved', null);
             let players = server.getActivePlayers();
@@ -369,7 +370,7 @@ module.exports = function(io, socket){
             && server.getStatus() === WAITING_PLAYERS){
 
                 let player = new Player(getPseudoWithId(socket.id), "player");
-                console.log('==> Player ' + player.getPseudo() + ' joined ' + server.getName());
+                logger.info("Player " + player.getPseudo() + " joined " + server.getName());
 
                 if(socket.room != null) rooms[socket.room].removePlayer(player);
                 server.addNewPlayer(player);
@@ -399,7 +400,7 @@ module.exports = function(io, socket){
      * This message can only be send if the game has not started
      */
     socket.on('exitServer', function(data){
-        console.log('==> ' + getPseudoWithId(socket.id) + ' leaved ' + socket.room);
+        logger.info(getPseudoWithId(socket.id) + ' leaved ' + socket.room);
         let server = rooms[data['server']];
         if(server != null){
             server.removePlayerByPseudo(getPseudoWithId(socket.id));
@@ -419,7 +420,7 @@ module.exports = function(io, socket){
      *                          'pseudo': [player's pseudo]}
      */
     socket.on('joinGame', function(data){
-        console.log('--> ' + data['pseudo'] + ' joined ' + data['server']);
+        logger.info(data['pseudo'] + ' joined ' + data['server']);
         let server = rooms[data['server']];
         if(server != null){
             let player = server.getPlayer(data['pseudo']);
@@ -457,7 +458,7 @@ module.exports = function(io, socket){
      * form of received data : {'question': player's question}
      */
     socket.on('recordMyQuestion', function(data){
-        console.log('--> ' + getPseudoWithId(socket.id) + ' recorded his question');
+        logger.verbose(getPseudoWithId(socket.id) + ' recorded his question');
         let server = rooms[socket.room];
         if(server != null){
             server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
@@ -477,7 +478,7 @@ module.exports = function(io, socket){
      * form of received datas : no data are send with this message (null)
      */
     socket.on('animatorValidation', function(data){
-        console.log('--> ' + socket.room + ' : received animator validation');
+        logger.verbose(socket.room + ' : received animator validation');
         let server = rooms[socket.room];
         if(server != null){
             server.setAnimReady();
@@ -493,7 +494,7 @@ module.exports = function(io, socket){
      * form of received data : no data are send with this message (null)
      */
     socket.on('endOfTurn', function(data){
-        console.log('--> ' + getPseudoWithId(socket.id) + ' finished his turn');
+        logger.verbose(getPseudoWithId(socket.id) + ' finished his turn');
         let server = rooms[socket.room];
         if(server != null){
             newTurn(server);
@@ -510,7 +511,7 @@ module.exports = function(io, socket){
      *                          'msg': [message body]}
      */
     socket.on('message', function(data){
-        console.log('--> ' + socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
+        logger.verbose(socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
         if(data["dest"] === "all"){
             let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
             socket.broadcast.to(socket.room).emit('message', rep);
@@ -528,7 +529,7 @@ module.exports = function(io, socket){
      * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
      */
     socket.on('cardPicked', function(data){
-        console.log('--> ' + getPseudoWithId(socket.id) + ' picked a new card');
+        logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
         io.sockets.in(socket.room).emit('cardPicked', data);
     });
 
@@ -551,7 +552,7 @@ module.exports = function(io, socket){
      * form of received datas : no datas are sent with this message (null)
      */
     socket.on('processStopGame', function(data){
-        console.log('--> ' + getPseudoWithId(socket.id) + ' started a stop game process');
+        logger.debug(getPseudoWithId(socket.id) + ' started a stop game process');
         let server = rooms[socket.room];
         if(server != null){
             server.exitBuffer.push(getPseudoWithId(socket.id));
@@ -573,7 +574,7 @@ module.exports = function(io, socket){
      * form of received data : {'exit': player's answer (true if he wants to stop, else false)}
      */
     socket.on('stopGame', function(data){
-        console.log('--> ' + getPseudoWithId(socket.id) + ' wants to stop game ? : ' + data['exit']);
+        logger.debug(getPseudoWithId(socket.id) + ' wants to stop game ? : ' + data['exit']);
         let server = rooms[socket.room];
         if(server != null){
             if(data['exit']){
@@ -601,7 +602,7 @@ module.exports = function(io, socket){
      *                          'pseudo': [player's name]}
      */
     socket.on('quitGame', function(data){
-        console.log('--> ' + data['pseudo'] + ' leaved game server ' + socket.room);
+        logger.verbose(data['pseudo'] + ' leaved game server ' + socket.room);
         let server = rooms[data['server']];
         if(server != null){
             let currentPlayer = server.getCurrentPlayer();

@@ -7,6 +7,7 @@ const querystring = require('querystring');
 const path = require('path');
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({extended: true});
+const logger = require('../js/logger.js');
 const db = require('../js/db');
 const keys = require('../js/dbConstants');
 const exportCSV = require('../js/exportCSV');
@@ -22,8 +23,10 @@ router.post('/checkConnection', urlencodedParser, function (req, res) {
     db.isConnected(req.body.username, function (connected) {
         if (connected) {
             res.send("OK");
+            logger.log("silly", req.body.username + " is already connected");
         } else {
             res.send("REJECT");
+            logger.log("silly", req.body.username + " has been rejected from the server");
         }
     });
 });
@@ -31,7 +34,7 @@ router.post('/checkConnection', urlencodedParser, function (req, res) {
 router.post('/getHistoric', urlencodedParser, function(req, res){
     db.getHistoricEntries(req.body.username, function(err, result){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.send('ERROR');
         }else{
             let historic = []; // used to store historic entries
@@ -43,6 +46,7 @@ router.post('/getHistoric', urlencodedParser, function(req, res){
                 historic.push(data);
             }
             res.send(historic);
+            logger.log("silly", historic);
         }
     });
 });
@@ -50,10 +54,11 @@ router.post('/getHistoric', urlencodedParser, function(req, res){
 router.post('/removeHistoric', urlencodedParser, function(req, res){
     db.removePlayerPartyHistoric(req.body.username, req.body.server, req.body.date, function(err){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.send('ERROR');
         }else{
             res.send('OK');
+            logger.debug("one historic successfully removed");
         }
     });
 });
@@ -62,9 +67,10 @@ router.post('/getPlayerProduction', urlencodedParser, function(req, res){
     var details = {'production': ''};
     db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
         if(err){
+            logger.error(err);
             res.send('ERROR');
         }else{
-            console.log(result != null);
+            logger.log("silly", result != null);
             if(result != null) details['production'] = result;
             res.send(details);
         }
@@ -72,12 +78,14 @@ router.post('/getPlayerProduction', urlencodedParser, function(req, res){
 });
 
 router.post('/recordPlayerProduction', urlencodedParser, function(req, res){
-    console.log(req.body.production);
+    logger.log("silly", req.body.production);
     db.recordPlayerProduction(req.body.username, req.body.partyName, req.body.partyDate, req.body.production, function(err){
         if(err){
+            logger.error(err);
             res.send('ERROR');
         }else{
             res.send('OK');
+            logger.debug("production saved : " + req.body.production);
         }
     });
 });
@@ -93,9 +101,10 @@ router.post('/getDetails', urlencodedParser, function(req, res){
 
         db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
             if(err){
+                logger.error(err);
                 res.send('ERROR');
             }else{
-                console.log(result != null);
+                logger.log("silly", result != null);
                 if(result != null) details['production'] = result;
                 res.send(details);
             }
@@ -125,10 +134,10 @@ router.post('/getPlayerDetails', urlencodedParser, function(req, res){
 });
 
 router.post('/getCardGames', urlencodedParser, function(req, res){
-    console.log(req.body.tags);
+    logger.debug("retrieving cards with tags : " + req.body.tags);
     db.getCardGamesByTags(JSON.parse(req.body.tags), function(err, result){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.send('ERROR');
         }else{
             let cardGames = []; //used to send all card games
@@ -178,7 +187,7 @@ function getCardGameInformation(name, language, callback){
     function retrieveCardgameDescription(){
         db.getCardGameDescription(name, language, function(err, description){
             if(err){
-                console.log(err);
+                logger.error(err);
                 callback(err);
             }else{
                 data['description'] = description[0][keys.CGT_KEY_DESCRIPTION];
@@ -190,7 +199,7 @@ function getCardGameInformation(name, language, callback){
     function retrieveCardgameTags(){
         db.getCardGameTags(name, language, function(err, tags){
             if(err){
-                console.log(err);
+                logger.error(err);
                 callback(err);
             }else{
                 for(let index = 0; index < tags.length; index++){
@@ -203,7 +212,7 @@ function getCardGameInformation(name, language, callback){
 
     db.getAllTags(function(err, allTags){
         if(err){
-            console.log(err);
+            logger.errro(err);
             callback(err);
         }else{
             for(let index = 0; index < allTags.length; index++){
@@ -218,7 +227,7 @@ router.post('/getCardGameInfo', urlencodedParser, function(req, res){
 
     getCardGameInformation(req.body.name, req.body.language, function(err, data){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.send({'msg': 'ERROR'});
         }else{
             data['msg'] = 'OK';
@@ -232,7 +241,7 @@ router.post('/updateCardgameDescription', urlencodedParser, function(req, res){
 
     db.updateCardgameDescription(req.body.name, req.body.language, req.body.description, function(err){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.send('ERROR');
         }else{
             res.send('OK');
@@ -247,7 +256,7 @@ router.post('/removeATag', urlencodedParser, function(req, res){
         data = {'msg': 'OK', 'tags': []};
         db.getCardGameTags(req.body.name, req.body.language, function(err, tags){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'GET CARDGAME TAGS ERROR'});
             }else{
                 for(let index = 0; index < tags.length; index++){
@@ -261,7 +270,7 @@ router.post('/removeATag', urlencodedParser, function(req, res){
     function removeTagFromCardgameWithId(cardgameId){
         db.removeATagFromCardgame(cardgameId, req.body.tag, function(err){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'REMOVING TAG ERROR'});
             }else{
                 sendActualizedTagsList();
@@ -271,7 +280,7 @@ router.post('/removeATag', urlencodedParser, function(req, res){
 
     db.getCardGame(req.body.name, req.body.language, function(err, result){
         if(err){
-            console.log(err);
+            logger.error(err);;
             res.send({'msg': 'GET CARDGAME ID ERROR'});
         }else{
             removeTagFromCardgameWithId(result[0][keys.CGT_KEY_ID]);
@@ -283,11 +292,11 @@ router.post('/removeATag', urlencodedParser, function(req, res){
 router.post('/addATag', urlencodedParser, function(req, res){
 
     function sendActualizedTagsList(){
-        console.log('sending actualized tags list');
+        logger.debug('sending actualized tags list');
         data = {'msg': 'OK', 'tags': []};
         db.getCardGameTags(req.body.name, req.body.language, function(err, tags){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'GET CARDGAME TAGS ERROR'});
             }else{
                 for(let index = 0; index < tags.length; index++){
@@ -299,10 +308,10 @@ router.post('/addATag', urlencodedParser, function(req, res){
     }
 
     function addTagToCardgameWithId(cardgameId){
-        console.log('adding tags to the cardgame');
+        logger.debug('adding tags to the cardgame');
         db.addANewTagToCardgame(cardgameId, req.body.tag, function(err){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'ADDING NEW TAG TO CARDGAME ERROR'});
             }else{
                 sendActualizedTagsList();
@@ -311,10 +320,10 @@ router.post('/addATag', urlencodedParser, function(req, res){
     }
 
     function searchCardgameId(){
-        console.log('retrieving cardgame id');
+        logger.debug('retrieving cardgame id');
         db.getCardGame(req.body.name, req.body.language, function(err, result){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'GET CARDGAME ID ERROR'});
             }else{
                 addTagToCardgameWithId(result[0][keys.CGT_KEY_ID]);
@@ -323,10 +332,10 @@ router.post('/addATag', urlencodedParser, function(req, res){
     }
 
     function addANewTag(){
-        console.log('adding a new tag to the tags table');
+        logger.debug('adding a new tag to the tags table');
         db.addANewTag(req.body.tag, function(err){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'ADDING NEW TAG ERROR'});
             }else{
                 searchCardgameId();
@@ -335,9 +344,9 @@ router.post('/addATag', urlencodedParser, function(req, res){
     }
 
     db.existsTag(req.body.tag, function(err, exists){
-        console.log('checking if the tag already exists');
+        logger.debug('checking if the tag already exists');
         if(err){
-            console.log(err);
+            logger.error(err);;
             res.send({'msg': 'CHECK IF TAG EXISTS ERROR'});
         }else{
             if(exists){
@@ -354,7 +363,7 @@ router.post('/updateCardGame', urlencodedParser, function(req, res){
     let update = req.body.update;
     let cardGamePath = "./upload/" + req.body.csv;
     if(update === 'yes'){
-        console.log("overwrite data");
+        logger.log("silly", "overwrite data");
         importCSV.importFromCsv(req.body.name, req.body.language, req.body.author, cardGamePath, false);
         getCardGameInformation(req.body.name, req.body.language, function(err, data){
             if(err){
@@ -365,7 +374,7 @@ router.post('/updateCardGame', urlencodedParser, function(req, res){
             }
         });
     }else{
-        console.log("no update !");
+        logger.log("silly", "no update !");
         fs.unlinkSync(cardGamePath);
         res.send({'send': 'NO UPDATE'});
     }
@@ -378,7 +387,7 @@ router.post('/updateCardGame', urlencodedParser, function(req, res){
  * @param {callback} cardGameExistsCallback : used to return the answer (takes a boolean param and file content)
  */
 function checkIfCardGameExists(name, language, cardGameExistsCallback){
-    console.log('checking if card game exists');
+    logger.debug('checking if card game exists');
     db.cardGameExists(name, language, function(exists){
         cardGameExistsCallback(null, exists);
     });
@@ -410,10 +419,10 @@ router.post('/importCardGame', function (req, res) {
     }
 
     function checkIfCardGameExists(name, language, fileName){
-        console.log('checking if card game exists');
+        logger.debug('checking if card game exists');
         db.getCardGame(name, language, function(err, result){
               if(err){
-                  console.log(err);
+                  logger.error(err);;
                   res.send({'msg': 'ERROR'});
               }else if(result.length == 1 && result[0][keys.CGT_KEY_AUTHOR] == params['author']){
                   res.send({'msg': 'UPDATE?', 'file': fileName});
@@ -432,7 +441,7 @@ router.post('/importCardGame', function (req, res) {
 
         fs.writeFile("./upload/" + fileName, file.buffer, function(err){
             if(err){
-                console.log(err);
+                logger.error(err);;
                 res.send({'msg': 'ERROR'});
             }else{
                 checkIfCardGameExists(params['name'], params['language'], fileName);
@@ -442,7 +451,7 @@ router.post('/importCardGame', function (req, res) {
 
     upload(req, res, function (err) {
         if (err) {
-            console.log(err);
+            logger.error(err);;
             res.send({'msg': 'ERROR'});
         }else{
             storeCsvFileOnServer();

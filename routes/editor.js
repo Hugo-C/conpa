@@ -5,6 +5,7 @@ const upload = multer().single('uploadCSV');
 const url = require('url');
 const querystring = require('querystring');
 const path = require('path');
+const logger = require('../js/logger.js');
 const importCSV = require('../js/importCSV');
 const exportCSV = require('../js/exportCSV');
 const db = require('../js/db');
@@ -18,7 +19,7 @@ const fs = require('fs');
 router.get('/', function(req, res){
     db.getCardGames(function(err, result){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.writeHead(500);
             res.send();
         }else{
@@ -41,10 +42,10 @@ router.post('/updateCardGame', urlencodedParser, function(req, res){
     let update = req.body.update;
     let cardGamePath = "./upload/" + req.body.csv;
     if(update === 'yes'){
-        console.log("overwrite data");
+        logger.info("overwrite data to update a card game");
         importCSV.importFromCsv(cardGamePath, false);
     }else{
-        console.log("no update !");
+        logger.debug("no update !");
         fs.unlinkSync(cardGamePath);
     }
     res.writeHead(200);
@@ -60,7 +61,7 @@ router.post('/updateCardGame', urlencodedParser, function(req, res){
 function checkIfCardGameExists(csvPath, cardGameExistsCallback){
     fs.readFile(csvPath, function(err, data) {
         let records = parse(data, {columns: true}); // data of the file
-        //console.log(records);
+        logger.log("silly", records);
         if(records.length > 0) // file is not empty
             db.cardGameExists(records[0]['nom jeu'], records[0]['langue'], function(exists){
                 cardGameExistsCallback(exists, records);
@@ -81,7 +82,7 @@ function generateRandomCsvFileName(){
 router.post('/uploadCSV', function (req, res) {
     upload(req, res, function (err) {
         if (err) {
-            console.log(err);
+            logger.error(err);
             res.writeHead(500);
             res.send();
             return; // An error occurred when uploading
@@ -90,9 +91,10 @@ router.post('/uploadCSV', function (req, res) {
             let file = req.file; // file content and metadata
             var fileName = generateRandomCsvFileName();
             var dest = "./upload/" + fileName; // path to the file (uploaded files are saved on the upload folder)
+            logger.debug("csv uploaded at : " + dest);
             fs.writeFile(dest, file.buffer, function(err){
                 if(err){
-                    console.log(err);
+                    logger.error(err);
                     res.writeHead(500); // An error occurred when uploading
                     res.send();
                 }
@@ -104,6 +106,7 @@ router.post('/uploadCSV', function (req, res) {
                 }else{
                     importCSV.importFromCsv(dest, true);
                     res.writeHead(200);
+                    logger.info("csv imported successfully");
                 }
                 res.send();
             });
@@ -117,6 +120,7 @@ router.get('/exportCSV', function(req, res){
         exportCSV.exportToCSV(params['cardGame'], params['language'], function(){
             let file = path.resolve(__dirname + "/../public/myCardGame.csv");
             res.download(file);
+            logger.info("csv downloaded : " + file);
         });
     }
 });

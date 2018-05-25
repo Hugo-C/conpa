@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
+const logger = require('../js/logger.js');
 const db = require('../js/db');
 const md5 = require('md5');
 const jade = require('jade');
@@ -11,14 +12,15 @@ const htmlToText = require('html-to-text');
 
 const EMAIL_RESET_PASSWORD = path.join('views/email/resetPassword.jade');
 
-
 router.get('/resetPassword/:token', function(req, res) {
     let token = req.params.token;
     db.isValidToken(token, function(err, name, tokenExpiration) {
         if(err){
             res.render('connection/tokenUnvalidResponse', {err: err});
+            logger.debug("unvalid token submitted");
         } else {
             res.render('connection/tokenValidResponse', {name: name, tokenExpiration: tokenExpiration});
+            logger.debug("valid token submitted");
         }
     });
 });
@@ -28,7 +30,7 @@ router.get('/', function(req, res){
 });
 
 router.post('/register', urlencodedParser, function(req, res){
-    console.log("new register");
+    logger.info("new register");
     let username = req.body.username;
     let email = req.body.email;
     let password = md5(req.body.password + "conpa35411");
@@ -36,10 +38,13 @@ router.post('/register', urlencodedParser, function(req, res){
         if(err){
             if(err.sqlMessage.match('PRIMARY')){
                 res.send('DUP_PSEUDO');
+                logger.debug("new register failed : duplicated pseudo : " + username);
             }else if(err.sqlMessage.match('uniq_email')){
                 res.send('DUP_EMAIL');
+                logger.debug("new register failed : duplicated email : " + email);
             }else{
                 res.send('ERROR');
+                logger.debug("new register failed : " + username);
             }
         }else{
             res.send("OK");
@@ -53,7 +58,7 @@ router.post('/login', urlencodedParser, function(req, res, next){
 
     function connectUser(){
         db.connectUser(username, function(err){
-            if(err) console.log(err);
+            if(err) logger.error(err);
             else res.send('OK');
         });
     }
@@ -61,13 +66,16 @@ router.post('/login', urlencodedParser, function(req, res, next){
     function checkPassword(){
         db.getPassword(username, function(err, mdp){
             if(err){
-                console.log(err);
+                logger.error(err);
                 res.send('MISMATCH');
+                logger.debug("login failed : " + err);
             }else{
                 if(password.match(mdp)){
                     connectUser();
+                    logger.info("login successful : " + username);
                 }else{
                     res.send('MISMATCH');
+                    logger.debug("login failed : pseudo and password mismatched : " + username);
                 }
             }
         });
@@ -78,6 +86,7 @@ router.post('/login', urlencodedParser, function(req, res, next){
             checkPassword();
         }else{
             res.send('NO_ACCOUNT');
+            logger.debug("user not in db : " + username);
         }
     });
 });
@@ -86,12 +95,13 @@ router.post('/logout', urlencodedParser, function(req, res){
     let username = req.body.username;
     db.disconnectUser(username, function(err){
         if(err){
-            console.log(err);
+            logger.error(err);
             res.writeHead(500);
             res.send();
         }else{
             res.writeHead(200);
             res.send();
+            logger.info(username + " logout");
         }
     });
 });
@@ -101,7 +111,7 @@ router.post('/resetPassword', urlencodedParser, function(req, res) {
     if(email){
         db.getUser(email, function(err, username){
             if(err){
-                console.log(err);
+                logger.error(err);
                 res.sendStatus(500);
             }else{
                 let fullUrl = req.protocol + "://" + req.get("host") + req.baseUrl + req.route.path;
@@ -109,13 +119,16 @@ router.post('/resetPassword', urlencodedParser, function(req, res) {
                     let mySendResetPassword = sendResetPassword.bind(null, fullUrl, email);
                     db.generateToken(username, mySendResetPassword);
                     res.sendStatus(304);
+                    logger.debug("token generated");
                 } else{
                     res.sendStatus(500);
+                    logger.warn("failed to generate the token");
                 }
             }
         });
     } else {
         res.sendStatus(500);
+        logger.warn("failed to generate the token : invalid email");
     }
 });
 
@@ -125,17 +138,21 @@ router.post('/setPassword', urlencodedParser, function(req, res) {
 
     let handlePasswordChanged = function(err, name){
         if(err){
+            logger.error(err);
             res.writeHead(500);
             res.send();
         } else {
-            console.log("password changed successfully");
+            logger.info("password changed successfully");
             res.writeHead(200);
             res.send();
-            db.clearToken(name, function(){});  // we are done once tokens are cleared
+            db.clearToken(name, function(){
+                logger.debug("token cleared");
+            });  // we are done once tokens are cleared
         }
     };
     let mySetPassword = function(err, name) {
         if(err){
+            logger.error(err);
             res.writeHead(403);
             res.send();
         } else {
@@ -158,7 +175,7 @@ let transporter = nodemailer.createTransport({
 
 
 function sendResetPassword(url, email, username, token){
-    console.log("token : " + token);
+    logger.debug("token : " + token);
     if(token === null)
         return;  // the creation of the token failed, we abort the process
     let htmlUrl = url + "/" + token;
@@ -170,7 +187,7 @@ function sendmail(emailAdresse, subject, htmlFile, jadeParameters) {
     // Compile the jade file
     let fn = jade.compileFile(htmlFile, null);
     let html = fn(jadeParameters);
-    console.log(html);
+    logger.log("silly", html);
     let text = htmlToText.fromString(html, {
         wordwrap: 130
     });
@@ -184,11 +201,11 @@ function sendmail(emailAdresse, subject, htmlFile, jadeParameters) {
         html: html,
     };
     // send email with defined transport object
-    transporter.sendMail(mailOptions, function(error) {
-        if (error) {
-            return console.log(error);
+    transporter.sendMail(mailOptions, function(err) {
+        if (err) {
+            logger.error(err);
         }
-        console.log("Message sent");
+        logger.info("Message sent");
     });
 }
 

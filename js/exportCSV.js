@@ -2,6 +2,7 @@ const db = require('../js/db');
 const keys = require('../js/dbConstants');
 const fs = require('fs');
 const csv = require('fast-csv');
+const logger = require('../js/logger');
 
 const FAMILY_NAME = 0;
 const CARDS_HEADER = 1;
@@ -53,7 +54,7 @@ function finalizeWriting(records, familiesExport, onFileReady){
  * @param {object} content : data to add
  */
 function writeIntoColumn(records, familyNb, object, content){
-    console.log(records);
+    logger.log("silly", records);
     var family = "famille " + (familyNb + 1); // header of the family column
     var infoFamily = "info sup famille " + (familyNb + 1); // header of the family informations column
     switch (object) {
@@ -89,7 +90,7 @@ function writeIntoColumn(records, familyNb, object, content){
  */
 function processFamilyCards(err, records, rows, column, familiesExport, onFileReady){
     if(err){
-        console.log(err);
+        logger.error(err);
     }else{
         for(card = 0; card < rows.length; card++){
             writeIntoColumn(records, column, CARD,
@@ -131,7 +132,7 @@ function recoverFamilyCards(familyId, records, processFamilyCards, destColumn, f
  */
 function processFamilies(err, records, rows, onFileReady){
     if(err){
-        console.log(err);
+        logger.error(err);
     }else{
         let familiesExport = [false, false, false, false, false]; // used to track families recovery process when all
         for(fafa = 0; fafa < rows.length; fafa++){
@@ -168,7 +169,7 @@ function recoverFamilies(cardGameId, records, processFamilies, onFileReady){
  */
 function recoverCardGameId(cardGame, language, records, onFileReady){
     db.getCardGame(cardGame, language, function(err, result){
-        if(err) console.log(err);
+        if(err) logger.error(err);
         else recoverFamilies(result[0][keys.CGT_KEY_ID], records, processFamilies, onFileReady);
     });
 }
