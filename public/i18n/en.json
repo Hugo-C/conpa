@@ -38,6 +38,7 @@
   "whiteColor" : "White",
   "purpleColor" : "Purple",
   "brownColor" : "Brown",
+  "blackColor" : "Black",
   "turnLabel" :"Turn",
   "questionLabel" : "Question",
   "cardLabel" : "Card",
@@ -143,5 +144,8 @@
   "playerLeavingMessage" : " left the game !",
   "yes" : "Yes",
   "no" : "No",
-  "wizz" : "Can I consult your production ?"
+  "wizz" : "Can I consult your production ?",
+  "rectangle" : "rectangle",
+  "link" : "link",
+  "withDash": "with dash"
 }

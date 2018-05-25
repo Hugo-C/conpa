@@ -17,6 +17,7 @@ function initCards(cardGame, language){
             cards = JSON.parse(response);
         });
     }
+    initLogoForDie(cards);
 }
 
 /**
