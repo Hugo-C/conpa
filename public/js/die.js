@@ -1,10 +1,12 @@
 'use strict';
 Physijs.scripts.worker = 'js/lib/physijs_worker.js';
 Physijs.scripts.ammo = 'ammo.js';
-
 var divDie;
 var render, req, loader, box_geometry, box, material,
     renderer, scene, ground_material, ground, camera, selected, vectAngularVelocity, diceLoop;
+
+let zGravity;
+let cameraZPosition;
 
 function initScene() {
     divDie = $('#scene')[0];
@@ -17,13 +19,12 @@ function initScene() {
     // Scene
     if (scene == null) {
         scene = new Physijs.Scene;
-        scene.setGravity(new THREE.Vector3(0, 0, 0));
     }
     scene.addEventListener('update', updateScene);
 
     // Camera
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set( 60, 50, 60 );
+    camera.position.set( 80, 70, 80 );
     camera.lookAt( scene.position );
     scene.add( camera );
 
@@ -52,13 +53,7 @@ function initScene() {
     doDispose(color);
     box = new Physijs.BoxMesh( box_geometry, material);
     box.collisions = 0;
-    box.position.set(8, 55, 8);
-    box.rotation.set(
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI
-    );
-    scene.add( box );
+    scene.add(box);
 
     // Update
     req = requestAnimationFrame( render );
@@ -68,6 +63,10 @@ function initScene() {
 render = function () {
     req = requestAnimationFrame(render);
     renderer.render(scene, camera);
+    if (zGravity > 0) {
+        zGravity -= 0.25;
+        scene.setGravity(new THREE.Vector3(0, -30, zGravity));
+    }
 };
 
 function updateScene() {
@@ -134,7 +133,6 @@ function deleteScene(callback) {
             verticesList.push(vertexIndex);
         }
     }
-    console.log("dice : " + numeroFace(verticesList));
     displayNewCard(numeroFace(verticesList));
     cancelAnimationFrame(req);
 
@@ -156,12 +154,12 @@ function deleteScene(callback) {
 function handleDie(callback) {
     if(box.position.y < 6.3) {
         clearInterval(diceLoop);
-        setTimeout(deleteScene, 1500, callback);
+        setTimeout(deleteScene, 2000, callback);
     }
 }
 
 function throwDie(callback) {
-    box.position.set(8, 55, 8);
+    box.position.set(8, 55, -80);
     box.rotation.set(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
@@ -177,7 +175,10 @@ function throwDie(callback) {
     );
     box.setAngularVelocity(vectAngularVelocity);
 
-    scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
+    cameraZPosition = 80;
+    zGravity = 50;
+    scene.setGravity(new THREE.Vector3( 0, -30, zGravity ));
     scene.simulate();
+    
     diceLoop = setInterval(handleDie, 100, callback);
 }
