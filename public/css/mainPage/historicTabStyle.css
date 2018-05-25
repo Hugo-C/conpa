@@ -9,7 +9,8 @@
 
 #historicTab .header,
 #historicTab .bottom {
-	background-color: #035EFB;
+  background-color: #035EFB;
+  background: linear-gradient(#0000a2, #000038);
 }
 
 

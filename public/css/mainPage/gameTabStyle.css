@@ -8,6 +8,8 @@
 #gameTab .header,
 #gameTab .bottom {
 	background-color: #CB1D1D;
+	background: linear-gradient(#ff0000, #630000);
+
 }
 
 #gameTab > div {

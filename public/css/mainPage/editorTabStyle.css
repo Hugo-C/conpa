@@ -10,6 +10,7 @@
 #editorTab .header,
 #editorTab .bottom {
 	background-color: #EFD700;
+    background: linear-gradient(#ffb400, #a47400);
 }
 
 
