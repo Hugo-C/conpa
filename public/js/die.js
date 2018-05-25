@@ -28,7 +28,7 @@ function initScene() {
 
     // Camera
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set( 80, 70, 80 );
+    camera.position.set( 70, 70, 70 );
     camera.lookAt( scene.position );
     scene.add( camera );
 
@@ -116,7 +116,8 @@ function numeroFace(arrayV){
         if (cpt === 4) foundV = true;
         i++;
     }
-    return i;
+    let keys = Object.keys(cards);
+    return keys[i-1];
 }
 
 function initLogoForDie(cards){
@@ -168,13 +169,13 @@ function deleteScene() {
     displayNewCard(numeroFace(verticesList));
     cancelAnimationFrame(req);
 
+    scene.removeEventListener('update', updateScene, false);
+    
     doDispose(renderer);
     doDispose(loader);
     scene.remove(ground);
     scene.remove(box);
     scene.remove(camera);
-
-    scene.removeEventListener('update', updateScene, false);
 
     divDie.removeChild(divDie.lastChild);
     $('#divProduction').css('display', 'flex');
@@ -185,13 +186,12 @@ function deleteScene() {
 function handleDie() {
     if(box.position.y < 6.3) {
         clearInterval(diceLoop);
-
-        setTimeout(deleteScene, 1500);
+        setTimeout(deleteScene, 2500);
     }
 }
 
 function throwDie() {
-    box.position.set(8, 55, -80);
+    box.position.set(8, 55, -70);
     box.rotation.set(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
@@ -207,7 +207,7 @@ function throwDie() {
     );
     box.setAngularVelocity(vectAngularVelocity);
 
-    zGravity = 50;
+    zGravity = 42;
     scene.setGravity(new THREE.Vector3( 0, -30, zGravity ));
     scene.simulate();
     diceLoop = setInterval(handleDie, 100);
