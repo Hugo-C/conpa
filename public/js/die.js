@@ -11,7 +11,6 @@ var render, req, loader, box_geometry, box, material,
 let sidePictures = [];
 
 let zGravity;
-let cameraZPosition;
 
 function initScene() {
     divDie = $('#scene')[0];
@@ -208,7 +207,6 @@ function throwDie() {
     );
     box.setAngularVelocity(vectAngularVelocity);
 
-    cameraZPosition = 80;
     zGravity = 50;
     scene.setGravity(new THREE.Vector3( 0, -30, zGravity ));
     scene.simulate();

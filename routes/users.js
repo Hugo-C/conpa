@@ -1,3 +1,4 @@
+const Jimp = require("jimp");
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
@@ -18,6 +19,22 @@ router.post('/email', urlencodedParser, function(req, res) {
             res.send(myRes);
         }
     });
+});
+
+/**
+ * Create an image from two png images
+ */
+router.get('/conpa', function (req, res) {
+    let logo = new Jimp('public/img/die/test.png', function (err, img) {
+        err ? console.log('logo err' + err) : console.log('logo created and ready for use');
+    });
+
+    Jimp.read("public/img/die/fond.png", function (err, lenna) {
+        if (err) throw err;
+        lenna.composite(logo, 0, 0);
+        lenna.write("public/img/die/image fusion.jpg");
+    });
+    res.send('Merge image of die');
 });
 
 /* GET users listing. */
