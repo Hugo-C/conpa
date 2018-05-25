@@ -3,6 +3,14 @@ html, body {
   width: 100%;
 }
 
+body {
+  background-image: url('/img/mainPage/fond1.svg');
+  background-size:cover;
+  background-position: center;
+  background-clip: border-box;
+  background-repeat: no-repeat;
+}
+
 .form_wrapper{
   padding: 0;
 	width: 20%;

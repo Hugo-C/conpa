@@ -150,4 +150,9 @@ div#clock {
   padding-bottom: 10px;
   padding-left: 25px;
   padding-right: 25px;
+  background-image: url('/img/mainPage/fond1.svg');
+  background-size:cover;
+  background-position: center;
+  background-clip: border-box;
+  background-repeat: no-repeat;
 }
