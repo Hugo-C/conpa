@@ -4,7 +4,7 @@ html, body {
 }
 
 body {
-  background-image: url('/img/mainPage/fond1.svg');
+  background-image: url('/img/background1.svg');
   background-size:cover;
   background-position: center;
   background-clip: border-box;
