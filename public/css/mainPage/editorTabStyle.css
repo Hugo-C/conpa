@@ -7,6 +7,14 @@
   transition: width 1s, height 1s;
 }
 
+#editorTab .header,
+#editorTab .bottom {
+
+  background: linear-gradient(#ffb400, #a47400);
+
+}
+
+
 #editorTab > div {
   padding: 0;
 }

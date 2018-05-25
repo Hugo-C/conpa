@@ -5,6 +5,12 @@
   transition: width 1s, height 1s;
 }
 
+#gameTab .header,
+#gameTab .bottom {
+
+	 background: linear-gradient(#ff0000, #630000);
+}
+
 #gameTab > div {
   padding: 0;
 }

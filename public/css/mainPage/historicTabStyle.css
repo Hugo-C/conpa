@@ -7,6 +7,14 @@
   transition: width 1s, height 1s;
 }
 
+#historicTab .header,
+#historicTab .bottom {
+
+  background: linear-gradient(#0000a2, #000038);
+}
+}
+
+
 #historicTab > div {
   padding: 0;
 }
