@@ -1,9 +1,14 @@
 'use strict';
 Physijs.scripts.worker = 'js/lib/physijs_worker.js';
 Physijs.scripts.ammo = 'ammo.js';
+
+const DIR_IMG = "img/die/";
+const NO_LOGO_IMG = "noLogo.png";
+
 var divDie;
 var render, req, loader, box_geometry, box, material,
     renderer, scene, ground_material, ground, camera, selected, vectAngularVelocity, diceLoop;
+let sidePictures = [];
 
 let zGravity;
 let cameraZPosition;
@@ -42,12 +47,12 @@ function initScene() {
     // Die
     box_geometry = new THREE.BoxGeometry( 12, 12, 12 );
     let color = new THREE.MeshFaceMaterial([
-        new THREE.MeshBasicMaterial({map:loader.load("img/die/1.png")}),
-        new THREE.MeshBasicMaterial({map:loader.load("img/die/2.png")}),
-        new THREE.MeshBasicMaterial({map:loader.load("img/die/3.png")}),
-        new THREE.MeshBasicMaterial({map:loader.load("img/die/4.png")}),
-        new THREE.MeshBasicMaterial({map:loader.load("img/die/5.png")}),
-        new THREE.MeshBasicMaterial({map:loader.load("img/die/6.png")})
+        new THREE.MeshBasicMaterial({map:loader.load(sidePictures[0])}),
+        new THREE.MeshBasicMaterial({map:loader.load(sidePictures[1])}),
+        new THREE.MeshBasicMaterial({map:loader.load(sidePictures[2])}),
+        new THREE.MeshBasicMaterial({map:loader.load(sidePictures[3])}),
+        new THREE.MeshBasicMaterial({map:loader.load(sidePictures[4])}),
+        new THREE.MeshBasicMaterial({map:loader.load(sidePictures[5])}),
     ]);
     material = Physijs.createMaterial(color, 0.6, 0.3);
     doDispose(color);
@@ -77,7 +82,7 @@ function updateScene() {
 function doDispose(obj) {
     if (obj !== null) {
         if (obj.children != null) {
-            for (var i = 0; i < obj.children.length; i++) {
+            for (let i = 0; i < obj.children.length; i++) {
                 doDispose(obj.children[i]);
             }
         }
@@ -115,8 +120,36 @@ function numeroFace(arrayV){
     return i;
 }
 
+function initLogoForDie(cards){
+    sidePictures = [];
+    let hasLogo = false;
+    // try to fetch custom logo
+    let families = Object.keys(cards);
+    for(let i = 0; i < 6; i++){
+        if(i >= families.length){
+            sidePictures.push(DIR_IMG + NO_LOGO_IMG);
+        } else {
+            let family = cards[families[i]];
+            if(family["logo"] !== undefined) {
+                hasLogo = true;
+                sidePictures.push(DIR_IMG + family["logo"]);
+            } else {
+                sidePictures.push(DIR_IMG + NO_LOGO_IMG);
+            }
+        }
+    }
+
+    // if the deck has no logo at all, we use the default die
+    if(!hasLogo){
+        sidePictures = [];
+        for(let i = 1; i <= 6; i++){
+            sidePictures.push(DIR_IMG + i + ".png");
+        }
+    }
+}
+
 // Display the card and delete the scene of the die
-function deleteScene(callback) {
+function deleteScene() {
 
     // Research the vertices colliding with the ground
     let verticesList = [];
@@ -136,29 +169,29 @@ function deleteScene(callback) {
     displayNewCard(numeroFace(verticesList));
     cancelAnimationFrame(req);
 
-    doDispose(renderer)
+    doDispose(renderer);
     doDispose(loader);
     scene.remove(ground);
     scene.remove(box);
     scene.remove(camera);
 
     scene.removeEventListener('update', updateScene, false);
-    
-    //camera = loader = box = material = renderer = ground_material = ground = selected = vectAngularVelocity = diceLoop = null;
 
     divDie.removeChild(divDie.lastChild);
-    callback();
+    $('#divProduction').css('display', 'flex');
+    $('#scene').remove();
     Legend.show();
 }
 
-function handleDie(callback) {
+function handleDie() {
     if(box.position.y < 6.3) {
         clearInterval(diceLoop);
-        setTimeout(deleteScene, 2000, callback);
+
+        setTimeout(deleteScene, 1500);
     }
 }
 
-function throwDie(callback) {
+function throwDie() {
     box.position.set(8, 55, -80);
     box.rotation.set(
         Math.random() * Math.PI,
@@ -179,6 +212,5 @@ function throwDie(callback) {
     zGravity = 50;
     scene.setGravity(new THREE.Vector3( 0, -30, zGravity ));
     scene.simulate();
-    
-    diceLoop = setInterval(handleDie, 100, callback);
+    diceLoop = setInterval(handleDie, 100);
 }
