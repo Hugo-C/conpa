@@ -144,8 +144,7 @@ module.exports = function(io, socket){
      * @param {Game} server : the game server we want to stop
      */
     function removeServer(server){
-        clearInterval(server.inactivePlayerManager);
-        clearInterval(server.productionSharingManager);
+        server.dispose();
         delete rooms[server.getName()];
     }
 
@@ -346,7 +345,7 @@ module.exports = function(io, socket){
             for(let index in players){
                 io.sockets.connected[clients[players[index]]].leave();
             }
-
+            server.trace.add(server.getHost().getPseudo(), "removed", null, "party");
             removeServer(server);
             io.sockets.emit('serverListUpdate', listAllServers());
         }
@@ -516,9 +515,11 @@ module.exports = function(io, socket){
         if(data["dest"] === "all"){
             let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
             socket.broadcast.to(socket.room).emit('message', rep);
+            server.trace.add(getPseudoWithId(socket.id), "send public message", data["msg"], data['dest']);
         } else {
             let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
             io.to(clients[data["dest"]]).emit("message", rep);
+            server.trace.add(getPseudoWithId(socket.id), "send private message", data["msg"], data['dest']);
         }
     });
 
@@ -530,8 +531,10 @@ module.exports = function(io, socket){
      * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
      */
     socket.on('cardPicked', function(data){
+        let server = rooms[socket.room];
         logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
         io.sockets.in(socket.room).emit('cardPicked', data);
+        server.trace.add("party", "set card", JSON.stringify(data));
     });
 
     /**
