@@ -159,7 +159,6 @@ module.exports = class Game {
     /**
      * Return the node of the fifo list corresponding to the given pseudo
      * @param {string} pseudo : pseudo of the desired player
-     * @return {FIFO Node} : player's node corresponding to the given pseudo
      */
     getPlayerNode(pseudo){
         let playerNode = null; // used to retrieve the player's node

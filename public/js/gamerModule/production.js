@@ -10,6 +10,8 @@ String.prototype.visualFontSize = function(){
     return ruler.offsetHeight;
 };
 
+const colors = {'red': '#ED1723', 'green': '#0FB32D', 'yellow': '#FFEE24', 'blue': '#3344FF', 'white': '#D5D5D5', 'purple': '#A531FF', 'brown': '#8C5B35'};
+
 class Production {
 
     constructor(parent, panning, zoomIndicator){
@@ -28,8 +30,7 @@ class Production {
         this.myElements = []; // list all elements in the svg
         this.myLinks = []; // list all links in the svg
 
-        this.colors = {'red': '#ED1723', 'green': '#0FB32D', 'yellow': '#FFEE24', 'blue': '#3344FF', 'white': '#D5D5D5', 'purple': '#A531FF', 'brown': '#8C5B35'};
-        this.selectedColor = this.colors['red'];
+        this.selectedColor = colors['red'];
 
         // Rectangle manipulation variables
         this.rectCreate = false;
@@ -302,9 +303,9 @@ class Production {
     }
 
     setSelectedColor(color){
-        this.selectedColor = this.colors[color];
+        this.selectedColor = colors[color];
         if(this.selectedItem != null){
-            this.selectedItem.setFillColor(this.colors[color]);
+            this.selectedItem.setFillColor(colors[color]);
         }
     }
 
@@ -368,7 +369,7 @@ class Production {
         $('.mainTool').css('display', 'none');
         $('.colorTool').css('display', 'block');
         if(this.selectedLink != null){
-            this.selectedLink.setColor(this.colors[color]);
+            this.selectedLink.setColor(colors[color]);
         }
     }
 

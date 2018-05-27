@@ -14,8 +14,12 @@ let isForceHide = false;
 
 class Legend{  // static class
 
+    /**
+     * Add a set of rectangles to the legend
+     * @param {Rectangle []} rectangles : the set of different rectangles
+     */
     static addRectangles(rectangles){
-        let overlay =  document.getElementById("overlayContent");
+        let overlayContent =  document.getElementById("overlayContent");
         for(let r of rectangles){
             // row
             let row = document.createElement("div");
@@ -49,12 +53,16 @@ class Legend{  // static class
             text.setAttribute("class", "legend");
             div.appendChild(text);
             row.append(div);
-            overlay.append(row);
+            overlayContent.append(row);
         }
     }
 
+    /**
+     * Add a set of links to the legend
+     * @param {Link []} links : the set of different links
+     */
     static addLinks(links){
-        let overlay =  document.getElementById("overlayContent");
+        let overlayContent =  document.getElementById("overlayContent");
         for(let link of links){
             // row
             let row = document.createElement("div");
@@ -76,6 +84,7 @@ class Legend{  // static class
             let svgLine = draw.line(0, "50%", "100%", "50%");
 
             let strokeColor = link.getColor();
+            // change the color if it's black in order to contrast with the overlay
             if(strokeColor ===  "#333333")
                 strokeColor = "#666666";
             svgLine.stroke({
@@ -100,10 +109,15 @@ class Legend{  // static class
             text.setAttribute("class", "legend");
             div.appendChild(text);
             row.append(div);
-            overlay.append(row);
+            overlayContent.append(row);
         }
     }
 
+    /**
+     * Refresh the legend by clearing it and adding again all rectangles and links
+     * @param {Rectangle []} rectangles : an array of rectangles
+     * @param {Link []} links : an array of links
+     */
     static refresh(rectangles, links){
         let textBackup = this.saveLegend();
         this.clear();
@@ -156,7 +170,7 @@ class Legend{  // static class
     /**
      * Checks if an html's container contains a rect tag
      * ( use jquery for the entry param )
-     * @param {HTML element} entry : container in which we want to check if he
+     * @param {HTMLElement} entry : container in which we want to check if he
      *                               contains a rect tag
      */
     static containsRectangle(entry){
@@ -264,9 +278,8 @@ class Legend{  // static class
     }
 
     /**
-     * Restores the textarea of a rectangle's entry
+     * Restores the textarea of an entry
      * ( use jquery for the entry param )
-     * @param {HTMLElement} entry : legend's entry container
      * @param {object array} data : all information about rectangles's entries
      */
     static restoreLegend(data){
@@ -281,6 +294,9 @@ class Legend{  // static class
         }
     }
 
+    /**
+     * Display the legend (if not forceHide)
+     */
     static show(){
         overlay.style.display = "block";
         if(!isForceHide){
@@ -288,15 +304,24 @@ class Legend{  // static class
         }
     }
 
+    /**
+     * Hide the legend
+     */
     static hide(){
         overlay.style.display = "none";
     }
 
+    /**
+     * Display the legend and don't allow the function hide to hide it
+     */
     static forceShow(){
         isForceHide = false;
         this.show();
     }
 
+    /**
+     * Hide the legend and don't allow the function show to display it
+     */
     static forceHide(){
         isForceHide = true;
         this.hide();

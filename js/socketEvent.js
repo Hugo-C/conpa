@@ -76,8 +76,8 @@ module.exports = function(io, socket){
      * - the number of players who have defined their questions
      * - the questions of each player
      *
-     * @param {Game} : the game server for which we want the current state of the game time
-     * @param {object} : { 'ready': number of players who are ready,
+     * @param {Game} server : the game server for which we want the current state of the game time
+     * @return {object} : { 'ready': number of players who are ready,
      *                     'playersQuestion': dictionnary of (pseudo, player's question) couple }
      */
     function getQuestionTimeState(server){
