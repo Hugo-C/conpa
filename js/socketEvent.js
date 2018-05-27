@@ -256,7 +256,7 @@ module.exports = function(io, socket){
         };
         //init internationalization / localization class
         socket.translater = new i18n_module(config.lang, config.langFile);
-        logger.verbose(socket.translater.__("i18n module initialised"));
+        logger.verbose(socket.translater.__("i18n module initialised : " + config.lang));
     }
 
     // -----------------------------------------------------------------------------
@@ -511,7 +511,8 @@ module.exports = function(io, socket){
      *                          'msg': [message body]}
      */
     socket.on('message', function(data){
-        logger.verbose(socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
+        let server = rooms[socket.room];
+        logger.verbose(socket.room + " new message from " + getPseudoWithId(socket.id) + " to " + data['dest']);
         if(data["dest"] === "all"){
             let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
             socket.broadcast.to(socket.room).emit('message', rep);

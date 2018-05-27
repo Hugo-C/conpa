@@ -444,7 +444,7 @@ exports.isConnected = function(user, callback){
     logger.debug(sql);
     let value = [user];
     state.pool.query(sql, value, function(err, result){
-        logger.debug(result);
+        logger.debug(user + " is connected ? : " + JSON.stringify(result));
         if(err) callback(false);
         else callback(result[0][keys.UT_CONNECT] === '1');
     });
@@ -556,7 +556,7 @@ let setToken = function(pseudo, token, callback){
     let value = [md5(token + TOKEN_SALT), expirationDate, pseudo];
     state.pool.query(sql, value, function(err){
         if(err){
-            logger.debug(err);
+            logger.error(err);
             callback(pseudo, null);
         } else {
             callback(pseudo, token);
@@ -761,8 +761,10 @@ exports.recordPlayerProduction = function(pseudo, serverName, date, production, 
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
     let values = [production, pseudo, serverName, date];
     state.pool.query(sql, values, function(err){
-        logger.debug(err);
-        if(err) callback(err);
+        if(err){
+            callback(err);
+            logger.error(err);
+        }
         else callback(null);
     });
 };
@@ -807,7 +809,7 @@ exports.getProduction = function(pseudo, party, date, callback){
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
     let values = [party, date, pseudo];
     state.pool.query(sql, values, function(err, result){
-        logger.debug(result);
+        logger.debug(JSON.stringify(result));
         if(err) callback(err);
         else callback(null, result[0][keys.HPT_KEY_PRODUCTION]);
     });

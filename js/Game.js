@@ -317,9 +317,7 @@ module.exports = class Game {
      * @param {Player} player : player to remove from this game server
      */
     removePlayer(player){
-        let playerNode = this.getPlayerNode(player.getPseudo());
-        if(playerNode != null) this.players.remove(playerNode);
-        this.removePlayerFromActivePlayersList(player.getPseudo());
+        this.removePlayerByPseudo(player.getPseudo());
     }
 
     /**

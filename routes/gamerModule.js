@@ -47,7 +47,7 @@ router.get('/cards', function(req, res) {
                 delete response[familyId[i]];
             }
             res.send(response);
-            logger.debug("cards send : " + response);
+            logger.debug("cards send : " + JSON.stringify(response));
         }
     };
     if(params["cardGame"] === undefined || params["language"] === undefined){

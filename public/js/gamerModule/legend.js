@@ -120,7 +120,7 @@ class Legend{  // static class
         this.addRectangles(rectSet);
 
         // Links
-        let linksSet = [];  // list of different rectangles
+        let linksSet = [];  // list of different links
         for(let l1 of links) {
             let keep = true;
             // we check if this kind of rectangle is already to be added
