@@ -146,22 +146,27 @@ h4.legend{  /* use to give advice about the legend */
   position: fixed;
   /*display: none; /* Should be hidden by default */
   width: 20%;
+  min-width: 20%;
   height: 12%;
+  min-height: 12%;
   top: 60%;
   left: 60%;
   background-color: rgb(0, 0, 0);
   opacity: 0.5;
   z-index: 2;
-  overflow: hidden;
 }
-
-div#colorMenu {
-  display: none;
-  background-color: grey;
+#overlayContent {
+  height: 100%;
+  overflow-y: auto;
+  background-color: rgb(0, 0, 0);
 }
-
-div#svgMenu {
-  display: block;
+#overlay svg {
+  max-width: 70px;
+}
+#overlay textarea {
+  font-size: 1vw;
+  color: white;
+  font-family: arial;
 }
 
 div.menu {
@@ -172,13 +177,14 @@ div.menu {
   background: linear-gradient(to left, grey , #1B1919);
 }
 
-div.menu > button {
+div.menu button {
   height: 10%;
   padding: 0;
 }
 
-div#svgMenu > button {
-  margin-bottom: 15px;
+div#colorMenu {
+  display: none;
+  background-color: grey;
 }
 
 div#colorMenu > button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
@@ -189,6 +195,22 @@ div#colorMenu > button[value="white"] { background-image: url("/img/gamerModule/
 div#colorMenu > button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
 div#colorMenu > button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
 
+div#svgMenu {
+  height: 100%;
+  display: block;
+}
+div#svgMenu > :first-child {
+  height: 90%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+div#svgMenu > :last-child {
+  height: 10%;
+}
+div#svgMenu button {
+  margin-bottom: 15px;
+}
+
 button#bouton[value="red"] { background-image: url("/img/gamerModule/textIcons/text_red.png");}
 button#bouton[value="green"] { background-image: url("/img/gamerModule/textIcons/text_green.png");}
 button#bouton[value="yellow"] { background-image: url("/img/gamerModule/textIcons/text_yellow.png");}
@@ -197,19 +219,27 @@ button#bouton[value="brown"] { background-image: url("/img/gamerModule/textIcons
 button#bouton[value="blue"] { background-image: url("/img/gamerModule/textIcons/text_blue.png");}
 button#bouton[value="white"] { background-image: url("/img/gamerModule/textIcons/text_white.png");}
 
-div#svgMenu > button#color[value="red"] { background-image: url("/img/gamerModule/redPencil.png"); }
-div#svgMenu > button#color[value="green"] { background-image: url("/img/gamerModule/greenPencil.png"); }
-div#svgMenu > button#color[value="yellow"] { background-image: url("/img/gamerModule/yellowPencil.png"); }
-div#svgMenu > button#color[value="blue"] { background-image: url("/img/gamerModule/bluePencil.png"); }
-div#svgMenu > button#color[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
-div#svgMenu > button#color[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
-div#svgMenu > button#color[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
+div#svgMenu button#color[value="red"] { background-image: url("/img/gamerModule/redPencil.png"); }
+div#svgMenu button#color[value="green"] { background-image: url("/img/gamerModule/greenPencil.png"); }
+div#svgMenu button#color[value="yellow"] { background-image: url("/img/gamerModule/yellowPencil.png"); }
+div#svgMenu button#color[value="blue"] { background-image: url("/img/gamerModule/bluePencil.png"); }
+div#svgMenu button#color[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
+div#svgMenu button#color[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
+div#svgMenu button#color[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
 
-div#svgMenu > button#legend[value="visible"] { background-image: url("/img/gamerModule/legende-.png"); }
-div#svgMenu > button#legend[value="hide"] { background-image: url("/img/gamerModule/legende+.png"); }
+div#svgMenu button#legend[value="visible"] { background-image: url("/img/gamerModule/legende-.png"); }
+div#svgMenu button#legend[value="hide"] { background-image: url("/img/gamerModule/legende+.png"); }
 
-div#svgMenu > button#moveElement { background-image: url("/img/gamerModule/move.png"); }
-div#svgMenu > button#fullScreen { background-image: url("/img/gamerModule/fullscreen.png"); }
+div#svgMenu button#moveElement { background-image: url("/img/gamerModule/move.png"); }
+div#svgMenu button#fullScreen { background-image: url("/img/gamerModule/fullscreen.png"); }
+
+div#svgMenu label#zoomLevel {
+  height: 70%;
+  padding: 0;
+  text-align: center;
+  font-size: 0.8vw;
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+}
 
 div#production {
   width: 92%;

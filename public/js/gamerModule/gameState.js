@@ -205,8 +205,8 @@ class GameState {
         this.mosaic = {};
     }
 
-    addNewProduction(pseudo, production){
-        this.playersProduction[pseudo] = production;
+    addNewProduction(pseudo, production, legend){
+        this.playersProduction[pseudo] = {'production': production, 'legend': legend};
     }
 
     getPlayersProduction(){
@@ -217,8 +217,8 @@ class GameState {
         return this.playersProduction[pseudo] != null;
     }
 
-    setProduction(container, panning){
-        this.production = new Production(container, panning);
+    setProduction(container, panning, zoomIndicator){
+        this.production = new Production(container, panning, zoomIndicator);
     }
 
     getProduction(){
@@ -229,8 +229,8 @@ class GameState {
         return this.mosaic[pseudo];
     }
 
-    addMosaicChannel(pseudo, container, panning){
-        this.mosaic[pseudo] = new Production(container, panning);
+    attachProductionToMosaicChannel(pseudo, container, panning, zoomIndicator){
+        this.mosaic[pseudo] = new Production(container, panning, zoomIndicator);
     }
 
     getNextPlayer(){
@@ -277,11 +277,29 @@ class GameState {
         }
     }
 
+    saveProduction(){
+        let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
+        if(currentProductionOwner === sessionStorage.pseudo){
+            sessionStorage.productionData = JSON.stringify(this.production.saveProduction());
+            sessionStorage.legendData = JSON.stringify(Legend.saveLegend());
+        }else{
+            sessionStorage.productionData = JSON.stringify(this.getPlayersProduction()[sessionStorage.pseudo]['production']);
+            sessionStorage.legendData = JSON.stringify(this.getPlayersProduction()[sessionStorage.pseudo]['legend']);
+        }
+    }
+
+    restoreProduction(){
+        this.production.restoreProduction(JSON.parse(sessionStorage.productionData));
+        Legend.restoreLegend(JSON.parse(sessionStorage.legendData));
+        delete sessionStorage.productionData;
+        delete sessionStorage.legendData;
+    }
+
     saveGameState(){
         sessionStorage.animator = this.animator;
         sessionStorage.players = JSON.stringify(this.players);
         sessionStorage.playersProduction = JSON.stringify(this.playersProduction);
-        sessionStorage.productionData = JSON.stringify(this.production.saveProduction());
+        this.saveProduction();
         sessionStorage.state = JSON.stringify(this.state);
         sessionStorage.useTimer = this.useTimer;
         sessionStorage.globalTimerValue = this.globalTimerValue;
@@ -300,7 +318,7 @@ class GameState {
         createPlayersProductionList(this.getPlayersPseudo());
         this.playersProduction = JSON.parse(sessionStorage.playersProduction);
         actualizeChatPlayersList(this.getOnlinePlayers());
-        this.production.restoreProduction(JSON.parse(sessionStorage.productionData));
+        this.restoreProduction();
         if(sessionStorage.role === 'animator'){
             clearMosaic();
             createMosaic(this.getOnlinePlayers());
@@ -330,12 +348,10 @@ class GameState {
             individualTimerColor('black', 'grey');
         }
         actualizePlayersProductionList();
-        updatePlayersState();
 
         delete sessionStorage.animator;
         delete sessionStorage.players;
         delete sessionStorage.playersProduction;
-        delete sessionStorage.productionData;
         delete sessionStorage.state;
         delete sessionStorage.useTimer;
         delete sessionStorage.globalTimerValue;

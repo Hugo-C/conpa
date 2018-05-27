@@ -15,7 +15,6 @@ $('#editorTab button.filter').on('click', function(){
 });
 
 $('.tabContent select').on('click', function(){
-    console.log('click');
     if($('.tabContent select .multiselect-item').css('display') == 'none'){
         $('.tabContent select .multiselect-item').css('display', 'block');
     }else{

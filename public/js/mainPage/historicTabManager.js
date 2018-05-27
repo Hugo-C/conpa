@@ -254,8 +254,13 @@ function openProductionEditor(production){
 
     $('.partySheet #productionViewer > svg').remove();
     myProduction = null;
-    myProduction = new Production($('.productionEditor #productionEditor')[0], false);
-    myProduction.restoreProduction(JSON.parse(production));
+    Legend.clear();
+    myProduction = new Production($('.productionEditor #productionEditor')[0], false, $('#zoomLevel'));
+    if(production == ""){
+        myProduction.restoreProduction(production);
+    }else{
+        myProduction.restoreProduction(JSON.parse(production));
+    }
 }
 
 $('#editProduction').on('click', function(){
@@ -319,7 +324,11 @@ function closeProductionEditor(production){
     $('.partySheet #productionViewer')[0].style.backgroundImage = '';
     myProduction = null;
     myProduction = new Production($('.partySheet #productionViewer')[0], true);
-    myProduction.restoreProduction(JSON.parse(production));
+    if(production == ""){
+        $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/noContent.png")';
+    }else{
+        myProduction.restoreProduction(JSON.parse(production));
+    }
 }
 
 $('#closeEditor').on('click', function(){
@@ -380,6 +389,20 @@ $("#moveElement").on("click", function(){
         $(this).css('background-image', 'url(' + movingImage + ')');
         Production.updatePanningState(true);
     }
+});
+
+$('#legend').on('click', function(){
+    if($(this).val() === 'visible'){
+        Legend.forceHide();
+        $(this).val('hide');
+    }else{
+        Legend.forceShow();
+        $(this).val('visible');
+    }
+});
+
+$('#centerSVG').on('click', function(){
+    myProduction.centerSVGToDefaultPosition();
 });
 
 // ---------------------------------------------------------------------

@@ -7,14 +7,20 @@ div#editorTab(class="formWrapperStyle rowFlexContainer col-lg-12 col-md-12 col-s
         div(class="col-lg-offset-1 col-lg-7 col-md-offset-1 col-md-7 col-sm-offset-1 col-sm-7")
           select(multiple="multiple")
         div(class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3")
-          button(class="filter") Filtrer
+          button(class="myCustomButton filter") Filtrer
       div(class="col-lg-12 col-md-12 col-sm-12")
         table#myCardgames(class="col-lg-12 col-md-12 col-sm-12")
           thead
             tr
-              th(data-i18n="cardgameName" onclick="sortEditorTable(0)" class="col-lg-3 col-md-3 col-sm-3")
-              th(data-i18n="cardgameLanguage" onclick="sortEditorTable(1)" class="col-lg-3 col-md-3 col-sm-3")
-              th(data-i18n="cardgameAuteur" onclick="sortEditorTable(2)" class="col-lg-3 col-md-3 col-sm-3")
+              th(onclick="sortEditorTable(0)" class="col-lg-3 col-md-3 col-sm-3")
+                span(data-i18n="cardgameName")
+                i(class="fas fa-sort")
+              th(onclick="sortEditorTable(1)" class="col-lg-3 col-md-3 col-sm-3")
+                span(data-i18n="cardgameLanguage")
+                i(class="fas fa-sort")
+              th(onclick="sortEditorTable(2)" class="col-lg-3 col-md-3 col-sm-3")
+                span(data-i18n="cardgameAuteur")
+                i(class="fas fa-sort")
               th(data-i18n="cardgameInfo" class="col-lg-3 col-md-3 col-sm-3")
           tbody
     div(class="formBottomStyle bottom row")

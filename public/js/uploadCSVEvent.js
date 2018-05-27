@@ -160,25 +160,6 @@ $('#editorTab .alert .cancel').on('click', function(){
     $('#importAlertMessage').text(''); // reset alert displayer
 });
 
-function displayAlert(type, message, button){
-    $("#editorTab > div").css("display", "none");
-    $(".alert").animate({"display": "block"}, 1000, function(){
-        $(".alert").css("display", "block");
-        $("#editorTab > div:not(.alert)").css("display", "none");
-    });
-    $('#editorTab .alertTitle').text('Alert !');
-    $('#editorTab .alertMessage').text(message);
-
-    $('#editorTab .alert').addClass(type);
-    if(button == 'confirm'){
-        $('#editorTab .alert .cancel').css('display', 'none');
-    }
-
-    let editorTab = $("#editorTab");
-    editorTab.css('height', '40%');
-    editorTab.css('width', '35%');
-}
-
 function refreshTagsDatalist(tags){
     let tagsDatalist = $('#tags');
     tagsDatalist.children().remove(); // we will replace old data by the data we have received
@@ -193,7 +174,7 @@ function refreshTagsPanel(data){
     let desc = data['description'] == null ? 'No description' : data['description'];
     $('#tagsPanel textarea').val(desc);
 
-    refreshCardgameTagsList('tagsPanel', data['tags']);
+    refreshCardgameTagsList($('#tagsPanel table'), data['tags']);
 
     refreshTagsDatalist(data['allTags']);
 
@@ -234,7 +215,7 @@ $('#addTag').on('click', function(){
             },
             success: function(response){
                 if(response['msg'] === 'OK'){
-                    refreshCardgameTagsList('tagsPanel', response['tags']);
+                    refreshCardgameTagsList($('#tagsPanel table'), response['tags']);
                 }else{
                     console.log(response['msg']);
                 }
@@ -259,7 +240,7 @@ $('#removeTag').on('click', function(){
             },
             success: function(response){
                 if(response['msg'] === 'OK'){
-                    refreshCardgameTagsList('tagsPanel', response['tags']);
+                    refreshCardgameTagsList($('#tagsPanel table'), response['tags']);
                 }else{
                     console.log(response['msg']);
                 }
@@ -317,9 +298,9 @@ function uploadCSV(csvFile){
             refreshTagsPanel(response);
         }else if(response['msg'] === 'UPDATE?'){
             sessionStorage.tempCSV = response['file'];
-            displayAlert('overwrite', 'This card game already exists !\nWould you overwrite it ?', 'both');
+            displayAlert('editorTab', 'overwrite', 'This card game already exists ! Would you overwrite it ?', 'both');
         }else if(response['msg'] === 'UNAUTHORIZED'){
-            displayAlert('access', 'This cardgame already exists and you are not allowed to overwrite it !', 'confirm');
+            displayAlert('editorTab', 'access', 'This cardgame already exists and you are not allowed to overwrite it !', 'confirm');
         }else{
             console.log(response['msg']);
             displayCardGamePage();

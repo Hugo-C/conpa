@@ -14,6 +14,10 @@ function actualizeChatPlayersList(players){
     }
 }
 
+function scrollAtBottom(container){
+    container[0].scrollTop = container[0].scrollHeight - container[0].clientHeight;
+}
+
 /**
  * Displays a message in the player tchat area
  *
@@ -23,9 +27,12 @@ function actualizeChatPlayersList(players){
  */
 function insertTextInChat(msg, sender, color){
     let chat = $("#messages");
-    let senderTag = '<span style="font-weight:bold; color:' + color + '">' + sender + ' : </span>';
-    let msgTag = '<span style="font-weight:bold; color:' + color + '">' + msg + '</span>';
+    let isScrollAtBottom = chat[0].scrollHeight - chat[0].scrollTop <= chat[0].clientHeight
+    let senderTag = '<span style="font-size: 1vw; font-weight:bold; color:' + color + '">' + sender + ' : </span>';
+    let msgTag = '<span style="font-size: 1vw; font-family: sans-serif, arial; color:' + color + '">' + msg + '</span>';
     chat.append('<p style="margin:0;">' + senderTag + msgTag + '</p>');
+
+    if(isScrollAtBottom) scrollAtBottom(chat);
 }
 
 /**
@@ -48,8 +55,7 @@ function getColor(dest){
 /** sends our message to the server */
 function sendInputText(){
     let dest = $("#chatPlayers").val();
-    let inputText = $("#inputBox").val();
-    let msg = inputText.match(/^Write your message here !/) ? "" : inputText;
+    let msg = $("#inputBox").val();
     socket.emit('message', {'dest': dest, 'msg': msg});
     insertTextInChat(msg, sessionStorage.pseudo, getColor(dest));
     $("#inputBox").val(""); // clean the input field

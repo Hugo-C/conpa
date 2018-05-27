@@ -526,8 +526,9 @@ exports.getEmail = function(pseudo, callback){
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
-        if(err) callback(err);
-        else if (result && result[0]) {
+        if(err){
+            callback(err);
+        } else if (result && result[0]) {
             callback(null, result[0][keys.UT_KEY_EMAIL]);
         } else {
             callback(null, null);  // no result

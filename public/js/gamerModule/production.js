@@ -12,11 +12,12 @@ String.prototype.visualFontSize = function(){
 
 class Production {
 
-    constructor(parent, panning){
+    constructor(parent, panning, zoomIndicator){
         this.parent = parent;
+        this.zoomIndicator = zoomIndicator;
         this.draw = SVG(parent).size('100%', '100%').panZoom({
             doPanning: panning,
-            zoomFactor: 0.5,
+            zoomFactor: 0.25,
             zoomMin: 0.25,
             zoomMax: 4,
         });
@@ -245,12 +246,16 @@ class Production {
         // --------------------- OTHERS LISTENERS ------------------------------
         // ---------------------------------------------------------------------
 
-        // resize the svg when page is resized
-        window.onresize = function(){
-            self.toggleMenuOff();
+        this.resizeSVG = function(){
             let dimHeight = $(self.parent).height();
             let dimWidth = $(self.parent).width();
             self.draw.attr({'height': dimHeight, 'width': dimWidth});
+        }
+
+        // resize the svg when page is resized
+        window.onresize = function(){
+            self.toggleMenuOff();
+            self.resizeSVG();
         };
 
         this.documentClick = function(evt){
@@ -277,6 +282,12 @@ class Production {
             }
         };
 
+        this.draw.on('wheel', function(evt){
+            if(self.zoomIndicator != null){
+                self.zoomIndicator.text('Zoom x' + self.draw.zoom().toFixed(2));
+            }
+        });
+
         this.draw.on('mousedown', this.onMouseDown);
         this.draw.on('mousemove', this.onMouseMove);
         this.draw.on('mouseup', this.onMouseUp);
@@ -284,6 +295,10 @@ class Production {
         this.draw.on('keydown', this.onKeydown);
         document.addEventListener('contextmenu', this.openContextMenu);
         document.addEventListener('click', this.documentClick);
+    }
+
+    resizeSVG(){
+        this.resizeSVG();
     }
 
     setSelectedColor(color){
@@ -525,7 +540,6 @@ class Production {
             data['idRect1'] = this.myLinks[index].getFirstRectId();
             data['idRect2'] = this.myLinks[index].getSecondRectId();
             data['strokeWidth'] = this.myLinks[index].getWidth();
-            console.log(this.myLinks[index].getDasharray());
             data['strokeDasharray'] = this.myLinks[index].getDasharray();
             data['fill'] = this.myLinks[index].getColor();
             data['navigability'] = this.myLinks[index].hasNavigability();
@@ -576,6 +590,7 @@ class Production {
         let masterCoord = this.draw['node'].childNodes[1].getBBox();
         let viewboxParam = "" + masterCoord.x + " " + masterCoord.y + " " + clientWidth + " " + clientHeight;
         this.draw['node'].setAttribute("viewBox", viewboxParam);
+        if(this.zoomIndicator != null) this.zoomIndicator.text('Zoom x1.00');
     }
 
     clearSVG(){

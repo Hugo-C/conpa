@@ -60,7 +60,7 @@ function actualizePlayersProductionList(){
         if(pseudo !== sessionStorage.pseudo){ // we already have a button to come back to our production
             playerProd = $('#' + pseudo + '_productionAccess');
             if(playerProd.children()[0] != null){
-                if(playersProduction[pseudo] === ""){
+                if(playersProduction[pseudo]['production'] === ""){
                     playerProd.children()[0].src = '/img/gamerModule/privateFlag.svg';
                 }else{
                     playerProd.children()[0].src = '/img/gamerModule/publicFlag.svg';
@@ -78,11 +78,11 @@ function refreshMosaic(){
     let playersProduction = clientGame.getPlayersProduction();
     for(let pseudo in playersProduction){
         clientGame.getMosaicProduction(pseudo).clearSVG();
-        if(playersProduction[pseudo] == ''){
+        if(playersProduction[pseudo]['production'] == ''){
             $('#' + pseudo + '_production').css('background-image', 'url("/img/gamerModule/privateContent.png")');
         }else{
             $('#' + pseudo + '_production').css('background-image', '');
-            clientGame.getMosaicProduction(pseudo).restoreProduction(playersProduction[pseudo]);
+            clientGame.getMosaicProduction(pseudo).restoreProduction(playersProduction[pseudo]['production']);
         }
     }
 }
@@ -144,21 +144,26 @@ function isMosaicDisplayed(){
  */
 function processChangeForPlayer(currentProduction, targetedProduction){
     let playersProduction = clientGame.getPlayersProduction();
+    let currentProductionOwner = currentProduction[0].id.split('_')[0];
+    let targetedProductionOwner = targetedProduction[0].id.split('_')[0];
     // if we leave our production, we save it before
-    if(currentProduction[0].id.split('_')[0] === sessionStorage.pseudo){
-        clientGame.addNewProduction(sessionStorage.pseudo, clientGame.getProduction().saveProduction());
+    if(currentProductionOwner === sessionStorage.pseudo){
+        clientGame.addNewProduction(sessionStorage.pseudo, clientGame.getProduction().saveProduction(), Legend.saveLegend());
     }
+    // clear the legend to display the legend of the targeted production
+    Legend.clear();
     // remove the current production to replace it by another one
     clientGame.getProduction().clearSVG();
     // production is private, display an image to inform the player
-    if(playersProduction[targetedProduction[0].id.split('_')[0]] === ''){
+    if(playersProduction[targetedProductionOwner]['production'] === ''){
         clientGame.getProduction().productionPrivate();
         $('#wizz').css('display', 'block');
     }else{ // production is public, we display it
         $('#wizz').css('display', 'none');
         clientGame.getProduction().productionPublic();
-        clientGame.getProduction().restoreProduction(playersProduction[targetedProduction[0].id.split('_')[0]]);
+        clientGame.getProduction().restoreProduction(playersProduction[targetedProductionOwner]['production']);
         clientGame.getProduction().centerSVGToDefaultPosition();
+        Legend.restoreLegend(playersProduction[targetedProductionOwner]['legend']);
     }
 }
 
@@ -168,23 +173,29 @@ function processChangeForPlayer(currentProduction, targetedProduction){
  */
 function processChangeForAnimator(currentProduction, targetedProduction){
     let playersProduction = clientGame.getPlayersProduction();
-    if(targetedProduction[0].id.split('_')[0] === sessionStorage.pseudo){
+    let currentProductionOwner = currentProduction[0].id.split('_')[0];
+    let targetedProductionOwner = targetedProduction[0].id.split('_')[0];
+
+    if(targetedProductionOwner === sessionStorage.pseudo){
         displayMosaic(); // animator's production is the mosaic
     }else{
-        if(currentProduction[0].id.split('_')[0] === sessionStorage.pseudo){
+        if(currentProductionOwner === sessionStorage.pseudo){
             hideMosaic(); // we hide mosaic to display only one production
         }
+        // clear the legend to display the legend of the targeted production
+        Legend.clear();
         // remove the current production to replace it by another one
         clientGame.getProduction().clearSVG();
         // production is private, display an image to inform the player
-        if(playersProduction[targetedProduction[0].id.split('_')[0]] === ''){
+        if(playersProduction[targetedProductionOwner]['production'] === ''){
             clientGame.getProduction().productionPrivate();
             $('#wizz').css('display', 'block');
         }else{ // production is public, we display it
             $('#wizz').css('display', 'none');
             clientGame.getProduction().productionPublic();
-            clientGame.getProduction().restoreProduction(playersProduction[targetedProduction[0].id.split('_')[0]]);
+            clientGame.getProduction().restoreProduction(playersProduction[targetedProductionOwner]['production']);
             clientGame.getProduction().centerSVGToDefaultPosition();
+            Legend.restoreLegend(playersProduction[targetedProductionOwner]['legend']);
         }
     }
 }
@@ -218,6 +229,65 @@ $('#wizz').on('click', function(){
     socket.emit('message', {'dest': targetedPlayer, 'msg': 'I would like to consult your production'});
 });
 
+function addCenterButtonToToolBar(toolBar, player){
+    // button used to center the view on the modified production's area
+    let centerButton = document.createElement('button');
+    centerButton.setAttribute('onclick', 'centerMosaicChannel("' + player + '")');
+    centerButton.classList.add('col-lg-offset-1', 'col-lg-10',
+                               'col-md-offset-1', 'col-md-10',
+                               'col-sm-offset-1', 'col-sm-10',
+                               'col-xs-offset-1', 'col-xs-10');
+    centerButton.style.height = '15%';
+    centerButton.style.padding = '0';
+
+    toolBar.appendChild(centerButton);
+}
+
+function addPseudoDisplayerToToolBar(toolBar, player){
+    // create a container to center the label for the pseudo
+    let textContainer = document.createElement('div');
+    textContainer.classList.add('rotated-text');
+    textContainer.style.height = '70%';
+    // create a label to display the player's pseudo
+    let playerLabel = document.createElement('span');
+    playerLabel.classList.add('rotated-text__inner');
+    playerLabel.classList.add('myCustomTitle');
+    playerLabel.innerHTML = player;
+    textContainer.appendChild(playerLabel);
+
+    toolBar.appendChild(textContainer);
+}
+
+function addZoomIndicatorToToolBar(toolBar, player){
+    // used to center the label
+    let zoomLevelContainer = document.createElement('div');
+    zoomLevelContainer.classList.add('rowFlexContainer');
+    zoomLevelContainer.setAttribute('style', 'height: 15%; padding: 0;');
+    // label used to display the zoom level
+    let zoomLevel = document.createElement('label');
+    zoomLevel.id = player + '_zoomLevel';
+    zoomLevel.innerHTML = 'Zoom x1.00';
+    zoomLevel.classList.add('rowFlexContainer', 'myCustomInput',
+                            'col-lg-10', 'col-md-10',
+                            'col-sm-10', 'col-xs-10');
+    zoomLevel.setAttribute('style', 'height: 70%; font-size: 0.6vw; font-family: "Georgia", "Helvetica", "Times New Roman"; padding: 0; text-align: center;');
+    zoomLevelContainer.appendChild(zoomLevel);
+    toolBar.appendChild(zoomLevelContainer);
+}
+
+function createChannelToolBar(channel, player){
+    // create a tool bar for channel tools
+    let bar = document.createElement('div');
+    bar.style.paddingTop = '5px';
+    bar.style.paddingBottom = '5px';
+    // Add tools to the bar
+    addCenterButtonToToolBar(bar, player);
+    addPseudoDisplayerToToolBar(bar, player);
+    addZoomIndicatorToToolBar(bar, player);
+
+    channel.appendChild(bar);
+}
+
 /**
  * Add a new "channel" to the mosaic
  * A "channel" is equivalent to a player's production and his pseudo
@@ -233,20 +303,8 @@ function addElementToRow(parent, player){
     prod.classList.add('imageBackground');
     prod.style.backgroundImage = 'url("/img/gamerModule/privateContent.png")';
     parent.appendChild(prod);
-    // create a tool bar for channel tools
-    let bar = document.createElement('div');
-    // create a container to center the label for the pseudo
-    let textContainer = document.createElement('div');
-    textContainer.classList.add('rotated-text');
-    bar.appendChild(textContainer);
-    // create a label to display the player's pseudo
-    let playerLabel = document.createElement('span');
-    playerLabel.classList.add('rotated-text__inner');
-    playerLabel.classList.add('myCustomTitle');
-    playerLabel.innerHTML = player;
-    textContainer.appendChild(playerLabel);
-    prod.appendChild(bar);
-    clientGame.addMosaicChannel(player, prod, false);
+    createChannelToolBar(prod, player);
+    clientGame.attachProductionToMosaicChannel(player, prod, false, $('#' + player + '_zoomLevel'));
 }
 
 /**
@@ -322,7 +380,7 @@ function initializeProductionPanel(){
     let myProductionAccess = '#productionPanel > :first-child > :nth-child(1) > div';
     $(myProductionAccess)[0].id = sessionStorage.pseudo + '_productionAccess';
     $(myProductionAccess).attr('onclick', 'changeDisplayedProduction(' + $(myProductionAccess)[0].id + ')');
-    clientGame.setProduction($('#productionPanel > div > div#production')[0], false);
+    clientGame.setProduction($('#productionPanel > div > div#production')[0], false, $('#zoomLevel'));
     if(sessionStorage.role === 'player'){
         displayProductionPanel();
     }else if(sessionStorage.role === 'animator'){
@@ -406,6 +464,18 @@ function displayScene() {
     parentScene.insertBefore(scene, null);
 }
 
+function centerMosaicChannel(playerChannel){
+    clientGame.getMosaicProduction(playerChannel).centerSVGToDefaultPosition();
+}
+
+function actualizeForeignProduction(pseudo){
+    let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
+    if(currentProductionOwner === pseudo){
+        clientGame.getProduction().restoreProduction(clientGame.getPlayersProduction()[pseudo]['production']);
+        Legend.restoreLegend(clientGame.getPlayersProduction()[pseudo]['legend']);
+    }
+}
+
 // ---------------------------------------------------------------------
 // ----------------------- BUTTONS LISTENER ----------------------------
 // ---------------------------------------------------------------------
@@ -450,40 +520,6 @@ $("#setPrivacy").on("click", function(){
     }
 });
 
-// remove default text when user wants to enter text
-$("#notesArea").on("focus", function(){
-    let value = $("textarea#notesArea").val();
-    if(value.match(/^Write your notes here !/)){
-        execNotesAreaCommand("delete");
-    }
-});
-
-// displays default text if the area is empty and has not the focus
-$("#notesArea").focusout(function(){
-    let value = $("textarea#notesArea").val();
-    value = $.trim(value);
-    if(value === ""){
-        $("textarea#notesArea").val("Write your notes here !");
-    }
-});
-
-// remove default text when user wants to enter text
-$("#inputBox").on("focus", function(){
-    let value = $("input#inputBox").val();
-    if(value.match(/^Write your message here !/)){
-        $("input#inputBox").val("");
-    }
-});
-
-// displays default text if the area is empty and has not the focus
-$("#inputBox").focusout(function(){
-    let value = $("input#inputBox").val();
-    value = $.trim(value);
-    if(value === ""){
-        $("input#inputBox").val("Write your message here !");
-    }
-});
-
 $("#startDice").on("click", function () {
     displayScene();
     initScene();
@@ -517,6 +553,10 @@ $('#legend').on('click', function(){
     }
 });
 
+$('#centerSVG').on('click', function(){
+    clientGame.getProduction().centerSVGToDefaultPosition();
+});
+
 // ---------------------------------------------------------------------
 // ----------------------- SOCKET LISTENERS ----------------------------
 // ---------------------------------------------------------------------
@@ -526,6 +566,8 @@ socket.on('initGameTime', function(data){
     clientGame.setPlayers(data['players']);
     createPlayersProductionList(data['players']);
     actualizeChatPlayersList(data['players']);
+    $('#inputBox').attr('placeholder', $.i18n('chatPlaceholder'));
+    $('#notesArea').attr('placeholder', $.i18n('notesPlaceholder'));
     if(sessionStorage.role === 'animator'){
         clearMosaic();
         createMosaic(data['players']);
@@ -552,11 +594,14 @@ socket.on('changeDuringGameTime', function(data){
  * This message is received when the server shares players production
  *
  * form of received data : list of dictionary
- * Dictionaries have this form : {'pseudo': player's pseudo, 'production': player's production}
+ * Dictionaries have this form : {'pseudo': player's pseudo,
+                                  'production': player's production,
+                                  'privacy': production's privacy}
  */
 socket.on('playersProduction', function(data){
-    clientGame.addNewProduction(data['pseudo'], data['production']);
+    clientGame.addNewProduction(data['pseudo'], data['privacy'] === 'public' ? data['production'] : "", data['legend']);
     actualizePlayersProductionList();
+    actualizeForeignProduction(data['pseudo']);
     if(sessionStorage.role === 'animator' && isMosaicDisplayed()){
         refreshMosaic();
     }
@@ -573,19 +618,18 @@ socket.on('shareYourProduction', function(data){
     let currentProduction = $('.selectedProduction');
     let privacy = $("button#setPrivacy");
     if(sessionStorage.role != 'animator'){
-        // we send the production if and only if player has set the privacy to public
-        if(privacy[0].value == 'public'){
-            // player works on his production, we send the current version
-            if(currentProduction[0].id.split('_')[0] == sessionStorage.pseudo){
-                socket.emit('shareMyProduction', {'pseudo': sessionStorage.pseudo,
-                            'production': clientGame.getProduction().saveProduction()});
-            // player is on another production, the last version of his production has been saved in playersProduction
-            }else{
-                socket.emit('shareMyProduction', {'pseudo': sessionStorage.pseudo,
-                            'production': clientGame.getProductions()[sessionStorage.pseudo]});
-            }
+        // player works on his production, we send the current version
+        if(currentProduction[0].id.split('_')[0] == sessionStorage.pseudo){
+            socket.emit('shareMyProduction', {'pseudo': sessionStorage.pseudo,
+                        'production': clientGame.getProduction().saveProduction(),
+                        'legend': Legend.saveLegend(),
+                        'privacy': privacy[0].value});
+        // player is on another production, the last version of his production has been saved in playersProduction
         }else{
-            socket.emit('shareMyProduction', {'pseudo': sessionStorage.pseudo, 'production': ""});
+            socket.emit('shareMyProduction', {'pseudo': sessionStorage.pseudo,
+                        'production': clientGame.getPlayersProduction()[sessionStorage.pseudo]['production'],
+                        'legend': clientGame.getPlayersProduction()[sessionStorage.pseudo]['legend'],
+                        'privacy': privacy[0].value});
         }
     }
 });
@@ -632,7 +676,6 @@ $("#moveElement").on("click", function(){
     let moveImage = "/img/gamerModule/move.png";
     let movingImage = "/img/gamerModule/moving.png";
     if($(this).hasClass("selected")){
-        console.log('--------------');
         $(this).removeClass("selected");
         $(this).css('background-image', 'url(' + moveImage + ')');
         Production.updatePanningState(false);
@@ -644,6 +687,7 @@ $("#moveElement").on("click", function(){
 });
 
 function fullscreenProduction(){
+    // hide around containers
     $('#chatInfos').css('display', 'none');
     $('#displayList').css('display', 'none');
     $('#gamePanel > :nth-child(2)').css('height', '95%');
@@ -652,9 +696,12 @@ function fullscreenProduction(){
     lastChild.css('height', '100%');
     lastChild.css('width', '100%');
     $('#production').css('width', '93%');
+    // resize the SVG to fill all the available space
+    clientGame.getProduction().resizeSVG();
 }
 
 function exitFullscreenProduction(){
+    // display around containers
     $('#chatInfos').css('display', 'block');
     $('#displayList').css('display', 'block');
     $('#gamePanel > :nth-child(2)').css('height', '');
@@ -663,6 +710,8 @@ function exitFullscreenProduction(){
     lastChild.css('height', '');
     lastChild.css('width', '');
     $('#production').css('width', '92%');
+    // resize the SVG to fill all the available space
+    clientGame.getProduction().resizeSVG();
 }
 
 $("#fullScreen").on("click", function(){

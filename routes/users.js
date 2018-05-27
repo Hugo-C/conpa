@@ -2,6 +2,7 @@ const Jimp = require("jimp");
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
+const logger = require('../js/logger.js');
 const urlencodedParser = bodyParser.urlencoded({extended: true});
 const db = require('../js/db');
 
