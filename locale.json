@@ -2,39 +2,67 @@
     "Salut": {
         "en": "Hello",
         "fr-FR": "Salut",
-        "it": "Ciao"
+		"en-US": "Hello",
+        "fr": "Salut"
     },
     "waitingForPlayers": {
         "en": "waiting for players",
-        "fr-FR": "en attente de joueurs"
+        "fr-FR": "en attente de joueurs",
+		"en-US": "waiting for players",
+        "fr": "en attente de joueurs"
     },
     "questionTime": {
-        "en": "question time"
+        "en": "question time",
+        "fr-FR": "formulation des questions",
+		"en-US": "question time",
+        "fr": "formulation des questions"
     },
     "gameTime": {
-        "en": "game time"
+        "en": "game time",
+        "fr-FR": "en jeu",
+		"en-US": "game time",
+        "fr": "en jeu"
     },
     "partyWithoutAnimator": {
-        "en": "party without animator"
+        "en": "party without animator",
+        "fr-FR": "partie sans animateur",
+		"en-US": "party without animator",
+        "fr": "partie sans animateur"
     },
     "currentPlayerMessage": {
-        "en": "It's the turn of "
+        "en": "It's the turn of ",
+        "fr-FR": "C'est le tour de ",
+		"en-US": "It's the turn of ",
+        "fr": "C'est le tour de "
     },
     "serverNameNotAvailableMessage": {
-        "en": "server name not available"
+        "en": "server name unavailable",
+        "fr-FR": "nom du serveur indisponible",
+		"en-US": "server name unavailable",
+        "fr": "nom du serveur indisponible"
     },
     "serverUnreachableMessage": {
-        "en": "You can not join this server ( server full or in game )"
+        "en": "You can't join this server ( server full or in game )",
+        "fr-FR": "Vous ne pouvez pas rejoindre ce serveur(serveur plein ou en jeu)",
+		"en-US": "You can't join this server ( server full or in game )",
+        "fr": "Vous ne pouvez pas rejoindre ce serveur(serveur plein ou en jeu)"
     },
     "playerLeavingMessage": {
-        "en": " left the game !"
+        "en": " left the game !",
+        "fr-FR": " a quitté le jeu !",
+		"en-US": " left the game !",
+        "fr": " a quitté le jeu !"
     },
     "yes": {
         "en": "Yes",
-        "fr-FR": "Oui"
+        "fr-FR": "Oui",
+		"en-US": "Yes",
+        "fr": "Oui"
     },
     "no": {
         "en": "No",
-        "fr-FR": "Non"
+        "fr-FR": "Non",
+		"en-US": "No",
+        "fr": "Non"
     }
 }
