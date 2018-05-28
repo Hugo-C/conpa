@@ -15,9 +15,9 @@ function initCards(cardGame, language){
         let client = new HttpClient();
         client.get("/gamerModule/cards?cardGame=" + cardGame + "&language=" + language, function(response) {
             cards = JSON.parse(response);
+            initLogoForDie(cards);
         });
     }
-    initLogoForDie(cards);
 }
 
 /**

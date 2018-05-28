@@ -140,7 +140,7 @@ function initLogoForDie(cards){
     }
 
     // if the deck has no logo at all, we use the default die
-    if(!hasLogo){
+    if (!hasLogo) {
         sidePictures = [];
         for(let i = 1; i <= 6; i++){
             sidePictures.push(DIR_IMG + i + ".png");
