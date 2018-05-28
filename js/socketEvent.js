@@ -534,6 +534,7 @@ module.exports = function(io, socket){
      * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
      */
     socket.on('cardPicked', function(data){
+        let server = rooms[socket.room];
         logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
         io.sockets.in(socket.room).emit('cardPicked', data);
         server.trace.add("party", "set card", JSON.stringify(data));

@@ -269,7 +269,7 @@ class Legend{  // static class
     }
 
     /**
-     * Restores the textarea of a rectangle's entry
+     * Restores the textarea of an entry
      * ( use jquery for the entry param )
      * @param {HTMLElement} entry : legend's entry container
      * @param {object array} data : all information about rectangles's entries
@@ -286,6 +286,9 @@ class Legend{  // static class
         }
     }
 
+    /**
+     * Display the legend (if not forceHide)
+     */
     static show(){
         overlay.style.display = "block";
         if(!isForceHide){
@@ -293,15 +296,24 @@ class Legend{  // static class
         }
     }
 
+    /**
+     * Hide the legend
+     */
     static hide(){
         overlay.style.display = "none";
     }
 
+    /**
+     * Display the legend and don't allow the function hide to hide it
+     */
     static forceShow(){
         isForceHide = false;
         this.show();
     }
 
+    /**
+     * Hide the legend and don't allow the function show to display it
+     */
     static forceHide(){
         isForceHide = true;
         this.hide();
