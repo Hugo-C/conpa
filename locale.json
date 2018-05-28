@@ -31,9 +31,9 @@
     },
     "currentPlayerMessage": {
         "en": "It's the turn of ",
-        "fr-FR": "C'est le tour de ",
+        "fr-FR": "C'est au tour de ",
 		    "en-US": "It's the turn of ",
-        "fr": "C'est le tour de "
+        "fr": "C'est au tour de "
     },
     "serverNameNotAvailableMessage": {
         "en": "server name unavailable",

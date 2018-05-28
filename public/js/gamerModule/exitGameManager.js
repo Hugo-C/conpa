@@ -73,6 +73,24 @@ $("#closeExitPanel").on("click", function(){
     $('#exitPanel').css('display', 'none'); // hide exit panel
 });
 
+function getPlayerProduction(){
+    let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
+    if(currentProductionOwner === sessionStorage.pseudo){
+        return clientGame.getProduction().saveProduction();
+    }else{
+        return clientGame.getPlayerProduction()[sessionStorage.pseudo]['production'];
+    }
+}
+
+function getPlayerLegend(){
+    let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
+    if(currentProductionOwner === sessionStorage.pseudo){
+        return Legend.saveLegend();
+    }else{
+        return clientGame.getPlayerProduction()[sessionStorage.pseudo]['legend'];
+    }
+}
+
 /**
  * Catch click event on leaveAlone button
  * This button his used to leave the game alone
@@ -80,10 +98,12 @@ $("#closeExitPanel").on("click", function(){
 $("#leaveAlone").on("click", function(){
     // moving to our own production
     $('#' + sessionStorage.pseudo + '_productionAccess').click();
-    let production = sessionStorage.role === 'animator' ? "" : JSON.stringify(clientGame.getProduction().saveProduction());
+    let production = sessionStorage.role === 'animator' ? "" : JSON.stringify(getPlayerProduction());
+    let legend = sessionStorage.role === 'animator' ? "" : JSON.stringify(getPlayerLegend());
     socket.emit('quitGame', {'pseudo': sessionStorage.pseudo,
                              'server': sessionStorage.server,
-                             'production': production}); // inform server that we leave the game
+                             'production': production,
+                             'legend': legend}); // inform server that we leave the game
     sessionStorage.server = null;
     sessionStorage.role = null;
     window.location = '/'; // redirection to the main page

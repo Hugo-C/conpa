@@ -1,16 +1,9 @@
 @import 'playerProductionPanel.css';
+@import 'mosaic.css';
 
 body, html {
   height: 100%;
   width: 100%;
-}
-
-button {
-  border: none;
-  background-color: Transparent;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 .basicContainer {
@@ -113,10 +106,10 @@ div#chatInfos {
 button#exit {
   background-color: grey;
 }
-.pseudoField, .globalTimerField, .questionField {
+.pseudoField, .globalTimerField, .questionField, #sendButton {
     background-color: darkgreen;
 }
-.pseudoField > span, .globalTimerField > span, .questionField > span, button#exit {
+.pseudoField > span, .globalTimerField > span, .questionField > span, button#exit, #sendButton {
   font-size: 1vw;
   font-weight: bold;
   color: black;
@@ -202,7 +195,6 @@ select#chatPlayers {
 
 button#sendButton {
   border-left: 2px solid black;
-  background-image: url("/img/gamerModule/sendButton.svg");
 }
 
 textarea#notesArea {

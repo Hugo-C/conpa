@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS HasPlayedIn(
   idParty INT UNSIGNED NOT NULL,
   question VARCHAR(255),
   production TEXT,
+  legend TEXT,
   FOREIGN KEY (pseudo) REFERENCES Users(pseudo),
   FOREIGN KEY (idParty) REFERENCES Party(id));
 

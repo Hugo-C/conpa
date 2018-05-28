@@ -57,18 +57,14 @@
 #serverManager > .body span {
   font-size: 1vw;
 }
-#serverManager .settingCategory span {
-  text-decoration: underline;
-}
 
-#serverManager > .body > :not(.settingCategory) {
-  border-bottom: 2px solid black;
-}
 #serverManager .settingCategory {
   height: 10%;
   margin-top: 2%;
-  margin-bottom: 3%;
-  border-bottom: 2px solid black;
+  margin-bottom: 4%;
+  background: linear-gradient(#D0D0D0, #9F9A9A);
+  cursor:pointer;
+  box-shadow: 2px 6px 6px 0px;
 }
 #serverManager .basicSettings,
 #serverManager .cardgameSettings,
@@ -110,7 +106,6 @@
 #serverManager > .body > .settingCategory > button[value="hide"] {
   background-image: url('/img/mainPage/hidden.png');
 }
-
 
 #serverManager .cardgameSettings {
   height: 80%;

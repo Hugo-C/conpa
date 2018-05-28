@@ -1,3 +1,4 @@
+const delayToRollTheDie = 30;
 var clientGame = new GameState();
 initializeProductionPanel();
 
@@ -267,7 +268,7 @@ function addZoomIndicatorToToolBar(toolBar, player){
     let zoomLevel = document.createElement('label');
     zoomLevel.id = player + '_zoomLevel';
     zoomLevel.innerHTML = 'Zoom x1.00';
-    zoomLevel.classList.add('rowFlexContainer', 'myCustomInput',
+    zoomLevel.classList.add('rowFlexContainer', 'myCustomIndicator',
                             'col-lg-10', 'col-md-10',
                             'col-sm-10', 'col-xs-10');
     zoomLevel.setAttribute('style', 'height: 70%; font-size: 0.6vw; font-family: "Georgia", "Helvetica", "Times New Roman"; padding: 0; text-align: center;');
@@ -641,7 +642,7 @@ socket.on('newTurn', function(data){
         showDice();
         activateNextPlayerButton();
         individualTimerColor('#1F5473', '#0AA6E1');
-        clientGame.startDiceDelay(10, rollTheDice);
+        clientGame.startDiceDelay(delayToRollTheDie, rollTheDice);
         $('circle.hourglassStroke')[0].classList.add('rollTheDice');
     }else{
         deactivateNextPlayerButton();

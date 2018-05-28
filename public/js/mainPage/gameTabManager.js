@@ -84,23 +84,12 @@ function populateSMTable(data){
 }
 
 $('#gameTab .cardgameInfoPanel button').on('click', function(){
-    displayServerManager();
+    displayPanel($('#gameTab'), $('#serverManager'), '90%', '50%');
 });
-
-function displayServerManager(){
-    $("#gameTab > div").css("display", "none");
-    $("#serverManager").animate({"display": "block"}, 1000, function(){
-        $("#serverManager").css("display", "block");
-    });
-
-    let gameTab = $("#gameTab");
-    gameTab.css('height', '90%');
-    gameTab.css('width', '50%');
-}
 
 /** displays game server creator window */
 $("#create").on("click", function(){
-    displayServerManager();
+    displayPanel($('#gameTab'), $('#serverManager'), '90%', '50%');
     refreshCardGames([], populateSMTable);
     refreshTags($('#serverManager select'));
     removeAllAlerts(); // in case of player have already try to create a server and he has been errors
@@ -165,32 +154,28 @@ $('#forceTurn').on('click', function(){
     }
 });
 
-$('.settingCategory button').on('click', function(){
-    if($(this).val() == 'display'){
-        $(this).val('hide');
-        $(this).parent().next().css('display', 'none');
-        $(this).parent().css('border-bottom', '2px solid black');
+$('.settingCategory').on('click', function(){
+    let button = $(this).find('button');
+    if(button.val() == 'display'){
+        button.val('hide');
+        button.parent().next().css('display', 'none');
     }else{
-        $(this).val('display');
-        $(this).parent().next().css('display', 'block');
-        $(this).parent().css('border-bottom', '0px solid black');
+        button.val('display');
+        button.parent().next().css('display', 'block');
     }
 });
 
-function displayServerList(){
-    $("#gameTab > div").css("display", "none");
-    $(".tabContent").animate({"display": "block"}, 1000, function(){
-        $(".tabContent").css("display", "block");
-    });
-
-    let gameTab = $("#gameTab");
-    gameTab.css('height', '100%');
-    gameTab.css('width', '100%');
+function hideGameManagerTabs(){
+  let hideButtons = $('#serverManager .settingCategory button[value="display"]');
+  for(let index = 0; index < hideButtons.length; index++){
+      $(hideButtons[index]).click();
+  }
 }
 
 /** displays server list */
 $("#cancel").on("click", function(){
-    displayServerList();
+    displayPanel($('#gameTab'), $('#gameTab .tabContent'), '100%', '100%');
+    hideGameManagerTabs();
 });
 
 /** Clear all alerts */
@@ -314,11 +299,11 @@ $('#gameTab .alert .confirm').on('click', function(){
         sessionStorage.server = null;
         sessionStorage.role = null;
     }
-    displayServerList();
+    displayPanel($('#gameTab'), $('#gameTab .tabContent'), '100%', '100%');
 });
 
 $('#gameTab .alert .cancel').on('click', function(){
-    displayServerList();
+    displayPanel($('#gameTab'), $('#gameTab .tabContent'), '100%', '100%');
 });
 
 /** Joining the selected game server */

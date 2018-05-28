@@ -79,29 +79,30 @@ function displayPlayersList(players){
     playersList.children().remove();
     for(let index in players){
         playersList.append($('<tr>')
-                        .append($('<td>' + players[index] + '</td>')));
+                   .append($('<td>' + players[index] + '</td>')));
     }
 }
 
-function displayProduction(production){
+function displayProduction(production, legend){
     $('.partySheet #productionViewer > svg').remove();
     $('.partySheet #productionViewer')[0].style.backgroundImage = '';
     if(production !== "" && production != null){
         myProduction = new Production($('.partySheet #productionViewer')[0], true);
         myProduction.restoreProduction(JSON.parse(production));
+        if(legend !== '' && legend != null){
+            Legend.restoreLegend(JSON.parse(legend));
+        }
     }else{
+        $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/noContent.png")';
+    }
+    if(myProduction != null && myProduction.isEmpty()){
         $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/noContent.png")';
     }
 }
 
 function displayPartyDetails(data){
-    $("#historicTab > .tabContent").css("display", "none");
-    $(".partySheet").animate({"display": "block"}, 1000, function(){
-        $(".partySheet").css("display", "block");
-    });
-    let historicTab = $("#historicTab");
-    historicTab.css('height', '100%');
-    historicTab.css('width', '80%');
+    displayPanel($('#historicTab'), $('#historicTab .partySheet'), '100%', '80%');
+
     $("#partyName").val(data['server']);
     $("#partyDate").val(data['date']);
     $("#partyAnimator").val(data['animator']);
@@ -113,7 +114,7 @@ function displayPartyDetails(data){
         $('#editProduction').css('display', 'none'); // animator has no production to edit
         $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/animator.png")';
     }else{
-        displayProduction(data['production']);
+        displayProduction(data['production'], data['legend']);
     }
 }
 
@@ -150,6 +151,7 @@ $('#open').on('click', function(){
 
 /** Retrieve the url of the production */
 function getProductionImageUrl(){
+    myProduction.integrateLegendToProduction(Legend.saveLegend(), $('#partyQuestion').val());
     let blob = new Blob([myProduction.getInlineSvg()], {type: "image/svg+xml;charset=utf-8"});
     let urlCreator = window.URL || window.webkitURL;
     return urlCreator.createObjectURL(blob);
@@ -157,21 +159,25 @@ function getProductionImageUrl(){
 
 /** allow to download a production as an svg image */
 $('#download').on('click', function(){
-    let productionUrl = getProductionImageUrl();
-    let partyName = $('#partyName').val();
-    let partyDate = $('#partyDate').val();
-    let partyQuestion = $('#partyQuestion').val();
-    let fileName = partyName + '(' + partyDate + ')[' + partyQuestion + '].svg';
-    if(productionUrl.match("blob")){
-        let downloader = document.createElement("a");
-        document.body.appendChild(downloader);
-        downloader.href = productionUrl;
-        downloader.download = fileName;
-        downloader.click();
-        downloader.remove();
+    if(myProduction != null && !myProduction.isEmpty()){
+        let productionUrl = getProductionImageUrl();
+        let partyName = $('#partyName').val();
+        let partyDate = $('#partyDate').val();
+        let partyQuestion = $('#partyQuestion').val();
+        if(productionUrl.match("blob")){
+            let downloader = document.createElement("a");
+            document.body.appendChild(downloader);
+            downloader.href = productionUrl;
+            downloader.download = 'production';
+            downloader.click();
+            downloader.remove();
+        }
+        let urlCreator = window.URL || window.webkitURL;
+        urlCreator.revokeObjectURL(productionUrl);
+        let production = myProduction.saveProduction();
+        myProduction.clearSVG();
+        myProduction.restoreProduction(production);
     }
-    let urlCreator = window.URL || window.webkitURL;
-    urlCreator.revokeObjectURL(productionUrl);
 });
 
 /** Remove the image from the browser buffer */
@@ -186,7 +192,7 @@ function freeProductionImage(){
 
 function refreshInfos(data){
     $("#partyQuestion").val(data['question']);
-    displayProduction(data['production']);
+    displayProduction(data['production'], data['legend']);
 }
 
 function loadSelectedPlayer(selectedPlayer){
@@ -230,40 +236,29 @@ $('#partyPlayers').on('click', 'tbody tr', function(){
 });
 
 $('#close').on('click', function(){
-    $(".partySheet").css("display", "none");
-    $("#historicTab > .tabContent").animate({"display": "block"}, 1000, function(){
-        $("#historicTab > .tabContent").css("display", "block");
-    });
-
-    let historicTab = $("#historicTab");
-    historicTab.css('height', '100%');
-    historicTab.css('width', '100%');
+    displayPanel($('#historicTab'), $('#historicTab .tabContent'), '100%', '100%');
     myProduction = null;
     $('#productionViewer > svg').remove();
 });
 
 function openProductionEditor(production){
-    $(".partySheet").css("display", "none");
-    $(".productionEditor").animate({"display": "block"}, 1000, function(){
-        $(".productionEditor").css("display", "block");
-    });
-
-    let historicTab = $("#historicTab");
-    historicTab.css('height', '100%');
-    historicTab.css('width', '100%');
+    displayPanel($('#historicTab'), $('#historicTab .productionEditor'), '100%', '100%');
 
     $('.partySheet #productionViewer > svg').remove();
     myProduction = null;
     Legend.clear();
     myProduction = new Production($('.productionEditor #productionEditor')[0], false, $('#zoomLevel'));
-    if(production == ""){
-        myProduction.restoreProduction(production);
+    if(production['production'] == ''){
+        myProduction.restoreProduction(production['production']);
     }else{
-        myProduction.restoreProduction(JSON.parse(production));
+        myProduction.restoreProduction(JSON.parse(production['production']));
+        if(production['legend'] !== ''){
+            Legend.restoreLegend(JSON.parse(production['legend']));
+        }
     }
 }
 
-$('#editProduction').on('click', function(){
+function getPlayerProduction(callback){
     $.ajax({
         type: 'POST',
         url: '/getPlayerProduction',
@@ -280,10 +275,14 @@ $('#editProduction').on('click', function(){
                 console.log("production retrieving has failed");
             }else{
                 console.log(response);
-                openProductionEditor(response['production']);
+                callback(response);
             }
         }
     });
+}
+
+$('#editProduction').on('click', function(){
+    getPlayerProduction(openProductionEditor);
 });
 
 $('#saveProduction').on('click', function(){
@@ -294,7 +293,8 @@ $('#saveProduction').on('click', function(){
             username: sessionStorage.pseudo,
             partyName: $('#partyName').val(),
             partyDate: $('#partyDate').val(),
-            production: JSON.stringify(myProduction.saveProduction())
+            production: JSON.stringify(myProduction.saveProduction()),
+            legend: JSON.stringify(Legend.saveLegend())
         },
         error: function(){
             console.log("backup failed");
@@ -311,47 +311,12 @@ $('#saveProduction').on('click', function(){
 });
 
 function closeProductionEditor(production){
-    $(".productionEditor").css("display", "none");
-    $(".partySheet").animate({"display": "block"}, 1000, function(){
-        $(".partySheet").css("display", "block");
-    });
-
-    let historicTab = $("#historicTab");
-    historicTab.css('height', '100%');
-    historicTab.css('width', '80%');
-
-    $('.productionEditor #productionEditor > svg').remove();
-    $('.partySheet #productionViewer')[0].style.backgroundImage = '';
-    myProduction = null;
-    myProduction = new Production($('.partySheet #productionViewer')[0], true);
-    if(production == ""){
-        $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/noContent.png")';
-    }else{
-        myProduction.restoreProduction(JSON.parse(production));
-    }
+    displayPanel($('#historicTab'), $('#historicTab .partySheet'), '100%', '80%');
+    displayProduction(production['production'], production['legend']);
 }
 
 $('#closeEditor').on('click', function(){
-    $.ajax({
-        type: 'POST',
-        url: '/getPlayerProduction',
-        data: {
-            username: sessionStorage.pseudo,
-            partyName: $('#partyName').val(),
-            partyDate: $('#partyDate').val()
-        },
-        error: function(){
-            console.log("production retrieving has failed");
-        },
-        success: function(response){
-            if(response === 'ERROR'){
-                console.log("production retrieving has failed");
-            }else{
-                console.log(response);
-                closeProductionEditor(response['production']);
-            }
-        }
-    });
+    getPlayerProduction(closeProductionEditor);
 });
 
 // ---------------------------------------------------------------------
@@ -364,7 +329,6 @@ $("#color").on("click", function(){
 });
 
 $("#colorMenu button").on("click", function(){
-    console.log('new color !');
     let selectedColor = $(this).val();
     $("#colorMenu").css('display', 'none');
     $("#svgMenu").css('display', 'block');
@@ -377,14 +341,11 @@ $("#colorMenu button").on("click", function(){
 $("#moveElement").on("click", function(){
     let moveImage = "/img/gamerModule/move.png";
     let movingImage = "/img/gamerModule/moving.png";
-    console.log($(this).hasClass('selected'));
     if($(this).hasClass("selected")){
-        console.log('--------------');
         $(this).removeClass("selected");
         $(this).css('background-image', 'url(' + moveImage + ')');
         Production.updatePanningState(false);
     }else{
-        console.log($(this));
         $(this).addClass("selected");
         $(this).css('background-image', 'url(' + movingImage + ')');
         Production.updatePanningState(true);

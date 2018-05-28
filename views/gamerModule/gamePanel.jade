@@ -1,6 +1,6 @@
 div#gamePanel(class="basicContainer bordered col-lg-10 col-md-10 col-sm-10 col-xs-10")
   div(class="row")
-    button#exit(class="basicContainer col-lg-1 col-md-1 col-sm-1 col-xs-1") EXIT
+    button#exit(class="basicContainer imageButton col-lg-1 col-md-1 col-sm-1 col-xs-1") EXIT
     div(class="pseudoField rowFlexContainer basicContainer col-lg-1 col-md-1 col-sm-1 col-xs-1") 
       span PSEUDO
     div#pseudo(class="basicContainer rowFlexContainer col-lg-2 col-md-2 col-sm-2 col-xs-2")
@@ -37,11 +37,11 @@ div#gamePanel(class="basicContainer bordered col-lg-10 col-md-10 col-sm-10 col-x
         input#inputBox(class="basicContainer col-lg-9 col-md-9 col-sm-9 col-xs-9" type="text" placeholder="Write your message here !")
         select#chatPlayers(class="col-lg-2 col-md-2 col-sm-2 col-xs-2")
           option(data-i18n="generalChannel" value="all")
-        button#sendButton(class="basicContainer stretchedImage col-lg-1 col-md-1 col-sm-1 col-xs-1")
+        button#sendButton(class="basicContainer imageButton col-lg-1 col-md-1 col-sm-1 col-xs-1") Send
     div(class="basicContainer col-lg-5 col-md-5 col-sm-5 col-xs-5")
       div(class="basicContainer row")
         textarea#notesArea(class="col-lg-11 col-md-11 col-sm-11 col-xs-11" placeholder="Write your message here !")
         div#menu(class="basicContainer columnFlexContainer col-lg-1 col-md-1 col-sm-1 col-xs-1")
-          button#copy.notesTool
-          button#clear.notesTool
+          button#copy(class="notesTool imageButton")
+          button#clear(class="notesTool imageButton")
   span(id="ruler")

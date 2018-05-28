@@ -44,32 +44,9 @@ $('#exportCardGame').on('click', function(){
     }
 });
 
-/** Display the form used to import a card game in the database */
-function displayImportPage(){
-    $("#editorTab > .tabContent").css("display", "none");
-    $("#importPage").animate({"display": "block"}, 1000, function(){
-        $("#importPage").css("display", "block");
-        $("#editorTab > .tabContent").css("display", "none");
-    });
-    let editorTab = $("#editorTab");
-    editorTab.css('height', '45%');
-    editorTab.css('width', '30%');
-}
-
 $('#importCardGame').on('click', function(){
-    displayImportPage();
+    displayPanel($('#editorTab'), $('#importPage'), '45%', '30%');
 });
-
-/** Display the main card game editor page */
-function displayCardGamePage(){
-    $("#editorTab > div").css("display", "none");
-    $("#editorTab > .tabContent").animate({"display": "block"}, 1000, function(){
-        $("#editorTab > .tabContent").css("display", "block");
-    });
-    let editorTab = $("#editorTab");
-    editorTab.css('height', '90%');
-    editorTab.css('width', '40%');
-}
 
 /** allow to come back to the main card game editor page */
 $('#cancelImport').on('click', function(){
@@ -78,7 +55,7 @@ $('#cancelImport').on('click', function(){
     myImport.attr('type', 'file');
     $('#importButton').text($.i18n("importedFile")); // no selected file
     $('#importAlertMessage').text(''); // reset alert displayer
-    displayCardGamePage();
+    displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
 });
 
 $('#importButton').on('click', function(){
@@ -90,7 +67,7 @@ $('#import').on('change', function(){
 });
 
 $('#editorTab .cardgameInfoPanel button').on('click', function(){
-    displayCardGamePage();
+    displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
 });
 
 function sortEditorTable(n){

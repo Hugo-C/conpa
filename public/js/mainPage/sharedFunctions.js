@@ -79,22 +79,25 @@ function refreshCardgameTagsList(table, tags){
 }
 
 /** Display the cardgame's information panel */
-function displayCardGameInfoPage(parentId, data){
-    console.log(parentId);
-    $("#" + parentId + " > div").css("display", "none");
-    $("#" + parentId + " > .cardgameInfoPanel").animate({"display": "block"}, 1000, function(){
-        $("#" + parentId + " > .cardgameInfoPanel").css("display", "block");
+function displayPanel(parent, panel, height, width){
+    parent.children().css("display", "none");
+    panel.animate({"display": "block"}, 1000, function(){
+        panel.css("display", "block");
     });
+
+    parent.css('height', height);
+    parent.css('width', width);
+}
+
+/** Display the cardgame's information panel */
+function displayCardGameInfoPage(parentId, data){
+    displayPanel($('#' + parentId), $('#' + parentId + ' > .cardgameInfoPanel'), '90%', '30%');
 
     $('.cardgameInfoPanel input[name="cardgameName"]').val(data['name']);
     $('.cardgameInfoPanel input[name="cardgameLanguage"]').val(data['language']);
 
     refreshCardgameTagsList($('#' + parentId + ' .cardgameInfoPanel table'), data['tags']);
     $('.cardgameInfoPanel textarea').val(data['description']);
-
-    let mainContainer = $("#" + parentId);
-    mainContainer.css('height', '90%');
-    mainContainer.css('width', '25%');
 }
 
 function getCardGameInfo(parent, table){

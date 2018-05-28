@@ -28,8 +28,8 @@ function scrollAtBottom(container){
 function insertTextInChat(msg, sender, color){
     let chat = $("#messages");
     let isScrollAtBottom = chat[0].scrollHeight - chat[0].scrollTop <= chat[0].clientHeight
-    let senderTag = '<span style="font-size: 1vw; font-weight:bold; color:' + color + '">' + sender + ' : </span>';
-    let msgTag = '<span style="font-size: 1vw; font-family: sans-serif, arial; color:' + color + '">' + msg + '</span>';
+    let senderTag = '<span style="font-size: 0.9vw; font-weight:bold; color:' + color + '">' + sender + ' : </span>';
+    let msgTag = '<span style="font-size: 0.9vw; font-family: sans-serif, arial; color:' + color + '">' + msg + '</span>';
     chat.append('<p style="margin:0;">' + senderTag + msgTag + '</p>');
 
     if(isScrollAtBottom) scrollAtBottom(chat);
