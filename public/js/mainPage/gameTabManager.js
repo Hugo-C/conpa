@@ -67,9 +67,8 @@ $('#serverList').on('click', 'tbody tr', function(){
     $('#serverMsg').text(''); // remove alerts
     $('#serverList tbody .selected').removeClass('selected');
     $(this).addClass('selected'); // selected class is used to know which server client want to join
-    console.log($.i18n('waitingForPlayers'));
-    if($(this).children()[0].innerHTML === sessionStorage.server
-    && $(this).children()[1].innerHTML === sessionStorage.pseudo
+
+    if($(this).children()[1].innerHTML === sessionStorage.pseudo
     && $(this).children()[4].innerHTML === $.i18n(WAITING_PLAYERS)){
         $('#join').text('Remove'); // if it's his own server and if the game has not started, he can remove it
     }else if($(this).children()[0].innerHTML === sessionStorage.server
@@ -85,23 +84,12 @@ function populateSMTable(data){
 }
 
 $('#gameTab .cardgameInfoPanel button').on('click', function(){
-    displayServerManager();
+    displayPanel($('#gameTab'), $('#serverManager'), '90%', '50%');
 });
-
-function displayServerManager(){
-    $("#gameTab > div").css("display", "none");
-    $("#serverManager").animate({"display": "block"}, 1000, function(){
-        $("#serverManager").css("display", "block");
-    });
-
-    let gameTab = $("#gameTab");
-    gameTab.css('height', '90%');
-    gameTab.css('width', '50%');
-}
 
 /** displays game server creator window */
 $("#create").on("click", function(){
-    displayServerManager();
+    displayPanel($('#gameTab'), $('#serverManager'), '90%', '50%');
     refreshCardGames([], populateSMTable);
     refreshTags($('#serverManager select'));
     removeAllAlerts(); // in case of player have already try to create a server and he has been errors
@@ -122,17 +110,16 @@ $('#serverManager button.filter').on('click', function(){
     refreshCardGames(tags, populateSMTable);
 });
 
+function sortGameTable(n){
+    sortTable(n, 'serverList');
+}
+
 function sortSMTable(n){
     sortTable(n, 'cardgames');
 }
 
 function displayTimersOption(display){
     $('.timersOption').css('display', display ? 'block' : 'none');
-    if(display){
-        $('#timers').parent().css('border-bottom', '0px solid black');
-    }else{
-        $('#timers').parent().css('border-bottom', '2px solid black');
-    }
 }
 
 function displayForceTurnOption(display){
@@ -167,16 +154,28 @@ $('#forceTurn').on('click', function(){
     }
 });
 
+$('.settingCategory').on('click', function(){
+    let button = $(this).find('button');
+    if(button.val() == 'display'){
+        button.val('hide');
+        button.parent().next().css('display', 'none');
+    }else{
+        button.val('display');
+        button.parent().next().css('display', 'block');
+    }
+});
+
+function hideGameManagerTabs(){
+  let hideButtons = $('#serverManager .settingCategory button[value="display"]');
+  for(let index = 0; index < hideButtons.length; index++){
+      $(hideButtons[index]).click();
+  }
+}
+
 /** displays server list */
 $("#cancel").on("click", function(){
-    $("#serverManager").css("display", "none");
-    $(".tabContent").animate({"display": "block"}, 1000, function(){
-        $(".tabContent").css("display", "block");
-    });
-
-    let gameTab = $("#gameTab");
-    gameTab.css('height', '100%');
-    gameTab.css('width', '100%');
+    displayPanel($('#gameTab'), $('#gameTab .tabContent'), '100%', '100%');
+    hideGameManagerTabs();
 });
 
 /** Clear all alerts */
@@ -203,24 +202,24 @@ function checkServerCreationForm(serverData){
     // Checking basic settings
     if(isNaN(serverData['server']['indivTimer']) || isNaN(serverData['server']['globalTimer'])
     || isNaN(serverData['server']['appropriation']) || isNaN(serverData['server']['places'])){
-        basicErrorDisplayer.text("Fields can't be empty");
+        basicErrorDisplayer.text($.i18n("noEmptyFields"));
         conform = false;
     }
     if(serverData['server']['name'] === ""){
-        basicErrorDisplayer.text("Server name can't be empty");
+        basicErrorDisplayer.text($.i18n("nameIsRequired"));
         conform = false;
     }
     if(serverData['role'] === 'animator' && serverData['server']['places'] === 1){
-        basicErrorDisplayer.text("He can't have an animator without players");
+        basicErrorDisplayer.text($.i18n("noAnimatorWithoutPlayers"));
         conform = false;
     }
     if(serverData['server']['places'] <= 0){
-        basicErrorDisplayer.text("Server can't have less than 1 places");
+        basicErrorDisplayer.text($.i18n("onePlaceMin"));
         conform = false;
     }
 
     if($('#cardgames tbody .selected').length === 0){
-        cardgameErrorDisplayer.text("You must select a card game");
+        cardgameErrorDisplayer.text($.i18n("cardgameIsRequired"));
         conform = false;
     }
 
@@ -229,14 +228,14 @@ function checkServerCreationForm(serverData){
     && (serverData['server']['indivTimer'] <= 0
     || serverData['server']['appropriation'] <= 0
     || serverData['server']['globalTimer'] <= 0)){
-        timersErrorDisplayer.text("Timers can't be less than 1");
+        timersErrorDisplayer.text($.i18n("timersValue"));
         conform = false;
     }else{
         if(serverData['server']['appropriation'] > serverData['server']['indivTimer']){
-            timersErrorDisplayer.text("Individual timer can't be less than the appropriation time");
+            timersErrorDisplayer.text($.i18n("indivLessThanApp"));
             conform = false;
         }else if(serverData['server']['indivTimer'] > serverData['server']['globalTimer']){
-            timersErrorDisplayer.text("Global timer can't be less than the individual timer");
+            timersErrorDisplayer.text($.i18n("globalLessThanIndiv"));
             conform = false;
         }
     }
@@ -275,7 +274,6 @@ $("#validate").on("click", function(){
                            'forceEndOfTurn': forceTurn === 'yes',
                            'delayBeforeForcing': delayBeforeForcing,
                            'sharingInterval': sharingInterval}};
-    console.log(data);
 
     if(checkServerCreationForm(data)){
         socket.emit('createServer', data);
@@ -294,16 +292,27 @@ socket.on('serverCreated', function(data){
     }
 });
 
+$('#gameTab .alert .confirm').on('click', function(){
+    if($('#gameTab .alert').hasClass('removeGame')){
+        let selectedServer = $('#serverList tbody .selected').children();
+        socket.emit('removeServer', {'server': selectedServer[0].innerHTML});
+        sessionStorage.server = null;
+        sessionStorage.role = null;
+    }
+    displayPanel($('#gameTab'), $('#gameTab .tabContent'), '100%', '100%');
+});
+
+$('#gameTab .alert .cancel').on('click', function(){
+    displayPanel($('#gameTab'), $('#gameTab .tabContent'), '100%', '100%');
+});
+
 /** Joining the selected game server */
 $("#join").on("click", function(){
     let selectedServer = $('#serverList tbody .selected').children();
     if(selectedServer != null){ // look at the onclick listener on "serverList" to have more details about the below code
-        if(selectedServer[0].innerHTML === sessionStorage.server
-        && selectedServer[1].innerHTML === sessionStorage.pseudo
+        if(selectedServer[1].innerHTML === sessionStorage.pseudo
         && selectedServer[4].innerHTML === $.i18n(WAITING_PLAYERS)){
-            socket.emit('removeServer', {'server': selectedServer[0].innerHTML});
-            sessionStorage.server = null;
-            sessionStorage.role = null;
+            displayAlert('gameTab', 'removeGame', 'Are you sure you want to delete it ? (every players will be fired)', 'both');
             $('#join').text('Join');
         }else if(selectedServer[0].innerHTML === sessionStorage.server){
             socket.emit('exitServer', {'server': selectedServer[0].innerHTML});
@@ -319,7 +328,6 @@ $("#join").on("click", function(){
 });
 
 socket.on('serverUnreachable', function(data){
-    console.log(data);
     $('#serverMsg').text(data['msg']);
     sessionStorage.server = null;
 });

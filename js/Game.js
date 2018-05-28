@@ -1,4 +1,5 @@
 const logger = require("../js/logger");
+const Trace = require("../js/Trace");
 
 module.exports = class Game {
     constructor(name, places, host, cardGameName, cardGameLanguage, useTimers,
@@ -24,6 +25,18 @@ module.exports = class Game {
         this.inactivePlayer = [];
         this.exitBuffer = []; // nobody wants to quit the game
         this.partyHistoricId = null;
+
+        this.trace = new Trace();
+        this.trace.add(this.host.getPseudo(), "create a serveur", this.name);
+        this.trace.add(this.host.getPseudo(), "set himself as animator", host.isAnimator());  // FIXME show only if true ?
+        if(this.useTimers){  // FIXME add server as target ?
+            this.trace.add(this.host.getPseudo(), "set individual timer", this.indivTimer);
+            this.trace.add(this.host.getPseudo(), "set global timer", this.globalTimer);
+            this.trace.add(this.host.getPseudo(), "set force end of turn", this.forceEndOfTurn);
+            if(this.forceEndOfTurn){
+                this.trace.add(this.host.getPseudo(), "set delay before forcing end of turn", this.delayBeforeForcing);
+            }
+        }
 
         if(!host.isAnimator()){
             this.players.push(host);
@@ -146,7 +159,6 @@ module.exports = class Game {
     /**
      * Return the node of the fifo list corresponding to the given pseudo
      * @param {string} pseudo : pseudo of the desired player
-     * @return {FIFO Node} : player's node corresponding to the given pseudo
      */
     getPlayerNode(pseudo){
         let playerNode = null; // used to retrieve the player's node
@@ -189,6 +201,7 @@ module.exports = class Game {
         if(this.players.length > 0){
             this.players.bump(this.players.node);
         }
+        this.trace.add("party", "set the turn", this.getCurrentPlayer());
     }
 
     /**
@@ -264,10 +277,12 @@ module.exports = class Game {
     recordPlayerQuestion(pseudo, question){
         let playerNode = this.getPlayerNode(pseudo);
         if(playerNode != null) playerNode.value.setQuestion(question);
+        this.trace.add(pseudo, "set his question", question);
     }
 
     setAnimReady(){
         this.host.setIsAnimReady(true);
+        this.trace.add(this.host.pseudo, "set his question", question);
     }
 
     /**
@@ -276,6 +291,7 @@ module.exports = class Game {
      */
     setStatus(newStatus){
         this.status = newStatus;
+        this.trace.add("party", "set the status", newStatus);
     }
 
     /**
@@ -295,6 +311,7 @@ module.exports = class Game {
     addNewPlayer(player){
         this.players.push(player);
         this.activePlayers.push(player.getPseudo());
+        this.trace.add(player.pseudo, "joined the game");
     }
 
     /**
@@ -310,6 +327,7 @@ module.exports = class Game {
         if (index > -1) {
             this.activePlayers.splice(index, 1);
         }
+        this.trace.add(pseudo, "is inactive");
     }
 
     /**
@@ -317,9 +335,7 @@ module.exports = class Game {
      * @param {Player} player : player to remove from this game server
      */
     removePlayer(player){
-        let playerNode = this.getPlayerNode(player.getPseudo());
-        if(playerNode != null) this.players.remove(playerNode);
-        this.removePlayerFromActivePlayersList(player.getPseudo());
+        this.removePlayerByPseudo(player.getPseudo());
     }
 
     /**
@@ -330,6 +346,7 @@ module.exports = class Game {
         let playerNode = this.getPlayerNode(pseudo);
         if(playerNode != null) this.players.remove(playerNode);
         this.removePlayerFromActivePlayersList(pseudo);
+        this.trace.add("party", "remove player", null, pseudo);
     }
 
     /**
@@ -353,5 +370,14 @@ module.exports = class Game {
             node.value.recordPlayer(this.partyHistoricId);
         }
         if(this.host.isAnimator()) this.host.recordPlayer(this.partyHistoricId);
+    }
+
+    /**
+     * Prepare the object to be destroyed
+     */
+    dispose(){
+        clearInterval(this.inactivePlayerManager);
+        clearInterval(this.productionSharingManager);
+        this.trace.save();  // TODO give a filename based on game server's name and current date
     }
 };

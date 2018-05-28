@@ -62,16 +62,21 @@ div#historicTab(class="formWrapperStyle rowFlexContainer")
         button(value="purple" class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
         button(value="brown" class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
       div#svgMenu(class="basicContainer menu")
-        button#bouton(value="red" class="playerOnly col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
-        button#color(value="red" class="playerOnly col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
-        button#moveElement(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+        div
+          button#bouton(value="red" class="playerOnly col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+          button#color(value="red" class="playerOnly col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+          button#moveElement(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+          button#centerSVG(class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+          button#legend(value="visible" class="col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1")
+        div(class="centeredItems")
+          label#zoomLevel(class="myCustomIndicator rowFlexContainer col-lg-offset-1 col-lg-10 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-1") Zoom x1.00
       div#productionEditor(class="basicContainer imageBackground")
         include contextualMenu.jade
         div#overlay
-          div
+          div#overlayContent
             h4(class="legend") this legend will fill itself dynamically, don't forget you can resize it and move it.
     div(class="formBottomStyle bottom row")
       div(class="rowFlexContainer col-lg-offset-7 col-lg-4 col-md-offset-7 col-md-4 col-sm-offset-7 col-sm-4")
         button#saveProduction(data-i18n="productionEditorSave" class="switch myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
         button#closeEditor(data-i18n="productionEditorClose" class="myCustomButton col-lg-offset-1 col-lg-5 col-md-offset-1 col-md-5 col-sm-offset-1 col-sm-5")
-  span(id="ruler")
+span(id="ruler")

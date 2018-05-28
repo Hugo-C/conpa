@@ -1,5 +1,5 @@
 const LOGO_DIRECTORY = "img/gamerModule/cardGameLogos/";
-const DEFAULT_LOGO = "noLogo.svg";
+const DEFAULT_LOGO = "noLogo.svg";  // all credit to anbileru adaleru
 
 var cards = {};  // all cards from the deck
 var cardTextNode = document.createTextNode("");

@@ -76,8 +76,8 @@ module.exports = function(io, socket){
      * - the number of players who have defined their questions
      * - the questions of each player
      *
-     * @param {Game} : the game server for which we want the current state of the game time
-     * @param {object} : { 'ready': number of players who are ready,
+     * @param {Game} server : the game server for which we want the current state of the game time
+     * @return {object} : { 'ready': number of players who are ready,
      *                     'playersQuestion': dictionnary of (pseudo, player's question) couple }
      */
     function getQuestionTimeState(server){
@@ -144,8 +144,7 @@ module.exports = function(io, socket){
      * @param {Game} server : the game server we want to stop
      */
     function removeServer(server){
-        clearInterval(server.inactivePlayerManager);
-        clearInterval(server.productionSharingManager);
+        server.dispose();
         delete rooms[server.getName()];
     }
 
@@ -181,9 +180,9 @@ module.exports = function(io, socket){
      * @param {number} partyHistoricId : id which represents the party in the party historic table
      * @param {string} production : a string which describes the svg production
      */
-    function recordProduction(pseudo, partyHistoricId, production){
+    function recordProduction(pseudo, partyHistoricId, production, legend){
         logger.log("silly", production);
-        db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, production, function(err){
+        db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, production, legend, function(err){
             if(err) logger.error(err);
         });
     }
@@ -256,7 +255,7 @@ module.exports = function(io, socket){
         };
         //init internationalization / localization class
         socket.translater = new i18n_module(config.lang, config.langFile);
-        logger.verbose(socket.translater.__("i18n module initialised"));
+        logger.verbose(socket.translater.__("i18n module initialised : " + config.lang));
     }
 
     // -----------------------------------------------------------------------------
@@ -347,6 +346,7 @@ module.exports = function(io, socket){
                 io.sockets.connected[clients[players[index]]].leave();
             }
 
+            server.trace.add(server.getHost().getPseudo(), "removed", null, "party");
             removeServer(server);
             io.sockets.emit('serverListUpdate', listAllServers());
         }
@@ -511,13 +511,18 @@ module.exports = function(io, socket){
      *                          'msg': [message body]}
      */
     socket.on('message', function(data){
-        logger.verbose(socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
-        if(data["dest"] === "all"){
-            let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
-            socket.broadcast.to(socket.room).emit('message', rep);
-        } else {
-            let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
-            io.to(clients[data["dest"]]).emit("message", rep);
+        let server = rooms[socket.room];
+        if(server != null){
+            logger.verbose(socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
+            if(data["dest"] === "all"){
+                let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
+                socket.broadcast.to(socket.room).emit('message', rep);
+                server.trace.add(getPseudoWithId(socket.id), "send public message", data["msg"], data['dest']);
+            } else {
+                let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
+                io.to(clients[data["dest"]]).emit("message", rep);
+                server.trace.add(getPseudoWithId(socket.id), "send private message", data["msg"], data['dest']);
+            }
         }
     });
 
@@ -531,6 +536,7 @@ module.exports = function(io, socket){
     socket.on('cardPicked', function(data){
         logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
         io.sockets.in(socket.room).emit('cardPicked', data);
+        server.trace.add("party", "set card", JSON.stringify(data));
     });
 
     /**
@@ -610,7 +616,7 @@ module.exports = function(io, socket){
             server.removePlayerByPseudo(data['pseudo']);
             socket.leave(data['server']);
             socket.room = null;
-            recordProduction(data['pseudo'], server.getHistoricId(), data['production']);
+            recordProduction(data['pseudo'], server.getHistoricId(), data['production'], data['legend']);
 
             if(server.getNbPlayer() === 0){
                 removeServer(server);

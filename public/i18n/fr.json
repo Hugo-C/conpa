@@ -1,7 +1,7 @@
 {
     "registerForm" : "S'inscrire",
     "usernameLabel" : "Pseudo:",
-    "usernameTooltip" : "Votre pseudo doit contenir au moins 4 caractères",
+    "usernameTooltip" : "Votre pseudo doit contenir entre 4 et 15 caractères",
     "emailLabel" : "Email:",
     "emailTooltip" : "Votre email est invalide",
     "passwordLabel" : "Mot de passe:",
@@ -55,7 +55,9 @@
     "stopGameProcessAborted": "La partie ne va pas finir car plus d'un joueur veux continuer",
     "exitGame?": "Quitter la partie?",
     "generalChannel" : "général",
-    "inputTextTempLabel" : "Ecrivez vos notes ici!",
+    "notesPlaceholder" : "Ecrivez vos notes ici !",
+    "chatPlaceholder": "Ecrivez votre messages ici !",
+    "questionPlaceholder": "Ecrivez votre question ici !",
     "websiteTitle" : "CONPA",
     "myProductionAccess" : "Ma production",
     "mosaicAccess" : "Mosaïque",
@@ -96,7 +98,7 @@
     "createGameServer" : "Créer",
     "joinGameServer" : "Rejoindre",
     "gameServerManagerTitle" : "Gestionnaire de partie",
-    "gameServerManagerBasicSettings" : "Réglages par défaut",
+    "gameServerManagerBasicSettings" : "Réglages de base",
     "gsmNameField" : "Nom",
     "gsmPlacesField" : "Nombre de joueurs",
     "gsmRoleField" : "Selectionner votre rôle",
@@ -147,5 +149,13 @@
     "wizz" : "Puis-je consulter ta production ?",
     "rectangle" : "rectangle",
     "link" : "lien",
-    "withDash" : "pointillé"
+    "withDash" : "pointillé",
+    "noEmptyFields": "Tous les champs sont obligatoires",
+    "nameIsRequired": "Le champ \"nom\" est obligatoire",
+    "noAnimatorWithoutPlayers": "Etre animateur requière au moins un joueur",
+    "onePlaceMin": "Une partie doit être constituée d'au moins un joueur",
+    "timersValue": "La valeur d'un timer doit être supérieur à 0",
+    "cardgameIsRequired": "Vous devez selectionner un jeu de cartes",
+    "indivLessThanApp": "Le timer individuel ne doit pas être inférieur au temps d'appropriation",
+    "globalLessThanIndiv": "Le timer global ne doit pas être inférieur au timer individuel"
 }

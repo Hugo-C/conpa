@@ -68,8 +68,8 @@ function refreshTags(container){
     });
 }
 
-function refreshCardgameTagsList(parentId, tags){
-    let tagsTable = $('#' + parentId + ' .cardgameInfoPanel table').find('tbody');
+function refreshCardgameTagsList(table, tags){
+    let tagsTable = table.find('tbody');
     console.log(tagsTable);
     tagsTable.children().remove(); // we will replace old data by the data we have received
     for(let index = 0; index < tags.length; index++){
@@ -79,22 +79,25 @@ function refreshCardgameTagsList(parentId, tags){
 }
 
 /** Display the cardgame's information panel */
-function displayCardGameInfoPage(parentId, data){
-    console.log(parentId);
-    $("#" + parentId + " > div").css("display", "none");
-    $("#" + parentId + " > .cardgameInfoPanel").animate({"display": "block"}, 1000, function(){
-        $("#" + parentId + " > .cardgameInfoPanel").css("display", "block");
+function displayPanel(parent, panel, height, width){
+    parent.children().css("display", "none");
+    panel.animate({"display": "block"}, 1000, function(){
+        panel.css("display", "block");
     });
+
+    parent.css('height', height);
+    parent.css('width', width);
+}
+
+/** Display the cardgame's information panel */
+function displayCardGameInfoPage(parentId, data){
+    displayPanel($('#' + parentId), $('#' + parentId + ' > .cardgameInfoPanel'), '90%', '30%');
 
     $('.cardgameInfoPanel input[name="cardgameName"]').val(data['name']);
     $('.cardgameInfoPanel input[name="cardgameLanguage"]').val(data['language']);
 
-    refreshCardgameTagsList(parentId, data['tags']);
+    refreshCardgameTagsList($('#' + parentId + ' .cardgameInfoPanel table'), data['tags']);
     $('.cardgameInfoPanel textarea').val(data['description']);
-
-    let mainContainer = $("#" + parentId);
-    mainContainer.css('height', '90%');
-    mainContainer.css('width', '25%');
 }
 
 function getCardGameInfo(parent, table){
@@ -120,6 +123,25 @@ function getCardGameInfo(parent, table){
             }
         });
     }
+}
+
+function displayAlert(parentId, type, message, button){
+    $('#' + parentId + ' > div').css("display", "none");
+    $(".alert").animate({"display": "block"}, 1000, function(){
+        $(".alert").css("display", "block");
+        $("#editorTab > div:not(.alert)").css("display", "none");
+    });
+    $('#' + parentId + ' .alertTitle').text('Confirmation');
+    $('#' + parentId + ' .alertMessage').text(message);
+
+    $('#' + parentId + ' .alert').addClass(type);
+    if(button == 'confirm'){
+        $('#' + parentId + ' .alert .cancel').css('display', 'none');
+    }
+
+    let tab = $('#' + parentId);
+    tab.css('height', '40%');
+    tab.css('width', '35%');
 }
 
 function sortTable(n, tableId) {

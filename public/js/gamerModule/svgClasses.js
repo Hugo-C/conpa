@@ -288,9 +288,9 @@ class Link {
     constructor(e1, e2, prod) {
         this.e1 = e1;
         this.e2 = e2;
-		this.prod = prod;
+		    this.prod = prod;
 
-		this.delta = 19;
+		    this.delta = 19;
         this.dasharray = 0;
         this.navigability = null;
         let pos1 = e1.center();

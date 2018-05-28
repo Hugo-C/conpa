@@ -22,6 +22,10 @@
   font-size: 1.5vw;
 }
 
+/* -------------------------------------------------------------------------- */
+/* ---------------------------- SERVER MANAGER ------------------------------ */
+/* -------------------------------------------------------------------------- */
+
 #serverManager {
   height: 100%;
   display: none;
@@ -40,14 +44,73 @@
   overflow-y: auto;
 }
 
-#serverManager > .body > div {
-  height: 12%;
+#serverManager .basicSettings label,
+#serverManager .timersSetings label,
+#serverManager .advancedSettings label {
+  padding: 0;
+  font-size: 1vw;
+}
+#serverManager > .body input {
+  text-align: center;
+  font-size: 1vw;
+}
+#serverManager > .body span {
+  font-size: 1vw;
+}
+
+#serverManager .settingCategory {
+  height: 10%;
+  margin-top: 2%;
+  margin-bottom: 4%;
+  background: linear-gradient(#D0D0D0, #9F9A9A);
+  cursor:pointer;
+  box-shadow: 2px 6px 6px 0px;
+}
+#serverManager .basicSettings,
+#serverManager .cardgameSettings,
+#serverManager .timersSetings,
+#serverManager .advancedSettings {
+  display: none;
+}
+#serverManager .basicSettings > div,
+#serverManager .cardgameSettings > div,
+#serverManager .timersSetings > div,
+#serverManager .advancedSettings > div {
   margin-bottom: 2%;
 }
-#serverManager > .body > div:nth-child(5) {
+#serverManager .basicSettings > div:last-child,
+#serverManager .cardgameSettings > div:last-child,
+#serverManager .timersSetings > div:last-child,
+#serverManager .advancedSettings > div:last-child {
+  margin-bottom: 3%;
+}
+
+#serverManager > .body > .settingCategory > :first-child {
+  padding: 0;
+  font-size: 1.3vw;
+  font-weight: bold;
+  color: black;
+}
+#serverManager > .body > .settingCategory > :nth-child(2) {
+  font-size: 0.8vw;
+  font-weight: bold;
+  color: red;
+}
+#serverManager > .body > .settingCategory > button {
+  height: 50%;
+  padding: 0;
+}
+#serverManager > .body > .settingCategory > button[value="display"] {
+  background-image: url('/img/mainPage/displayed.png');
+}
+#serverManager > .body > .settingCategory > button[value="hide"] {
+  background-image: url('/img/mainPage/hidden.png');
+}
+
+#serverManager .cardgameSettings {
   height: 80%;
 }
-#serverManager > .body > div:nth-child(5) > :first-child {
+#serverManager .cardgameSettings > :first-child {
   height: 15%;
   padding-left: 5%;
   padding-right: 5%;
@@ -55,70 +118,33 @@
   border: 2px solid black;
   box-shadow: 2px 0px 8px 0px;
 }
-#serverManager > .body > div:nth-child(5) > :last-child {
+#serverManager .cardgameSettings > :last-child {
   height: 83%;
   padding: 2%;
   overflow-y: auto;
 }
-#serverManager > .body > div:nth-child(5) table {
+
+#serverManager .cardgameSettings table {
   margin-bottom: 20px;
   box-shadow: 2px 2px 8px 0px;
 }
-#serverManager > .body > div:nth-child(5) table th {
-  font-size: 0.8vw;
-}
-
-#serverManager > .body > div:nth-child(5) label {
+#serverManager .cardgameSettings label {
   margin-bottom: 0;
 }
-#serverManager > .body > div:nth-child(5) button.filter {
+#serverManager .cardgameSettings button.filter {
   height: 80%;
   font-size: 1vw;
   font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
 }
-#serverManager > .body > div:nth-child(5) select {
+#serverManager .cardgameSettings select {
   display: block;
 }
-#serverManager > .body > div:nth-child(5) button[type="button"] {
+#serverManager .cardgameSettings button[type="button"] {
   padding: 1%;
   padding-left: 3%;
   padding-right: 5%;
   font-size: 1vw;
   font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
-}
-
-#serverManager > .body > :nth-child(3),
-#serverManager > .body > :nth-child(5),
-#serverManager > .body > :nth-child(7),
-#serverManager > .body > :nth-child(10) {
-  border-bottom: 2px solid black;
-}
-
-#serverManager > .body > .settingClass {
-  margin-bottom: 3%;
-}
-
-#serverManager > .body > .settingClass > :first-child {
-  padding: 0;
-  font-size: 1.5vw;
-  font-weight: bold;
-  color: black;
-}
-#serverManager > .body > .settingClass > :last-child {
-  font-size: 1vw;
-  font-weight: bold;
-  color: red;
-}
-
-#serverManager > .body > div > label {
-  padding: 0;
-  font-size: 1.1vw;
-}
-#serverManager > .body > div > input {
-  text-align: center;
-}
-#serverManager > .body > div > span {
-  text-decoration: underline;
 }
 
 #serverManager > .bottom {
@@ -128,4 +154,14 @@
 .timersOption,
 .forceTurnOption {
   display: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------- ALERT FORM ------------------------------------ */
+/* -------------------------------------------------------------------------- */
+
+#gameTab .alert {
+  display: none;
+  height: 100%;
+  margin: 0;
 }

@@ -444,7 +444,7 @@ exports.isConnected = function(user, callback){
     logger.debug(sql);
     let value = [user];
     state.pool.query(sql, value, function(err, result){
-        logger.debug(result);
+        logger.debug(user + " is connected ? : " + JSON.stringify(result));
         if(err) callback(false);
         else callback(result[0][keys.UT_CONNECT] === '1');
     });
@@ -526,8 +526,9 @@ exports.getEmail = function(pseudo, callback){
               ' WHERE ' + keys.UT_KEY_PSEUDO + ' = ?;';
     let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
-        if(err) callback(err);
-        else if (result && result[0]) {
+        if(err){
+            callback(err);
+        } else if (result && result[0]) {
             callback(null, result[0][keys.UT_KEY_EMAIL]);
         } else {
             callback(null, null);  // no result
@@ -555,7 +556,7 @@ let setToken = function(pseudo, token, callback){
     let value = [md5(token + TOKEN_SALT), expirationDate, pseudo];
     state.pool.query(sql, value, function(err){
         if(err){
-            logger.debug(err);
+            logger.error(err);
             callback(pseudo, null);
         } else {
             callback(pseudo, token);
@@ -738,31 +739,34 @@ exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
  * @param {blob} production : name of the player's production file on the server
  * @param {callback} callback : function used to return errors
  */
-exports.recordPlayerProductionWithPartyId = function(pseudo, party, production, callback){
+exports.recordPlayerProductionWithPartyId = function(pseudo, party, production, legend, callback){
     let sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
-              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
+              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?, ' + keys.HPT_KEY_LEGEND + ' = ?' +
               ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
               ' AND ' + keys.HPT_KEY_PARTY + ' = ?;';
-    let values = [production, pseudo, party];
+    let values = [production, legend, pseudo, party];
     state.pool.query(sql, values, function(err){
         if(err) callback(err);
         else callback(null);
     });
 };
 
-exports.recordPlayerProduction = function(pseudo, serverName, date, production, callback){
+exports.recordPlayerProduction = function(pseudo, serverName, date, production, legend, callback){
     let sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
-              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
+              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?, ' + keys.HPT_KEY_LEGEND + ' = ?' +
               ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
               ' AND ' + keys.PT_KEY_SERVER + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
-    let values = [production, pseudo, serverName, date];
+    let values = [production, legend, pseudo, serverName, date];
     state.pool.query(sql, values, function(err){
-        logger.debug(err);
-        if(err) callback(err);
-        else callback(null);
+        if(err){
+            callback(err);
+            logger.error(err);
+        }else{
+            callback(null);
+        }
     });
 };
 
@@ -797,7 +801,7 @@ exports.getPlayersInParty = function(party, date, callback){
 };
 
 exports.getProduction = function(pseudo, party, date, callback){
-    let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
+    let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION + ', ' + keys.HPT_KEY_LEGEND +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
@@ -806,15 +810,16 @@ exports.getProduction = function(pseudo, party, date, callback){
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
     let values = [party, date, pseudo];
     state.pool.query(sql, values, function(err, result){
-        logger.debug(result);
+        logger.debug(JSON.stringify(result));
         if(err) callback(err);
-        else callback(null, result[0][keys.HPT_KEY_PRODUCTION]);
+        else callback(null, result[0]);
     });
 };
 
 exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
     let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
               ', ' + keys.HPT_KEY_QUESTION +
+              ', ' + keys.HPT_KEY_LEGEND +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +

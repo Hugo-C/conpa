@@ -43,3 +43,4 @@ exports.HPT_KEY_PSEUDO = "pseudo";
 exports.HPT_KEY_PARTY = "idParty";
 exports.HPT_KEY_QUESTION = "question";
 exports.HPT_KEY_PRODUCTION = "production";
+exports.HPT_KEY_LEGEND = "legend";

@@ -10,13 +10,16 @@ String.prototype.visualFontSize = function(){
     return ruler.offsetHeight;
 };
 
+const colors = {'red': '#ED1723', 'green': '#0FB32D', 'yellow': '#FFEE24', 'blue': '#3344FF', 'white': '#D5D5D5', 'purple': '#A531FF', 'brown': '#8C5B35'};
+
 class Production {
 
-    constructor(parent, panning){
+    constructor(parent, panning, zoomIndicator){
         this.parent = parent;
+        this.zoomIndicator = zoomIndicator;
         this.draw = SVG(parent).size('100%', '100%').panZoom({
             doPanning: panning,
-            zoomFactor: 0.5,
+            zoomFactor: 0.25,
             zoomMin: 0.25,
             zoomMax: 4,
         });
@@ -27,8 +30,7 @@ class Production {
         this.myElements = []; // list all elements in the svg
         this.myLinks = []; // list all links in the svg
 
-        this.colors = {'red': '#ED1723', 'green': '#0FB32D', 'yellow': '#FFEE24', 'blue': '#3344FF', 'white': '#D5D5D5', 'purple': '#A531FF', 'brown': '#8C5B35'};
-        this.selectedColor = this.colors['red'];
+        this.selectedColor = colors['red'];
 
         // Rectangle manipulation variables
         this.rectCreate = false;
@@ -245,12 +247,16 @@ class Production {
         // --------------------- OTHERS LISTENERS ------------------------------
         // ---------------------------------------------------------------------
 
-        // resize the svg when page is resized
-        window.onresize = function(){
-            self.toggleMenuOff();
+        this.resizeSVG = function(){
             let dimHeight = $(self.parent).height();
             let dimWidth = $(self.parent).width();
             self.draw.attr({'height': dimHeight, 'width': dimWidth});
+        }
+
+        // resize the svg when page is resized
+        window.onresize = function(){
+            self.toggleMenuOff();
+            self.resizeSVG();
         };
 
         this.documentClick = function(evt){
@@ -277,6 +283,12 @@ class Production {
             }
         };
 
+        this.draw.on('wheel', function(evt){
+            if(self.zoomIndicator != null){
+                self.zoomIndicator.text('Zoom x' + self.draw.zoom().toFixed(2));
+            }
+        });
+
         this.draw.on('mousedown', this.onMouseDown);
         this.draw.on('mousemove', this.onMouseMove);
         this.draw.on('mouseup', this.onMouseUp);
@@ -286,10 +298,14 @@ class Production {
         document.addEventListener('click', this.documentClick);
     }
 
+    resizeSVG(){
+        this.resizeSVG();
+    }
+
     setSelectedColor(color){
-        this.selectedColor = this.colors[color];
+        this.selectedColor = colors[color];
         if(this.selectedItem != null){
-            this.selectedItem.setFillColor(this.colors[color]);
+            this.selectedItem.setFillColor(colors[color]);
         }
     }
 
@@ -353,7 +369,7 @@ class Production {
         $('.mainTool').css('display', 'none');
         $('.colorTool').css('display', 'block');
         if(this.selectedLink != null){
-            this.selectedLink.setColor(this.colors[color]);
+            this.selectedLink.setColor(colors[color]);
         }
     }
 
@@ -401,7 +417,6 @@ class Production {
 
         for(let index in words){
             let word = words[index];
-
             if((currentLineWidth + word.visualLength()) < textWidth){
                 if(word.includes('\n')){
                     let wordCut = word.split('\n', 2);
@@ -525,7 +540,6 @@ class Production {
             data['idRect1'] = this.myLinks[index].getFirstRectId();
             data['idRect2'] = this.myLinks[index].getSecondRectId();
             data['strokeWidth'] = this.myLinks[index].getWidth();
-            console.log(this.myLinks[index].getDasharray());
             data['strokeDasharray'] = this.myLinks[index].getDasharray();
             data['fill'] = this.myLinks[index].getColor();
             data['navigability'] = this.myLinks[index].hasNavigability();
@@ -567,6 +581,184 @@ class Production {
     }
 
     // -------------------------------------------------------------------------
+    // ----------------------- Legend integration ------------------------------
+    // -------------------------------------------------------------------------
+
+    getLineText(line){
+        let result = '';
+        for(let index = 0; index < line.length; index++){
+            result += line[index];
+        }
+        return result;
+    }
+
+    /**
+     * Cut a text in several lines that do not exceed a certain size
+     * Add a '\n' character between each line of the cut text
+     * @param {String} text : text to cut
+     * @param {Number} maxWidth : max size of a line
+     * @return {String} : a text in which each line's width is smaller than maxWidth
+     */
+    handleText(text, maxWidth){
+        let lines = this.cutTextIntoLines(text, maxWidth);
+        let result = '';
+
+        for(let index = 0; index < lines.length; index++){
+            if(index < lines.length - 1){
+                result += this.getLineText(lines[index]) + '\n';
+            }else{
+                result += this.getLineText(lines[index]);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Adds player's question on the production
+     * @param {String} question : question to add
+     * @param {Number} textMaxWidth : line's max width
+     * @param {Float} coordX : x coordinate of legend's top left corner
+     * @param {Float} coordY : y coordinate at which we will add a new entry
+     * @param {Float} margin : space between each entry
+     * @return {Float} : y coordinate at which we can add a new entry
+     */
+    addQuestionToLegend(question, textMaxWidth, coordX, coordY, margin){
+        let questionSpan = this.master.text(this.handleText(question, textMaxWidth)).move(coordX, coordY);
+        questionSpan.font({
+            weight: 'bold',
+            size: '1vw'
+        });
+        let textBBox = questionSpan['node'].childNodes[0].getBBox();
+        coordY = coordY + textBBox.height + margin/2;
+
+        return coordY;
+    }
+
+    /**
+     * Adds legend of each rectangle on the production
+     * @param {Object} rectangles : legend's information for each rectangle
+     * @param {Float} iconWidth : width of a legend's icon
+     * @param {Float} iconHeight : height of a legend's icon
+     * @param {Number} textMaxWidth : line's max width
+     * @param {Float} coordX : x coordinate of legend's top left corner
+     * @param {Float} coordY : y coordinate at which we will add a new entry
+     * @param {Float} margin : space between each entry
+     * @return {Float} : y coordinate at which we can add a new entry
+     */
+    addRectanglesToLegend(rectangles, iconWidth, iconHeight, textMaxWidth, coordX, coordY, margin){
+        for(let index = 0; index < rectangles.length; index++){
+            this.master.rect(iconWidth, iconHeight)
+                       .fill(rectangles[index]['fill'])
+                       .move(coordX, coordY);
+
+            if(rectangles[index]['text'] !== ''){
+                let text = this.master.text(this.handleText(rectangles[index]['text'], textMaxWidth))
+                                      .move(coordX + iconWidth + margin, coordY);
+                let textBBox = text['node'].childNodes[0].getBBox();
+                coordY = coordY + Math.max(iconHeight, textBBox.height) + margin;
+            }else{
+                coordY = coordY + iconHeight + margin;
+            }
+        }
+        return coordY;
+    }
+
+    /**
+     * Adds legend of each link on the production
+     * @param {Object} links : legend's information for each link
+     * @param {Float} iconWidth : width of a legend's icon
+     * @param {Float} iconHeight : height of a legend's icon
+     * @param {Number} textMaxWidth : line's max width
+     * @param {Float} coordX : x coordinate of legend's top left corner
+     * @param {Float} coordY : y coordinate at which we will add a new entry
+     * @param {Float} margin : space between each entry
+     * @return {Float} : y coordinate at which we can add a new entry
+     */
+    addLinksToLegend(links, iconWidth, iconHeight, textMaxWidth, coordX, coordY, margin){
+        for(let index = 0; index < links.length; index++){
+            this.master.line(coordX, coordY + iconHeight/2,
+                             coordX + iconWidth, coordY + iconHeight/2)
+                       .stroke({
+                            width: links[index]['width'],
+                            color: links[index]['fill'],
+                            dasharray: links[index]['dasharray']
+                        });
+            if(links[index]['text'] !== ''){
+                let text = this.master.text(this.handleText(links[index]['text'], textMaxWidth))
+                                      .move(coordX + iconWidth + margin, coordY);
+                let textBBox = text['node'].childNodes[0].getBBox();
+                coordY = coordY + Math.max(iconHeight, textBBox.height) + margin;
+            }else{
+                coordY = coordY + iconHeight + margin;
+            }
+        }
+        return coordY;
+    }
+
+    /**
+     * Integrates the legend into the production
+     * The legend is added to the right of the master container
+     *
+     * @param {Object} legend : an object which contain legend information
+     * (this object can be obtained with the "saveLegend" function : legend.js file)
+     * @param {String} question : player's question
+     */
+    integrateLegendToProduction(legend, question){
+        let iconHeight = 50;
+        let iconWidth = 100;
+        let textMaxWidth = 300;
+        let margin = 20;
+        let masterCoord = this.draw['node'].childNodes[1].getBBox();
+        let coordX = masterCoord.x + masterCoord.width + 2*margin;
+        let coordY = masterCoord.y;
+        let questionHeight = 0;
+
+        if(question !== null && question !== ''){
+            coordY = this.addQuestionToLegend(question,
+                                              textMaxWidth,
+                                              coordX,
+                                              coordY,
+                                              margin);
+            questionHeight = coordY - masterCoord.y;
+        }
+
+        coordY = this.addRectanglesToLegend(legend['rectangles'],
+                                            iconWidth,
+                                            iconHeight,
+                                            textMaxWidth,
+                                            coordX,
+                                            coordY,
+                                            margin);
+
+        coordY = this.addLinksToLegend(legend['links'],
+                                       iconWidth,
+                                       iconHeight,
+                                       textMaxWidth,
+                                       coordX,
+                                       coordY,
+                                       margin);
+
+        let legendWidth = iconWidth + textMaxWidth + 100;
+        let legendHeight = coordY - masterCoord.y + questionHeight + margin;
+
+        let background = this.master.rect(legendWidth, legendHeight).fill('grey')
+                                    .move(masterCoord.x + masterCoord.width + margin, masterCoord.y - questionHeight);
+        background.back();
+        background.attr('opacity', 0.7);
+        background.attr('stroke', '#000');
+        background.attr('stroke-width', 2);
+
+        this.master.line(masterCoord.x + masterCoord.width + margin,
+                         masterCoord.y + margin/2,
+                         masterCoord.x + masterCoord.width + legendWidth + margin,
+                         masterCoord.y + margin/2)
+                   .stroke({
+                      width: 2,
+                      color: '#000'
+                   });
+    }
+
+    // -------------------------------------------------------------------------
     // ------------------------ Utils functions --------------------------------
     // -------------------------------------------------------------------------
 
@@ -576,11 +768,20 @@ class Production {
         let masterCoord = this.draw['node'].childNodes[1].getBBox();
         let viewboxParam = "" + masterCoord.x + " " + masterCoord.y + " " + clientWidth + " " + clientHeight;
         this.draw['node'].setAttribute("viewBox", viewboxParam);
+        if(this.zoomIndicator != null) this.zoomIndicator.text('Zoom x1.00');
     }
 
     clearSVG(){
         this.myElements = [];
         this.myLinks = [];
         this.master['node'].innerHTML = "";
+    }
+
+    isEmpty(){
+        if(this.myLinks.length == 0 && this.myElements.length == 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

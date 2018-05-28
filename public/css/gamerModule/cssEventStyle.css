@@ -14,24 +14,16 @@ button:focus {
   outline: 0;
 }
 
-button#bouton[value="red"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_red.png");}
-button#bouton[value="green"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_green.png");}
-button#bouton[value="yellow"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_yellow.png");}
-button#bouton[value="purple"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_purple.png");}
-button#bouton[value="brown"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_brown.png");}
-button#bouton[value="blue"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_blue.png");}
-button#bouton[value="white"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_white.png");}
-
 button#exit:hover {
   background-color: darkgrey;
 }
 
 button#sendButton:hover {
-  background-image: url("/img/gamerModule/sendButtonOnHover.svg");
+  background-color: green;
 }
 
 button#sendButton:active {
-  background-image: url("/img/gamerModule/sendButtonOnClick.svg");
+  background-color: lightgreen;
 }
 
 button#skipButton:hover {
@@ -82,10 +74,6 @@ div#familyLogoDiv:hover span{
 div#familyLogoDiv:hover img{
   -webkit-filter: grayscale(100%) blur(3px);
   filter: grayscale(100%) blur(3px);
-}
-
-#overlay:hover{
-  opacity: 0.85;
 }
 
 foreignObject > textarea {

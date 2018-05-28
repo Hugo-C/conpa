@@ -64,14 +64,17 @@ router.post('/removeHistoric', urlencodedParser, function(req, res){
 });
 
 router.post('/getPlayerProduction', urlencodedParser, function(req, res){
-    var details = {'production': ''};
+    var details = {'production': '', 'legend': ''};
     db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
         if(err){
             logger.error(err);
             res.send('ERROR');
         }else{
             logger.log("silly", result != null);
-            if(result != null) details['production'] = result;
+            if(result != null){
+                details['production'] = result[keys.HPT_KEY_PRODUCTION];
+                details['legend'] = result[keys.HPT_KEY_LEGEND];
+            }
             res.send(details);
         }
     });
@@ -79,7 +82,7 @@ router.post('/getPlayerProduction', urlencodedParser, function(req, res){
 
 router.post('/recordPlayerProduction', urlencodedParser, function(req, res){
     logger.log("silly", req.body.production);
-    db.recordPlayerProduction(req.body.username, req.body.partyName, req.body.partyDate, req.body.production, function(err){
+    db.recordPlayerProduction(req.body.username, req.body.partyName, req.body.partyDate, req.body.production, req.body.legend, function(err){
         if(err){
             logger.error(err);
             res.send('ERROR');
@@ -91,7 +94,7 @@ router.post('/recordPlayerProduction', urlencodedParser, function(req, res){
 });
 
 router.post('/getDetails', urlencodedParser, function(req, res){
-    var details = {'production': '', 'players': []};
+    var details = {'production': '', 'legend': '', 'players': []};
 
     function processPlayersList(players){
 
@@ -105,7 +108,10 @@ router.post('/getDetails', urlencodedParser, function(req, res){
                 res.send('ERROR');
             }else{
                 logger.log("silly", result != null);
-                if(result != null) details['production'] = result;
+                if(result != null){
+                    details['production'] = result[keys.HPT_KEY_PRODUCTION];
+                    details['legend'] = result[keys.HPT_KEY_LEGEND];
+                }
                 res.send(details);
             }
         });
@@ -128,6 +134,7 @@ router.post('/getPlayerDetails', urlencodedParser, function(req, res){
         }else{
             details['question'] = result[0][keys.HPT_KEY_QUESTION];
             details['production'] = result[0][keys.HPT_KEY_PRODUCTION];
+            details['legend'] = result[0][keys.HPT_KEY_LEGEND];
             res.send(details);
         }
     });

@@ -13,10 +13,13 @@
   background: linear-gradient(#0000a2, #000038);
 }
 
-
 #historicTab > div {
   padding: 0;
 }
+
+/* -------------------------------------------------------------------------- */
+/* --------------------------- PARTY SHEET PANEL ---------------------------- */
+/* -------------------------------------------------------------------------- */
 
 .partySheet {
   height: 100%;
@@ -46,7 +49,6 @@
 .partySheet > .body > div:first-child > div:first-child > div.row > input {
   height: 60%;
 }
-
 .partySheet > .body > div:first-child > div:first-child > div.row > label {
   padding: 0;
   font-size: 1.2vw;
@@ -55,7 +57,6 @@
 .partySheet > .body > div:first-child > div:last-child > input {
   height: 35%;
 }
-
 .partySheet > .body > div:first-child > div:last-child > label {
   padding: 0;
   font-size: 1.2vw;
@@ -83,9 +84,16 @@ input#partyDate {
     display: none;
 }
 
+/* -------------------------------------------------------------------------- */
+/* ------------------------- Production editor ------------------------------ */
+/* -------------------------------------------------------------------------- */
+
 .productionEditor {
   display: none;
+  height: 100%;
+  padding: 0;
 }
+
 .productionEditor .body button {
   border: none;
   background-color: Transparent;
@@ -96,78 +104,49 @@ input#partyDate {
 .productionEditor .body button:focus {
   outline: 0;
 }
-.productionEditor {
-  height: 100%;
-  padding: 0;
-}
+
 .productionEditor > .body {
   display: flex;
   padding: 0;
 }
+
 .productionEditor > .body > .menu {
-  width: 6%;
+  width: 5%;
   height: 100%;
   padding-top: 15px;
   padding-bottom: 5px;
   border-right: 2px solid black;
   background-color: lightgrey;
 }
+
 .productionEditor > .body > .menu > button {
   height: 10%;
   padding: 0;
 }
+
 .productionEditor > .body > #colorMenu {
-  display: none;
+  dis
+  play: none;
 }
 .productionEditor > .body > #svgMenu > button {
   margin-bottom: 15px;
 }
+
 .productionEditor > .body > #productionEditor {
-  width: 94%;
+  width: 95%;
   height: 100%;
   border: none;
   overflow: hidden;
 }
-
-div#colorMenu > button[value="red"] { background-image: url("/img/gamerModule/red.jpg"); }
-div#colorMenu > button[value="green"] { background-image: url("/img/gamerModule/green.jpg"); }
-div#colorMenu > button[value="yellow"] { background-image: url("/img/gamerModule/yellow.jpg"); }
-div#colorMenu > button[value="blue"] { background-image: url("/img/gamerModule/blue.jpg"); }
-div#colorMenu > button[value="white"] { background-image: url("/img/gamerModule/white.jpg"); }
-div#colorMenu > button[value="purple"] { background-image: url("/img/gamerModule/purple.jpg"); }
-div#colorMenu > button[value="brown"] { background-image: url("/img/gamerModule/brown.jpg"); }
-
-button#bouton[value="red"] { background-image: url("/img/gamerModule/textIcons/text_red.png");}
-button#bouton[value="green"] { background-image: url("/img/gamerModule/textIcons/text_green.png");}
-button#bouton[value="yellow"] { background-image: url("/img/gamerModule/textIcons/text_yellow.png");}
-button#bouton[value="purple"] { background-image: url("/img/gamerModule/textIcons/text_purple.png");}
-button#bouton[value="brown"] { background-image: url("/img/gamerModule/textIcons/text_brown.png");}
-button#bouton[value="blue"] { background-image: url("/img/gamerModule/textIcons/text_blue.png");}
-button#bouton[value="white"] { background-image: url("/img/gamerModule/textIcons/text_white.png");}
-
-button#bouton[value="red"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_red.png");}
-button#bouton[value="green"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_green.png");}
-button#bouton[value="yellow"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_yellow.png");}
-button#bouton[value="purple"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_purple.png");}
-button#bouton[value="brown"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_brown.png");}
-button#bouton[value="blue"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_blue.png");}
-button#bouton[value="white"]:focus { background-image: url("/img/gamerModule/textIcons/textFocus_white.png");}
-
-div#svgMenu > button#color[value="red"] { background-image: url("/img/gamerModule/redPencil.png"); }
-div#svgMenu > button#color[value="green"] { background-image: url("/img/gamerModule/greenPencil.png"); }
-div#svgMenu > button#color[value="yellow"] { background-image: url("/img/gamerModule/yellowPencil.png"); }
-div#svgMenu > button#color[value="blue"] { background-image: url("/img/gamerModule/bluePencil.png"); }
-div#svgMenu > button#color[value="white"] { background-image: url("/img/gamerModule/whitePencil.png"); }
-div#svgMenu > button#color[value="purple"] { background-image: url("/img/gamerModule/purplePencil.png"); }
-div#svgMenu > button#color[value="brown"] { background-image: url("/img/gamerModule/brownPencil.png"); }
-
-div#svgMenu > button#moveElement { background-image: url("/img/gamerModule/move.png"); }
 
 /* -------------------------------------------------------------------------- */
 /* ------------------------------- Tools ------------------------------------ */
 /* -------------------------------------------------------------------------- */
 
 #ruler {
+  position: absolute;
   visibility: hidden;
+  height: auto;
+  width: auto;
   white-space: nowrap;
 }

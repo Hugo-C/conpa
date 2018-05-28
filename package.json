@@ -30,7 +30,7 @@
     "morgan": "~1.9.0",
     "multer": "^1.3.0",
     "mysql": "^2.15.0",
-    "nodemailer": "^4.6.4",
+    "nodemailer": "^4.6.5",
     "npm": "^6.1.0",
     "popper.js": "^1.14.3",
     "request": "^2.86.0",
@@ -39,7 +39,7 @@
     "socket.io": "^2.1.1",
     "sqlstring": "^2.3.1",
     "svg.draggy.js": "^1.1.1",
-    "svg.js": "^2.6.4",
+    "svg.js": "^2.6.5",
     "winston": "^3.0.0-rc5"
   },
   "devDependencies": {

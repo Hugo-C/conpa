@@ -1,4 +1,4 @@
-{
+﻿{
     "Salut": {
         "en": "Hello",
         "fr-FR": "Salut",
@@ -31,9 +31,9 @@
     },
     "currentPlayerMessage": {
         "en": "It's the turn of ",
-        "fr-FR": "C'est le tour de ",
-		"en-US": "It's the turn of ",
-        "fr": "C'est le tour de "
+        "fr-FR": "C'est au tour de ",
+		    "en-US": "It's the turn of ",
+        "fr": "C'est au tour de "
     },
     "serverNameNotAvailableMessage": {
         "en": "server name unavailable",
@@ -50,19 +50,25 @@
     "playerLeavingMessage": {
         "en": " left the game !",
         "fr-FR": " a quitté le jeu !",
-		"en-US": " left the game !",
+	"en-US": " left the game !",
         "fr": " a quitté le jeu !"
     },
     "yes": {
         "en": "Yes",
         "fr-FR": "Oui",
-		"en-US": "Yes",
+	"en-US": "Yes",
         "fr": "Oui"
     },
     "no": {
         "en": "No",
         "fr-FR": "Non",
-		"en-US": "No",
+	"en-US": "No",
         "fr": "Non"
+    },
+    "rollTheDie": {
+        "en": "Roll the die !",
+        "fr-FR": "Lancez le dé !",
+        "en-US": "Roll the die !",
+        "fr": "Lancez le dé"
     }
 }

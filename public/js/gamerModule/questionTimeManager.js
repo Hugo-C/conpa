@@ -34,28 +34,10 @@ $('#projector').on('click', function(){
  */
 $('#validate').on('click', function(){
     let question = $('#myQuestion').val();
-    if(sessionStorage.role === 'player'
-    && $.trim(question) !== ''
-    && !question.match(/^Write your question here !/)){
+    if(sessionStorage.role === 'player' && $.trim(question) !== ''){
         socket.emit('recordMyQuestion', {'question': question});
     }else if(sessionStorage.role === 'animator'){
         socket.emit('animatorValidation', null);
-    }
-});
-
-$('#myQuestion').on("focus", function(){
-    let value = $("input#myQuestion").val();
-    if(value.match(/^Write your question here !/)){
-        $("input#myQuestion").val("");
-    }
-});
-
-// displays default text if the area is empty and has not the focus
-$("#myQuestion").focusout(function(){
-    let value = $("input#myQuestion").val();
-    value = $.trim(value);
-    if(value === ""){
-        $("input#myQuestion").val("Write your question here !");
     }
 });
 
@@ -233,8 +215,8 @@ function displayMyQuestion(playersQuestion){
  */
 socket.on('initQuestionTime', function(data){
     let players = data['players'];
-    console.log(players);
     $('#playersQuestion').empty();
+    $('#myQuestion').attr('placeholder', $.i18n('questionPlaceholder'));
     actualizeNbReady(0, players.length);
 
     if(players.length > 0){

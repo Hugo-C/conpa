@@ -85,7 +85,7 @@ function doDispose(obj) {
                 doDispose(obj.children[i]);
             }
         }
-        
+
         if (obj.geometry) {
             obj.geometry.dispose();
             obj.geometry = undefined;
@@ -170,7 +170,7 @@ function deleteScene() {
     cancelAnimationFrame(req);
 
     scene.removeEventListener('update', updateScene, false);
-    
+
     doDispose(renderer);
     doDispose(loader);
     scene.remove(ground);
@@ -180,7 +180,7 @@ function deleteScene() {
     divDie.removeChild(divDie.lastChild);
     $('#divProduction').css('display', 'flex');
     $('#scene').remove();
-    Legend.show();
+    if($('#legend').val() === 'visible') Legend.show();
 }
 
 function handleDie() {

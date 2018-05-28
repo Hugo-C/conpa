@@ -9,6 +9,7 @@ body {
   background-position: center;
   background-clip: border-box;
   background-repeat: no-repeat;
+  box-shadow: 2px 2px 16px 8px inset;
 }
 
 .form_wrapper{

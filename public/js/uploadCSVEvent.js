@@ -131,15 +131,15 @@ function overwriteCardgame(overwrite){
         },
         error: function(){
             alert("Request failed");
-            displayCardGamePage();
+            displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
         },
         success: function(response){
             if(response['send'] === 'OK'){
-                displayTagsPanel();
+                displayPanel($('#editorTab'), $('#tagsPanel'), '85%', '60%');
                 refreshTagsPanel(response);
             }else{
                 console.log(response['send']);
-                displayCardGamePage();
+                displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
             }
         }
     });
@@ -150,7 +150,7 @@ $('#editorTab .alert .confirm').on('click', function(){
     if($('#editorTab .alert').hasClass('overwrite')){
         overwriteCardgame("yes");
     }else if($('#editorTab .alert').hasClass('access')){
-        displayCardGamePage();
+        displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
     }
     $('#importAlertMessage').text(''); // reset alert displayer
 });
@@ -159,25 +159,6 @@ $('#editorTab .alert .cancel').on('click', function(){
     overwriteCardgame("no");
     $('#importAlertMessage').text(''); // reset alert displayer
 });
-
-function displayAlert(type, message, button){
-    $("#editorTab > div").css("display", "none");
-    $(".alert").animate({"display": "block"}, 1000, function(){
-        $(".alert").css("display", "block");
-        $("#editorTab > div:not(.alert)").css("display", "none");
-    });
-    $('#editorTab .alertTitle').text('Alert !');
-    $('#editorTab .alertMessage').text(message);
-
-    $('#editorTab .alert').addClass(type);
-    if(button == 'confirm'){
-        $('#editorTab .alert .cancel').css('display', 'none');
-    }
-
-    let editorTab = $("#editorTab");
-    editorTab.css('height', '40%');
-    editorTab.css('width', '35%');
-}
 
 function refreshTagsDatalist(tags){
     let tagsDatalist = $('#tags');
@@ -193,7 +174,7 @@ function refreshTagsPanel(data){
     let desc = data['description'] == null ? 'No description' : data['description'];
     $('#tagsPanel textarea').val(desc);
 
-    refreshCardgameTagsList('tagsPanel', data['tags']);
+    refreshCardgameTagsList($('#tagsPanel table'), data['tags']);
 
     refreshTagsDatalist(data['allTags']);
 
@@ -204,17 +185,6 @@ $('#tagsPanel textarea').on('focus', function(){
         $('#tagsPanel textarea').val('');
     }
 });
-
-function displayTagsPanel(){
-    $("#editorTab > div").css("display", "none");
-    $("#tagsPanel").animate({"display": "block"}, 1000, function(){
-        $("#tagsPanel").css("display", "block");
-        $("#editorTab > div:not(#tagsPanel)").css("display", "none");
-    });
-    let editorTab = $("#editorTab");
-    editorTab.css('height', '85%');
-    editorTab.css('width', '60%');
-}
 
 $('#addTag').on('click', function(){
     console.log('add a new tag');
@@ -234,7 +204,7 @@ $('#addTag').on('click', function(){
             },
             success: function(response){
                 if(response['msg'] === 'OK'){
-                    refreshCardgameTagsList('tagsPanel', response['tags']);
+                    refreshCardgameTagsList($('#tagsPanel table'), response['tags']);
                 }else{
                     console.log(response['msg']);
                 }
@@ -259,7 +229,7 @@ $('#removeTag').on('click', function(){
             },
             success: function(response){
                 if(response['msg'] === 'OK'){
-                    refreshCardgameTagsList('tagsPanel', response['tags']);
+                    refreshCardgameTagsList($('#tagsPanel table'), response['tags']);
                 }else{
                     console.log(response['msg']);
                 }
@@ -285,19 +255,19 @@ $('#valideUpdate').on('click', function(){
             },
             success: function(response){
                 if(response === 'OK'){
-                    displayCardGamePage();
+                    displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
                 }else{
                     console.log(response);
                 }
             }
         });
     }else{
-        displayCardGamePage();
+        displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
     }
 });
 
 $('#cancelUpdate').on('click', function(){
-    displayCardGamePage();
+    displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
 });
 
 /**
@@ -313,16 +283,16 @@ function uploadCSV(csvFile){
     request.onload = function(){
         let response = JSON.parse(request.responseText);
         if(response['msg'] === 'OK'){
-            displayTagsPanel();
+            displayPanel($('#editorTab'), $('#tagsPanel'), '85%', '60%');
             refreshTagsPanel(response);
         }else if(response['msg'] === 'UPDATE?'){
             sessionStorage.tempCSV = response['file'];
-            displayAlert('overwrite', 'This card game already exists !\nWould you overwrite it ?', 'both');
+            displayAlert('editorTab', 'overwrite', 'This card game already exists ! Would you overwrite it ?', 'both');
         }else if(response['msg'] === 'UNAUTHORIZED'){
-            displayAlert('access', 'This cardgame already exists and you are not allowed to overwrite it !', 'confirm');
+            displayAlert('editorTab', 'access', 'This cardgame already exists and you are not allowed to overwrite it !', 'confirm');
         }else{
             console.log(response['msg']);
-            displayCardGamePage();
+            displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
         }
     };
 
