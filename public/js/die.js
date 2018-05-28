@@ -55,7 +55,8 @@ function initScene() {
     ]);
     material = Physijs.createMaterial(color, 0.6, 0.3);
     doDispose(color);
-    box = new Physijs.BoxMesh( box_geometry, material);
+    box = new Physijs.BoxMesh(box_geometry, material);
+    box.position.set(8, 55, -70);
     box.collisions = 0;
     scene.add(box);
 
@@ -191,7 +192,6 @@ function handleDie() {
 }
 
 function throwDie() {
-    box.position.set(8, 55, -70);
     box.rotation.set(
         Math.random() * Math.PI,
         Math.random() * Math.PI,

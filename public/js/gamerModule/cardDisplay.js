@@ -18,6 +18,9 @@ function initCards(cardGame, language){
             initLogoForDie(cards);
         });
     }
+    else {
+        initLogoForDie(cards);
+    }
 }
 
 /**
