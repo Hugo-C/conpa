@@ -290,7 +290,6 @@ class Legend{  // static class
      * Display the legend (if not forceHide)
      */
     static show(){
-        overlay.style.display = "block";
         if(!isForceHide){
             overlay.style.display = "block";
         }
