@@ -101,10 +101,10 @@
   padding: 0;
 }
 #serverManager > .body > .settingCategory > button[value="display"] {
-  background-image: url('/img/mainPage/displayed.png');
+  background-image: url('/img/mainPage/hidden.png');
 }
 #serverManager > .body > .settingCategory > button[value="hide"] {
-  background-image: url('/img/mainPage/hidden.png');
+  background-image: url('/img/mainPage/displayed.png');
 }
 
 #serverManager .cardgameSettings {
