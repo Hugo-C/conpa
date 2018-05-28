@@ -10,7 +10,7 @@ var render, req, loader, box_geometry, box, material,
     renderer, scene, ground_material, ground, camera, selected, vectAngularVelocity, diceLoop;
 let sidePictures = [];
 
-let xGravity, zGravity;
+let zGravity;
 
 function initScene() {
     divDie = $('#scene')[0];
@@ -70,11 +70,9 @@ render = function () {
     renderer.render(scene, camera);
     if (zGravity > 0) {
         zGravity -= 0.25;
+        scene.setGravity(new THREE.Vector3(0, -30, zGravity));
     }
-    if (xGravity > 0) {
-        xGravity -= 0.25;
-    }
-    scene.setGravity(new THREE.Vector3(xGravity, -30, zGravity));
+    
 };
 
 function updateScene() {
@@ -210,9 +208,8 @@ function throwDie() {
     );
     box.setAngularVelocity(vectAngularVelocity);
 
-    xGravity = 10;
-    zGravity = 40;
-    scene.setGravity(new THREE.Vector3( xGravity, -30, zGravity ));
+    zGravity = 35;
+    scene.setGravity(new THREE.Vector3( 0, -30, zGravity ));
     scene.simulate();
     diceLoop = setInterval(handleDie, 100);
 }
