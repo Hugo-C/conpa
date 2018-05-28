@@ -32,15 +32,15 @@ div#svgMenu {
   display: block;
 }
 div#svgMenu > :first-child {
-  height: 90%;
+  height: 85%;
   overflow-y: auto;
   overflow-x: hidden;
 }
 div#svgMenu > :last-child {
-  height: 10%;
+  height: 15%;
 }
 div#svgMenu button {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 button#bouton[value="red"] { background-image: url("/img/gamerModule/textIcons/text_red.png");}
@@ -73,6 +73,7 @@ div#svgMenu button#legend[value="hide"] { background-image: url("/img/gamerModul
 div#svgMenu button#moveElement { background-image: url("/img/gamerModule/move.png"); }
 div#svgMenu button#fullScreen { background-image: url("/img/gamerModule/fullscreen.png"); }
 div#svgMenu button#centerSVG { background-image: url("/img/gamerModule/Centrer2.png"); }
+div#svgMenu button#centerSVG:hover { background-image: url("/img/gamerModule/Centrer3.png"); }
 
 div#svgMenu label#zoomLevel {
   height: 70%;
