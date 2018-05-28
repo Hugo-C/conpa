@@ -180,7 +180,7 @@ function deleteScene() {
     divDie.removeChild(divDie.lastChild);
     $('#divProduction').css('display', 'flex');
     $('#scene').remove();
-    if($('#legend').val() === 'visible') Legend.show();
+    Legend.show();
 }
 
 function handleDie() {
