@@ -378,6 +378,6 @@ module.exports = class Game {
     dispose(){
         clearInterval(this.inactivePlayerManager);
         clearInterval(this.productionSharingManager);
-        this.trace.save(this.name + " " + Date.now());
+        this.trace.save(this.name + "_" + new Date());
     }
 };

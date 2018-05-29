@@ -28,7 +28,7 @@ module.exports = class Trace {
         if(filename == null){
             filename = "test.json";
         }
-        filename = "./../traces/" + filename;
+        filename = "./traces/" + filename;
         if(!filename.endsWith(".json")){
             filename += ".json";
         }
