@@ -282,7 +282,7 @@ module.exports = class Game {
 
     setAnimReady(){
         this.host.setIsAnimReady(true);
-        this.trace.add(this.host.pseudo, "set his question", question);
+        this.trace.add(this.host.pseudo, "the animator is ready");
     }
 
     /**
