@@ -42,6 +42,7 @@ module.exports = function(io, socket){
      */
     function listAllServers(){
         data = []; // accumulator
+        if(socket.translater == null) initTranslater();
         for(let room in rooms){
             let roomData = rooms[room];
             data.push({ 'name': room,
@@ -125,6 +126,7 @@ module.exports = function(io, socket){
      * @param {Game} gameServer : game server for which we want to start a new turn
      */
     function newTurn(gameServer){
+        if(socket.translater == null) initTranslater();
         logger.debug("New turn for the server " + gameServer.getName());
         gameServer.newTurn();
         let data = {'currentPlayer': gameServer.getCurrentPlayer(),
@@ -160,6 +162,7 @@ module.exports = function(io, socket){
      * @param {Game} gameServer : the game server to record
      */
     function recordGameServer(gameServer){
+        if(socket.translater == null) initTranslater();
         let animator = gameServer.getHost().isAnimator() ? gameServer.getHost().getPseudo() : socket.translater.__('partyWithoutAnimator');
         let date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
         db.recordNewParty(gameServer.getName(), animator, date, function(err, partyId){
@@ -198,7 +201,7 @@ module.exports = function(io, socket){
      * @param {Game} server : the game server for which this function works
      */
     function inactivePlayerManager(server){
-
+        if(socket.translater == null) initTranslater();
         for(let index in server.inactivePlayer){
             if(io.sockets.connected[clients[server.inactivePlayer[index]]] == null
             || io.sockets.connected[clients[server.inactivePlayer[index]]].room == null){
@@ -292,6 +295,7 @@ module.exports = function(io, socket){
      *              'globalTimer': [value of the global timer] } }
      */
     socket.on('createServer', function(data){
+        if(socket.translater == null) initTranslater();
         if(!(data["server"]["name"] in rooms)){
             logger.verbose("New game server : " + data["server"]["name"]);
 
@@ -365,6 +369,7 @@ module.exports = function(io, socket){
      */
     socket.on('joinServer', function(data){
         let server = rooms[data["server"]];
+        if(socket.translater == null) initTranslater();
         if(server != null){ // to prevent reception of bad data
             if(server.getNbPlayer() < server.getPlaces()
             && !(server.isInServer(getPseudoWithId(socket.id)))
@@ -612,6 +617,7 @@ module.exports = function(io, socket){
     socket.on('quitGame', function(data){
         logger.verbose(data['pseudo'] + ' leaved game server ' + socket.room);
         let server = rooms[data['server']];
+        if(socket.translater == null) initTranslater();
         if(server != null){
             let currentPlayer = server.getCurrentPlayer();
 

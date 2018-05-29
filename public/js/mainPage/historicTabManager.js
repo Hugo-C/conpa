@@ -115,6 +115,7 @@ function displayPartyDetails(data){
         $('.partySheet #productionViewer')[0].style.backgroundImage = 'url("/img/mainPage/animator.png")';
     }else{
         displayProduction(data['production'], data['legend']);
+        $('#editProduction').css('display', 'block'); // animator has no production to edit
     }
 }
 
