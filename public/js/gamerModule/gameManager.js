@@ -234,10 +234,12 @@ function addCenterButtonToToolBar(toolBar, player){
     // button used to center the view on the modified production's area
     let centerButton = document.createElement('button');
     centerButton.setAttribute('onclick', 'centerMosaicChannel("' + player + '")');
+    centerButton.setAttribute('style', 'background-image: url("/img/gamerModule/Centrer2.png");');
     centerButton.classList.add('col-lg-offset-1', 'col-lg-10',
                                'col-md-offset-1', 'col-md-10',
                                'col-sm-offset-1', 'col-sm-10',
-                               'col-xs-offset-1', 'col-xs-10');
+                               'col-xs-offset-1', 'col-xs-10',
+                               'imageButton');
     centerButton.style.height = '15%';
     centerButton.style.padding = '0';
 
@@ -271,7 +273,9 @@ function addZoomIndicatorToToolBar(toolBar, player){
     zoomLevel.classList.add('rowFlexContainer', 'myCustomIndicator',
                             'col-lg-10', 'col-md-10',
                             'col-sm-10', 'col-xs-10');
-    zoomLevel.setAttribute('style', 'height: 70%; font-size: 0.6vw; font-family: "Georgia", "Helvetica", "Times New Roman"; padding: 0; text-align: center;');
+    zoomLevel.setAttribute('style', 'height: 90%; font-size: 0.6vw; ' +
+                           'font-family: "Georgia", "Helvetica", "Times New Roman"; ' +
+                           'padding: 0; text-align: center;');
     zoomLevelContainer.appendChild(zoomLevel);
     toolBar.appendChild(zoomLevelContainer);
 }
