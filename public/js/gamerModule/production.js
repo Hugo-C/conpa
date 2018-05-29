@@ -581,7 +581,6 @@ class Production {
         for(let index in links){
             buffer[links[index]['idRect1']].linkRect(buffer[links[index]['idRect2']]);
             this.myLinks[index].setWidth(links[index]['strokeWidth']);
-            console.log(links[index]['strokeDasharray']);
             this.myLinks[index].setDasharray(links[index]['strokeDasharray']);
             this.myLinks[index].setColor(links[index]['fill']);
             if(links[index]['navigability']){
@@ -638,8 +637,7 @@ class Production {
     addQuestionToLegend(question, textMaxWidth, coordX, coordY, margin){
         let questionSpan = this.master.text(this.handleText(question, textMaxWidth)).move(coordX, coordY);
         questionSpan.font({
-            weight: 'bold',
-            size: '1vw'
+            weight: 'bold'
         });
         let textBBox = questionSpan['node'].childNodes[0].getBBox();
         coordY = coordY + textBBox.height + margin/2;
@@ -662,6 +660,7 @@ class Production {
         for(let index = 0; index < rectangles.length; index++){
             this.master.rect(iconWidth, iconHeight)
                        .fill(rectangles[index]['fill'])
+                       .attr({'stroke': 'black', 'stroke-width': 2})
                        .move(coordX, coordY);
 
             if(rectangles[index]['text'] !== ''){
@@ -735,6 +734,8 @@ class Production {
             questionHeight = coordY - masterCoord.y;
         }
 
+        coordY = coordY + margin;
+
         coordY = this.addRectanglesToLegend(legend['rectangles'],
                                             iconWidth,
                                             iconHeight,
@@ -751,23 +752,25 @@ class Production {
                                        coordY,
                                        margin);
 
-        let legendWidth = iconWidth + textMaxWidth + 100;
+        let legendWidth = iconWidth + (3*textMaxWidth)/2;
         let legendHeight = coordY - masterCoord.y + questionHeight + margin;
 
-        let background = this.master.rect(legendWidth, legendHeight).fill('grey')
-                                    .move(masterCoord.x + masterCoord.width + margin, masterCoord.y - questionHeight);
+        let background = this.master.rect(legendWidth, legendHeight)
+                                    .fill('#BFE900')
+                                    .attr({'stroke': 'black', 'stroke-width': 2})
+                                    .move(masterCoord.x + masterCoord.width + margin, masterCoord.y - margin/2);
         background.back();
-        background.attr('opacity', 0.7);
-        background.attr('stroke', '#000');
+        background.attr('opacity', 0.8);
+        background.attr('stroke', 'black');
         background.attr('stroke-width', 2);
 
         this.master.line(masterCoord.x + masterCoord.width + margin,
-                         masterCoord.y + margin/2,
+                         masterCoord.y + questionHeight,
                          masterCoord.x + masterCoord.width + legendWidth + margin,
-                         masterCoord.y + margin/2)
+                         masterCoord.y + questionHeight)
                    .stroke({
                       width: 2,
-                      color: '#000'
+                      color: 'black'
                    });
     }
 
