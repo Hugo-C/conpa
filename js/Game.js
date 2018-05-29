@@ -378,6 +378,6 @@ module.exports = class Game {
     dispose(){
         clearInterval(this.inactivePlayerManager);
         clearInterval(this.productionSharingManager);
-        this.trace.save();  // TODO give a filename based on game server's name and current date
+        this.trace.save(this.name + " " + Date.now());
     }
 };
