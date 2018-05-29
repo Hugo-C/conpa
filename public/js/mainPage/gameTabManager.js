@@ -312,7 +312,7 @@ $("#join").on("click", function(){
     if(selectedServer != null){ // look at the onclick listener on "serverList" to have more details about the below code
         if(selectedServer[1].innerHTML === sessionStorage.pseudo
         && selectedServer[4].innerHTML === $.i18n(WAITING_PLAYERS)){
-            displayAlert('gameTab', 'removeGame', 'Are you sure you want to delete it ? (every players will be fired)', 'both');
+            displayAlert('gameTab', 'removeGame', 'Are you sure you want to delete it ? (every players will be kicked)', 'both');
             $('#join').text('Join');
         }else if(selectedServer[0].innerHTML === sessionStorage.server){
             socket.emit('exitServer', {'server': selectedServer[0].innerHTML});

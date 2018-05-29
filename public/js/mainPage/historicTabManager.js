@@ -282,6 +282,7 @@ function getPlayerProduction(callback){
 }
 
 $('#editProduction').on('click', function(){
+    $('#productionEditor > svg').remove();
     getPlayerProduction(openProductionEditor);
 });
 

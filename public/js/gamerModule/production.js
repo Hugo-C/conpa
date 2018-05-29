@@ -486,7 +486,19 @@ class Production {
         const regexForeignObject = /<foreignObject([\s\S]*?)<\/foreignObject>/mgi;
         const regexTextArea = /<textarea[^>]+?>([\s\S]*?)<\/textarea>/mgi;
         const regexText = /<text x="([0-9]+)[.]?[0-9]*" y="([0-9]+)[.]?[0-9]*"([\s\S]*?)<\/text>/mgi;
-        let self = this; // used to have access at class functions inside the getInlineSvg's functions
+        const regexSVG = /<svg .*?>/;
+
+        // used to display all the master's content on the downloaded svg
+        let masterBox = this.master['node'].getBBox();
+        let margin = 20;
+        let viewBoxX = masterBox.x - margin;
+        let viewBoxY = masterBox.y - margin;
+        let viewBoxHeight = masterBox.height + margin;
+        let viewBoxWidth = masterBox.width + 2*margin;
+        let viewBox = 'viewBox="' + viewBoxX + ' ' + viewBoxY + ' ' + viewBoxWidth + ' ' + viewBoxHeight + '"';
+        let genericSVGTag = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" ' + viewBox + '>';
+        // used to have access at class functions inside the getInlineSvg's functions
+        let self = this;
 
         function handleReplaceString(match, p1) {
             let res = p1.replace(regexTextArea, "$1");
@@ -507,6 +519,7 @@ class Production {
         // save all textarea values by replacing foreignObject by native text svg
         svgSave = svgSave.replace(regexForeignObject, handleReplaceString);
         svgSave = svgSave.replace(regexText, moveText);
+        svgSave = svgSave.replace(regexSVG, genericSVGTag);
         return svgSave;
     }
 

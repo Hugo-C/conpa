@@ -104,6 +104,7 @@ module.exports = function(io, socket){
                                                       server.getSharingInterval(),
                                                       server.getName());
         newTurn(server);
+        io.sockets.emit('serverListUpdate', listAllServers());
     }
 
     /**
