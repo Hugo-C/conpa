@@ -319,7 +319,7 @@ module.exports = class Game {
      * @param {string} playerPseudo : pseudo of the player that we are searching for
      */
     isInServer(playerPseudo){
-        return this.getPlayerNode(playerPseudo) != null;
+        return this.getPlayer(playerPseudo) != null;
     }
 
     removePlayerFromActivePlayersList(pseudo){

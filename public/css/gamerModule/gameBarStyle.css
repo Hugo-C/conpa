@@ -57,6 +57,9 @@ div#gameBar > div > div:nth-child(4) {
   overflow-y: auto;
   padding: 0;
 }
+#playerQuestion span {
+  font-size: 0.9vw;
+}
 
 div#gameBar > div > div:nth-child(6) {
   height: 35%;

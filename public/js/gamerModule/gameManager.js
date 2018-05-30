@@ -476,6 +476,12 @@ function centerMosaicChannel(playerChannel){
 function actualizeForeignProduction(pseudo){
     let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
     if(currentProductionOwner === pseudo){
+        // hide the background1 image to display the production
+        if(clientGame.getProduction().isPrivate()){
+            clientGame.getProduction().productionPublic();
+            $('#wizz').css('display', 'none');
+        }
+        clientGame.getProduction().clearSVG();
         clientGame.getProduction().restoreProduction(clientGame.getPlayersProduction()[pseudo]['production']);
         Legend.restoreLegend(clientGame.getPlayersProduction()[pseudo]['legend']);
     }
@@ -606,7 +612,7 @@ socket.on('changeDuringGameTime', function(data){
 socket.on('playersProduction', function(data){
     clientGame.addNewProduction(data['pseudo'], data['privacy'] === 'public' ? data['production'] : "", data['legend']);
     actualizePlayersProductionList();
-    actualizeForeignProduction(data['pseudo']);
+    //actualizeForeignProduction(data['pseudo']);
     if(sessionStorage.role === 'animator' && isMosaicDisplayed()){
         refreshMosaic();
     }

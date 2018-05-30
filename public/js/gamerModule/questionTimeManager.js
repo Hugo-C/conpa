@@ -241,6 +241,7 @@ socket.on('initQuestionTime', function(data){
     }else{
         $('#animatorProfil').css('display', 'block');
         $('#animatorProfil span').text(data['animator']);
+        $('.questionsDisplayer').css('height', '40%');
     }
 
     if(sessionStorage.role === 'animator'){

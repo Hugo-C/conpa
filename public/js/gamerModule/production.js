@@ -377,6 +377,10 @@ class Production {
         this.parent.style.backgroundImage = 'url("/img/gamerModule/privateContent.png")';
     }
 
+    isPrivate(){
+        return this.parent.style.backgroundImage == 'url("/img/gamerModule/privateContent.png")';
+    }
+
     productionPublic(){
         this.parent.style.backgroundImage = '';
     }

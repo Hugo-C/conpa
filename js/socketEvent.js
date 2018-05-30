@@ -62,7 +62,7 @@ module.exports = function(io, socket){
     function startGameOnServerFull(serverName){
         let server = rooms[serverName];
         if(server.getNbPlayer() === server.getPlaces()){
-            io.to(server.getName())
+            io.sockets.in(server.getName())
               .emit('gameStart', {'server': server.getName(),
                                   'animator': server.getAnimatorPseudo(),
                                   'players': server.getActivePlayers()});
@@ -266,6 +266,41 @@ module.exports = function(io, socket){
     // --------------------------- SOCKET LISTENERS --------------------------------
     // -----------------------------------------------------------------------------
 
+    function dataError(code){
+        switch (code) {
+            case 'IGNORE':
+                break;
+            case 'FATAL':
+                socket.emit('dataError', {'error': 'FATAL'});
+                break;
+        }
+    }
+
+    function nullDataControler(data){
+        for(keys in data){
+            if(data[keys] == null){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function processPseudoMessage(data){
+        logger.info("New player : " + data['pseudo']);
+        clients[data["pseudo"]] = socket.id;
+        socket.room = null;
+        initTranslater();
+        io.sockets.emit('serverListUpdate', listAllServers());
+    }
+
+    function pseudoControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && data['pseudo'].match('[A-Za-z0-9]{4,15}')){
+            success(data);
+        }else{
+            unsuccess();
+        }
+    }
+
     /**
      * Process pseudo message
      * Adds a new player in the clients dictionnaries and
@@ -274,12 +309,58 @@ module.exports = function(io, socket){
      * form of received data : { 'pseudo': value }
      */
     socket.on('pseudo', function(data){
-        logger.info("New player : " + data['pseudo']);
-        clients[data["pseudo"]] = socket.id;
-        socket.room = null;
-        initTranslater();
-        io.sockets.emit('serverListUpdate', listAllServers());
+        pseudoControler(data, processPseudoMessage, dataError);
     });
+
+    function createServerControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && data['places'] >= 1
+        && (data['useTimers'] == true || data['useTimers'] == false)
+        && data['indivTimer'] >= 1 && data['globalTimer'] >= 1
+        && (data['forceEndOfTurn'] == true || data['forceEndOfTurn'] == false)
+        && data['delayBeforeForcing'] >= 1 && data['sharingInterval'] >= 5){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
+
+    function processCreateServer(data){
+        if(socket.translater == null) initTranslater();
+        if(socket.room != null) processExitServer({'server': socket.room});
+        if(!(data["name"] in rooms)){
+            logger.verbose("New game server : " + data["name"]);
+
+            let player = new Player(getPseudoWithId(socket.id), data["role"]);
+            let server = new Game(data["name"],
+                                  data["places"],
+                                  player,
+                                  data["cardGameName"],
+                                  data["cardGameLanguage"],
+                                  data["useTimers"],
+                                  data["indivTimer"],
+                                  data["globalTimer"],
+                                  data["forceEndOfTurn"],
+                                  data["delayBeforeForcing"],
+                                  data["sharingInterval"],
+                                  WAITING_PLAYERS);
+            server.inactivePlayerManager = setInterval(inactivePlayerManager, 10000, server);
+
+            rooms[data["name"]] = server;
+            socket.room = data["name"];
+            socket.join(socket.room);
+
+            // informs the creator that the server has been created successfully
+            socket.emit('serverCreated', {'error': false, 'msg': null});
+            // refresh servers list
+            io.sockets.emit('serverListUpdate', listAllServers());
+            // try to start the game
+            startGameOnServerFull(server.getName());
+        }else{
+            // informs the creator that the server's name is not available
+            socket.emit('serverCreated', { 'error': true,
+                                           'msg': socket.translater.__('serverNameNotAvailableMessage') });
+        }
+    }
 
     /**
      * Process createServer message
@@ -295,50 +376,14 @@ module.exports = function(io, socket){
      *              'globalTimer': [value of the global timer] } }
      */
     socket.on('createServer', function(data){
-        if(socket.translater == null) initTranslater();
-        if(!(data["server"]["name"] in rooms)){
-            logger.verbose("New game server : " + data["server"]["name"]);
-
-            let player = new Player(getPseudoWithId(socket.id), data["role"]);
-            let server = new Game(data["server"]["name"],
-                                  data["server"]["places"],
-                                  player,
-                                  data["server"]["cardGameName"],
-                                  data["server"]["cardGameLanguage"],
-                                  data["server"]["useTimers"],
-                                  data["server"]["indivTimer"],
-                                  data["server"]["globalTimer"],
-                                  data["server"]["forceEndOfTurn"],
-                                  data["server"]["delayBeforeForcing"],
-                                  data["server"]["sharingInterval"],
-                                  WAITING_PLAYERS);
-            server.inactivePlayerManager = setInterval(inactivePlayerManager, 10000, server);
-
-            rooms[data["server"]["name"]] = server;
-            socket.room = data["server"]["name"];
-            socket.join(socket.room);
-
-            // informs the creator that the server has been created successfully
-            socket.emit('serverCreated', {'error': false, 'msg': null});
-            // refresh servers list
-            io.sockets.emit('serverListUpdate', listAllServers());
-            // try to start the game
-            startGameOnServerFull(server.getName());
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
         }else{
-            // informs the creator that the server's name is not available
-            socket.emit('serverCreated', { 'error': true,
-                                           'msg': socket.translater.__('serverNameNotAvailableMessage') });
+            createServerControler(data, processCreateServer, dataError);
         }
     });
 
-    /**
-     * Process "removeServer" message
-     * Players sends their messages when they want to remove a server they have created
-     * When this message is received, we remove  the given game server from the server
-     *
-     * form of received data : {'server': server's name}
-     */
-    socket.on('removeServer', function(data){
+    function processRemoveServer(data){
         let server = rooms[data["server"]];
         // A player can only remove his own server if the game hasn't started
         if(server != null && server.getStatus() === WAITING_PLAYERS
@@ -355,22 +400,37 @@ module.exports = function(io, socket){
             removeServer(server);
             io.sockets.emit('serverListUpdate', listAllServers());
         }
-    });
+    }
+
+    function removeServerControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[data['server']] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
-     * Process joinServer message
-     * - Creates a new player (player who wants to join the server)
-     *   If the player is already in a server, he is automatically removed form his server
-     *   before being added in the new one
-     * - Sends to all players the new list of available servers
-     * - launch the game if the server is full
+     * Process "removeServer" message
+     * Players sends their messages when they want to remove a server they have created
+     * When this message is received, we remove  the given game server from the server
      *
-     * form of received data : {'server': [destination server's name]}
+     * form of received data : {'server': server's name}
      */
-    socket.on('joinServer', function(data){
+    socket.on('removeServer', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            removeServerControler(data, processRemoveServer, dataError);
+        }
+    });
+
+    function processJoinServer(data){
         let server = rooms[data["server"]];
         if(socket.translater == null) initTranslater();
-        if(server != null){ // to prevent reception of bad data
+        if(socket.room != null) processExitServer({'server': socket.room});
+        if(server != null){
+            // we can join a server if he's not full and not in game
             if(server.getNbPlayer() < server.getPlaces()
             && !(server.isInServer(getPseudoWithId(socket.id)))
             && server.getStatus() === WAITING_PLAYERS){
@@ -388,8 +448,9 @@ module.exports = function(io, socket){
                 // there is a new player, try to start the game
                 startGameOnServerFull(server.getName());
 
+            // case of reconnection (if a player has lost his connection)
             }else if(server.isInServer(getPseudoWithId(socket.id))
-                  && socket.room == null){ // case of reconnection (if a player has lost his connection)
+                  && socket.room == null){
 
                 socket.room = server.getName();
                 socket.join(socket.room);
@@ -398,14 +459,35 @@ module.exports = function(io, socket){
                 socket.emit('serverUnreachable', {'msg': socket.translater.__('serverUnreachableMessage')});
             }
         }
-    });
+    }
+
+    function joinServerControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[data['server']] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
-     * Process "exitServer" message
-     * Players sends this message when they want to leave a game server
-     * This message can only be send if the game has not started
+     * Process joinServer message
+     * - Creates a new player (player who wants to join the server)
+     *   If the player is already in a server, he is automatically removed form his server
+     *   before being added in the new one
+     * - Sends to all players the new list of available servers
+     * - launch the game if the server is full
+     *
+     * form of received data : {'server': [destination server's name]}
      */
-    socket.on('exitServer', function(data){
+    socket.on('joinServer', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            joinServerControler(data, processJoinServer, dataError);
+        }
+    });
+
+    function processExitServer(data){
         logger.info(getPseudoWithId(socket.id) + ' leaved ' + socket.room);
         let server = rooms[data['server']];
         if(server != null){
@@ -413,19 +495,36 @@ module.exports = function(io, socket){
             socket.leave(server.getName());
             socket.room = null;
 
+            if(server.getNbPlayer() === 0){
+                removeServer(server);
+            }
+
             io.sockets.emit('serverListUpdate', listAllServers());
+        }
+    }
+
+    function exitServerControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[data['server']] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
+
+    /**
+     * Process "exitServer" message
+     * Players sends this message when they want to leave a game server
+     * This message can only be send if the game has not started
+     */
+    socket.on('exitServer', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            exitServerControler(data, processExitServer, dataError);
         }
     });
 
-    /**
-     * Process joinGame message
-     * Players sends this message automatically when the game starts
-     * This message allow the (main) server to know in which room are all players
-     *
-     * form of received data : {'server': [name of the game server in which player is],
-     *                          'pseudo': [player's pseudo]}
-     */
-    socket.on('joinGame', function(data){
+    function processJoinGame(data){
         logger.info(data['pseudo'] + ' joined ' + data['server']);
         let server = rooms[data['server']];
         if(server != null){
@@ -452,7 +551,49 @@ module.exports = function(io, socket){
                 }
             }
         }
+    }
+
+    function joinGameControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[data['server']] != null
+        && rooms[data['server']].isInServer(data['pseudo'])){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
+
+    /**
+     * Process joinGame message
+     * Players sends this message automatically when the game starts
+     * This message allow the (main) server to know in which room are all players
+     *
+     * form of received data : {'server': [name of the game server in which player is],
+     *                          'pseudo': [player's pseudo]}
+     */
+    socket.on('joinGame', function(data){
+        joinGameControler(data, processJoinGame, dataError);
     });
+
+    function processRecordQuestion(data){
+        logger.verbose(getPseudoWithId(socket.id) + ' recorded his question');
+        let server = rooms[socket.room];
+        if(server != null){
+            server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
+            if(server.isAllQuestionsDefined()){ // all questions are defined, we can starts the game
+                startGameTime(server);
+            }else{
+                io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
+            }
+        }
+    }
+
+    function recordQuestionControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            success(data)
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
      * Process "recordMyQuestion" message
@@ -464,17 +605,29 @@ module.exports = function(io, socket){
      * form of received data : {'question': player's question}
      */
     socket.on('recordMyQuestion', function(data){
-        logger.verbose(getPseudoWithId(socket.id) + ' recorded his question');
-        let server = rooms[socket.room];
-        if(server != null){
-            server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
-            if(server.isAllQuestionsDefined()){ // all questions are defined, we can starts the game
-                startGameTime(server);
-            }else{
-                io.to(socket.room).emit('actualizeQuestions', getQuestionTimeState(server));
-            }
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            recordQuestionControler(data, processRecordQuestion, dataError);
         }
     });
+
+    function processAnimatorValidation(data){
+        logger.verbose(socket.room + ' : received animator validation');
+        let server = rooms[socket.room];
+        if(server != null){
+            server.setAnimReady();
+            startGameTime(server);
+        }
+    }
+
+    function animatorValidationControler(data, success, unsuccess){
+        if(rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
      * Process "animatorValidation" message
@@ -484,13 +637,28 @@ module.exports = function(io, socket){
      * form of received datas : no data are send with this message (null)
      */
     socket.on('animatorValidation', function(data){
-        logger.verbose(socket.room + ' : received animator validation');
-        let server = rooms[socket.room];
-        if(server != null){
-            server.setAnimReady();
-            startGameTime(server);
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            animatorValidationControler(data, processAnimatorValidation, dataError);
         }
     });
+
+    function processEndOfTurn(data){
+        logger.verbose(getPseudoWithId(socket.id) + ' finished his turn');
+        let server = rooms[socket.room];
+        if(server != null){
+            newTurn(server);
+        }
+    }
+
+    function endOfTurnControler(data, success, unsuccess){
+        if(rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
      * Process 'endOfTurn' message
@@ -500,23 +668,14 @@ module.exports = function(io, socket){
      * form of received data : no data are send with this message (null)
      */
     socket.on('endOfTurn', function(data){
-        logger.verbose(getPseudoWithId(socket.id) + ' finished his turn');
-        let server = rooms[socket.room];
-        if(server != null){
-            newTurn(server);
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            endOfTurnControler(data, processEndOfTurn, dataError);
         }
     });
 
-    /**
-     * Process tchat message on server side
-     * Redirects message to the good receivers
-     * If the destination equals 'all', message is sends to all players of the sender's room
-     * else message is sends to the specified receiver
-     *
-     * form of received datas : {'dest': ["all" or receiver's pseudo],
-     *                          'msg': [message body]}
-     */
-    socket.on('message', function(data){
+    function processMessage(data){
         let server = rooms[socket.room];
         if(server != null){
             logger.verbose(socket.room + ' new message from ' + getPseudoWithId(socket.id) + ' to ' + data['dest']);
@@ -530,7 +689,47 @@ module.exports = function(io, socket){
                 server.trace.add(getPseudoWithId(socket.id), "send private message", data["msg"], data['dest']);
             }
         }
+    }
+
+    function messageControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
+
+    /**
+     * Process tchat message on server side
+     * Redirects message to the good receivers
+     * If the destination equals 'all', message is sends to all players of the sender's room
+     * else message is sends to the specified receiver
+     *
+     * form of received datas : {'dest': ["all" or receiver's pseudo],
+     *                          'msg': [message body]}
+     */
+    socket.on('message', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            messageControler(data, processMessage, dataError);
+        }
     });
+
+    function processCardPicked(data){
+        let server = rooms[socket.room];
+        logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
+        io.sockets.in(socket.room).emit('cardPicked', data);
+        server.trace.add("party", "set card", JSON.stringify(data));
+    }
+
+    function cardPickedControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
      * Process "cardPicked" message on server side
@@ -540,11 +739,24 @@ module.exports = function(io, socket){
      * form of received data : {'family': picked card's family, 'cardContent': picked card's content}
      */
     socket.on('cardPicked', function(data){
-        let server = rooms[socket.room];
-        logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
-        io.sockets.in(socket.room).emit('cardPicked', data);
-        server.trace.add("party", "set card", JSON.stringify(data));
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            cardPickedControler(data, processCardPicked, dataError);
+        }
     });
+
+    function processShareMyProduction(data){
+        socket.broadcast.to(socket.room).emit('playersProduction', data);
+    }
+
+    function shareMyProductionControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
      * Process "shareMyProduction" message on server side
@@ -554,17 +766,14 @@ module.exports = function(io, socket){
      * form of received data : {'pseudo' : player's pseudo, 'production': player's production}
      */
     socket.on('shareMyProduction', function(data){
-        socket.broadcast.to(socket.room).emit('playersProduction', data);
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            shareMyProductionControler(data, processShareMyProduction, dataError);
+        }
     });
 
-    /**
-     * Process "processStopGame" message on server side
-     * This message is sent by client when a player wants to stop the game
-     * When this message is received, we ask to all players if they agree with it
-     *
-     * form of received datas : no datas are sent with this message (null)
-     */
-    socket.on('processStopGame', function(data){
+    function processStopGameProcess(data){
         logger.debug(getPseudoWithId(socket.id) + ' started a stop game process');
         let server = rooms[socket.room];
         if(server != null){
@@ -578,15 +787,32 @@ module.exports = function(io, socket){
                                 .emit('stopGame?', server.exitBuffer);
             }
         }
-    });
+    }
+
+    function stopGameProcessControler(data, success, unsuccess){
+        if(rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
-     * Process "stopGame" message on server side
-     * This message is sent by client to answer at the "stopGame?" message
+     * Process "processStopGame" message on server side
+     * This message is sent by client when a player wants to stop the game
+     * When this message is received, we ask to all players if they agree with it
      *
-     * form of received data : {'exit': player's answer (true if he wants to stop, else false)}
+     * form of received datas : no datas are sent with this message (null)
      */
-    socket.on('stopGame', function(data){
+    socket.on('processStopGame', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            stopGameProcessControler(data, processStopGameProcess, dataError);
+        }
+    });
+
+    function processStopGame(data){
         logger.debug(getPseudoWithId(socket.id) + ' wants to stop game ? : ' + data['exit']);
         let server = rooms[socket.room];
         if(server != null){
@@ -602,19 +828,31 @@ module.exports = function(io, socket){
                 server.exitBuffer = [];
             }
         }
-    });
+    }
+
+    function stopGameControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
 
     /**
-     * Process quitGame message
-     * - Informs server that the player has leaved the game server
-     * - Removes the player from the game server
-     * - Sends the actualized list of players to the game server players
-     * - Sends to all players the actualized list of servers
+     * Process "stopGame" message on server side
+     * This message is sent by client to answer at the "stopGame?" message
      *
-     * form of received data : {'server': [game server name who player currently is],
-     *                          'pseudo': [player's name]}
+     * form of received data : {'exit': player's answer (true if he wants to stop, else false)}
      */
-    socket.on('quitGame', function(data){
+    socket.on('stopGame', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            stopGameControler(data, processStopGame, dataError);
+        }
+    });
+
+    function processQuitGame(data){
         logger.verbose(data['pseudo'] + ' leaved game server ' + socket.room);
         let server = rooms[data['server']];
         if(socket.translater == null) initTranslater();
@@ -635,6 +873,32 @@ module.exports = function(io, socket){
                 if(currentPlayer === data['pseudo']) newTurn(server);
             }
             io.sockets.emit('serverListUpdate', listAllServers());
+        }
+    }
+
+    function quitGameControler(data, success, unsuccess){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            success(data);
+        }else{
+            unsuccess('IGNORE');
+        }
+    }
+
+    /**
+     * Process quitGame message
+     * - Informs server that the player has leaved the game server
+     * - Removes the player from the game server
+     * - Sends the actualized list of players to the game server players
+     * - Sends to all players the actualized list of servers
+     *
+     * form of received data : {'server': [game server name who player currently is],
+     *                          'pseudo': [player's name]}
+     */
+    socket.on('quitGame', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            quitGameControler(data, processQuitGame, dataError);
         }
     });
 };

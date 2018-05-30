@@ -8,6 +8,17 @@ var socket = io();
 // registered the client on server
 socket.emit('pseudo', {'pseudo': sessionStorage.pseudo});
 
+socket.on('dataError', function(data){
+    switch (data['error']) {
+        case 'FATAL':
+            sessionStorage.server = null;
+            window.location = '/connection';
+            break;
+        default:
+            console.log('error !!');
+    }
+});
+
 /**
  * Process serverListUpdate message
  * Displays available servers in the html table
@@ -200,20 +211,20 @@ function checkServerCreationForm(serverData){
     let conform = true;
 
     // Checking basic settings
-    if(isNaN(serverData['server']['indivTimer']) || isNaN(serverData['server']['globalTimer'])
-    || isNaN(serverData['server']['appropriation']) || isNaN(serverData['server']['places'])){
+    if(isNaN(serverData['indivTimer']) || isNaN(serverData['globalTimer'])
+    || isNaN(serverData['appropriation']) || isNaN(serverData['places'])){
         basicErrorDisplayer.text($.i18n("noEmptyFields"));
         conform = false;
     }
-    if(serverData['server']['name'] === ""){
+    if(serverData['name'] === ""){
         basicErrorDisplayer.text($.i18n("nameIsRequired"));
         conform = false;
     }
-    if(serverData['role'] === 'animator' && serverData['server']['places'] === 1){
+    if(serverData['role'] === 'animator' && serverData['places'] === 1){
         basicErrorDisplayer.text($.i18n("noAnimatorWithoutPlayers"));
         conform = false;
     }
-    if(serverData['server']['places'] <= 0){
+    if(serverData['places'] <= 0){
         basicErrorDisplayer.text($.i18n("onePlaceMin"));
         conform = false;
     }
@@ -224,17 +235,17 @@ function checkServerCreationForm(serverData){
     }
 
     // Checking timers settings
-    if(serverData['server']['useTimers']
-    && (serverData['server']['indivTimer'] <= 0
-    || serverData['server']['appropriation'] <= 0
-    || serverData['server']['globalTimer'] <= 0)){
+    if(serverData['useTimers']
+    && (serverData['indivTimer'] <= 0
+    || serverData['appropriation'] <= 0
+    || serverData['globalTimer'] <= 0)){
         timersErrorDisplayer.text($.i18n("timersValue"));
         conform = false;
     }else{
-        if(serverData['server']['appropriation'] > serverData['server']['indivTimer']){
+        if(serverData['appropriation'] > serverData['indivTimer']){
             timersErrorDisplayer.text($.i18n("indivLessThanApp"));
             conform = false;
-        }else if(serverData['server']['indivTimer'] > serverData['server']['globalTimer']){
+        }else if(serverData['indivTimer'] > serverData['globalTimer']){
             timersErrorDisplayer.text($.i18n("globalLessThanIndiv"));
             conform = false;
         }
@@ -263,17 +274,17 @@ $("#validate").on("click", function(){
     let sharingInterval = parseInt($('input#prodSharing')[0].value);
 
     let data = {'role': role,
-                'server': {'name': serverName,
-                           'places': places,
-                           'cardGameName': cardGameName,
-                           'cardGameLanguage': cardGameLanguage,
-                           'useTimers' : timers === 'yes',
-                           'indivTimer': indivTimer,
-                           'appropriation': appropriationTime,
-                           'globalTimer': globalTimer,
-                           'forceEndOfTurn': forceTurn === 'yes',
-                           'delayBeforeForcing': delayBeforeForcing,
-                           'sharingInterval': sharingInterval}};
+                'name': serverName,
+                'places': places,
+                'cardGameName': cardGameName,
+                'cardGameLanguage': cardGameLanguage,
+                'useTimers' : timers === 'yes',
+                'indivTimer': indivTimer,
+                'appropriation': appropriationTime,
+                'globalTimer': globalTimer,
+                'forceEndOfTurn': forceTurn === 'yes',
+                'delayBeforeForcing': delayBeforeForcing,
+                'sharingInterval': sharingInterval};
 
     if(checkServerCreationForm(data)){
         socket.emit('createServer', data);
