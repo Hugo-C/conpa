@@ -12,7 +12,6 @@ function refreshCardGames(myTags, callback){
             if(response === 'ERROR'){
                 console.log("card games retrieving has failed");
             }else{
-                console.log(response);
                 callback(response);
             }
         }
@@ -59,7 +58,6 @@ function refreshTags(container){
             if(response['msg'] === 'ERROR'){
                 console.log("tags retrieving has failed");
             }else if(response['msg'] === 'OK'){
-                console.log(response);
                 refreshTagsSelector(container, response['tags']);
             }else{
                 console.log('an error has occured');
@@ -70,7 +68,6 @@ function refreshTags(container){
 
 function refreshCardgameTagsList(table, tags){
     let tagsTable = table.find('tbody');
-    console.log(tagsTable);
     tagsTable.children().remove(); // we will replace old data by the data we have received
     for(let index = 0; index < tags.length; index++){
         tagsTable.append($('<tr>')
@@ -115,9 +112,8 @@ function getCardGameInfo(parent, table){
             },
             success: function(response){
                 if(response['msg'] === 'ERROR'){
-                    console.log(response);
+                    console.log('error getCardGameInfo');
                 }else if(response['msg'] === 'OK'){
-                    console.log(response);
                     displayCardGameInfoPage(parent.id, response);
                 }
             }

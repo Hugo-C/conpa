@@ -1,5 +1,5 @@
 div#gamePanel(class="basicContainer bordered col-lg-10 col-md-10 col-sm-10 col-xs-10")
-  div(class="row")
+  div(class="row" style="height: 5%;")
     button#exit(class="basicContainer imageButton col-lg-1 col-md-1 col-sm-1 col-xs-1") EXIT
     div(class="pseudoField rowFlexContainer basicContainer col-lg-1 col-md-1 col-sm-1 col-xs-1") 
       span PSEUDO
@@ -14,22 +14,11 @@ div#gamePanel(class="basicContainer bordered col-lg-10 col-md-10 col-sm-10 col-x
     div#question(class="basicContainer rowFlexContainer playerOnly col-lg-5 col-md-5 col-sm-5 col-xs-5")
       div(class="col-lg-12 col-md-12 col-sm-12 col-xs-12")
         span(class="col-lg-12 col-md-12 col-sm-12 col-xs-12")
-  div(class="row")
+  div(class="row" style="height: 70%;")
     include playerProductionPanel.jade
-  div#exitPanel(class="row")
-    div(class="row rowFlexContainer")
-      span#exitPanelTitle(data-i18n="exitPanelTitle")
-    div(class="row rowFlexContainer")
-      div(class="col-lg-12 col-md-12 col-sm-12 col-xs-12 rowFlexContainer")
-    div(class="row rowFlexContainer")
-      span#exitMessage
-    div(class="row rowFlexContainer")
-      button#leaveAlone(data-i18n="leaveAlone" class="myCustomButton col-lg-3 col-md-3 col-sm-3 col-xs-3")
-      button#stopGame(data-i18n="stopGame" class="myCustomButton col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3 col-xs-offset-1 col-xs-3") 
-      button#validateExit(data-i18n="stopGameAgree" class="myCustomButton col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3 col-xs-offset-1 col-xs-3")
-      button#closeExitPanel(data-i18n="closeExitPanel" class="myCustomButton col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3 col-xs-offset-1 col-xs-3")
-      button#cancelExit(data-i18n="stopGameRefuse" class="myCustomButton col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-offset-1 col-sm-3 col-xs-offset-1 col-xs-3")
-  div#chatInfos(class="col-lg-12 col-md-12 col-sm-12 col-xs-12")
+    include exitPanel.jade
+    include selectCardPanel.jade
+  div#chatInfos(class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="height: 25%;")
     div(class="basicContainer col-lg-7 col-md-7 col-sm-7 col-xs-7")
       div(class="row")
         section#messages(class="basicContainer col-lg-12 col-md-12 col-sm-12 col-xs-12")
