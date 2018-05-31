@@ -715,7 +715,7 @@ function exitFullscreenProduction(){
     // display around containers
     $('#chatInfos').css('display', 'block');
     $('#displayList').css('display', 'block');
-    $('#gamePanel > :nth-child(2)').css('height', '');
+    $('#gamePanel > :nth-child(2)').css('height', '70%');
     $('#productionPanel > :first-child').css('display', 'block');
     let lastChild = $('#productionPanel > :last-child');
     lastChild.css('height', '');
