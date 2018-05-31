@@ -5,7 +5,7 @@ function actualizeChatPlayersList(players){
     playerSelector.children().remove();
     playerSelector.append('<option value="all">general</option>');
     for(let index in players){
-        if(players[index] !== sessionStorage.pseudo){ // we not displays the pseudo of the current player
+        if(players[index] !== sessionStorage.pseudo){ // we don't display the pseudo of the current player
             playerSelector.append($('<option>', {
                 value: players[index],
                 text : players[index]

@@ -804,4 +804,8 @@ class Production {
             return false;
         }
     }
+
+    sendTrace(actor, action, value, target){
+        socket.emit('trace', {'actor': actor, 'action': action, 'value': value, 'target': target});
+    }
 }

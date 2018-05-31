@@ -265,12 +265,14 @@ module.exports = function(io, socket){
     // --------------------------- SOCKET LISTENERS --------------------------------
     // -----------------------------------------------------------------------------
 
-    function dataError(code){
-        switch (code) {
-            case 'IGNORE':
+    function handleDataError(error){
+        switch (error.message) {
+            case cst.IGNORE_ERROR_MSG:
+                logger.warn("a non-fatal error occured : " + error.stack);
                 break;
-            case 'FATAL':
+            case cst.FATAL_ERROR_MSG:
                 socket.emit('dataError', {'error': 'FATAL'});
+                logger.error("a fatal error occured : " + error.stack);
                 break;
         }
     }
@@ -292,11 +294,11 @@ module.exports = function(io, socket){
         io.sockets.emit('serverListUpdate', listAllServers());
     }
 
-    function pseudoControler(data, success, unsuccess){
+    function pseudoControler(data, callback){
         if(data != null && nullDataControler(data) && data['pseudo'].match('[A-Za-z0-9]{4,15}')){
-            success(data);
+            callback(data);
         }else{
-            unsuccess();
+            throw new Error(cst.FATAL_ERROR_MSG);
         }
     }
 
@@ -308,18 +310,22 @@ module.exports = function(io, socket){
      * form of received data : { 'pseudo': value }
      */
     socket.on('pseudo', function(data){
-        pseudoControler(data, processPseudoMessage, dataError);
+        try {
+            pseudoControler(data, processPseudoMessage);
+        } catch (err) {
+            handleDataError(err);
+        }
     });
 
-    function createServerControler(data, success, unsuccess){
+    function createServerControler(data, callback){
         if(data != null && nullDataControler(data) && data['places'] >= 1
         && (data['useTimers'] == true || data['useTimers'] == false)
         && data['indivTimer'] >= 1 && data['globalTimer'] >= 1
         && (data['forceEndOfTurn'] == true || data['forceEndOfTurn'] == false)
         && data['delayBeforeForcing'] >= 1 && data['sharingInterval'] >= 5){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -376,9 +382,13 @@ module.exports = function(io, socket){
      */
     socket.on('createServer', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            createServerControler(data, processCreateServer, dataError);
+            try{
+                createServerControler(data, processCreateServer);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -401,11 +411,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function removeServerControler(data, success, unsuccess){
+    function removeServerControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -418,9 +428,13 @@ module.exports = function(io, socket){
      */
     socket.on('removeServer', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            removeServerControler(data, processRemoveServer, dataError);
+            try {
+                removeServerControler(data, processRemoveServer);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -457,11 +471,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function joinServerControler(data, success, unsuccess){
+    function joinServerControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -477,9 +491,13 @@ module.exports = function(io, socket){
      */
     socket.on('joinServer', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
-        }else{
-            joinServerControler(data, processJoinServer, dataError);
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else {
+            try {
+                joinServerControler(data, processJoinServer);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -499,11 +517,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function exitServerControler(data, success, unsuccess){
+    function exitServerControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -514,9 +532,13 @@ module.exports = function(io, socket){
      */
     socket.on('exitServer', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            exitServerControler(data, processExitServer, dataError);
+            try{
+                exitServerControler(data, processExitServer);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -531,7 +553,7 @@ module.exports = function(io, socket){
 
     socket.on('reconnexion', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
             processReconnexion(data);
         }
@@ -566,12 +588,12 @@ module.exports = function(io, socket){
         }
     }
 
-    function joinGameControler(data, success, unsuccess){
+    function joinGameControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null
         && rooms[data['server']].isInServer(data['pseudo'])){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -584,7 +606,11 @@ module.exports = function(io, socket){
      *                          'pseudo': [player's pseudo]}
      */
     socket.on('joinGame', function(data){
-        joinGameControler(data, processJoinGame, dataError);
+        try {
+            joinGameControler(data, processJoinGame);
+        } catch (err) {
+            handleDataError(err);
+        }
     });
 
     function processRecordQuestion(data){
@@ -600,11 +626,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function recordQuestionControler(data, success, unsuccess){
+    function recordQuestionControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
-            success(data)
+            callback(data)
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -619,9 +645,13 @@ module.exports = function(io, socket){
      */
     socket.on('recordMyQuestion', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            recordQuestionControler(data, processRecordQuestion, dataError);
+            try {
+                recordQuestionControler(data, processRecordQuestion);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -634,11 +664,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function animatorValidationControler(data, success, unsuccess){
+    function animatorValidationControler(data, callback){
         if(rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -651,9 +681,13 @@ module.exports = function(io, socket){
      */
     socket.on('animatorValidation', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            animatorValidationControler(data, processAnimatorValidation, dataError);
+            try {
+                animatorValidationControler(data, processAnimatorValidation);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -665,11 +699,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function endOfTurnControler(data, success, unsuccess){
+    function endOfTurnControler(data, callback){
         if(rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -682,9 +716,13 @@ module.exports = function(io, socket){
      */
     socket.on('endOfTurn', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            endOfTurnControler(data, processEndOfTurn, dataError);
+            try {
+                endOfTurnControler(data, processEndOfTurn);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -704,11 +742,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function messageControler(data, success, unsuccess){
+    function messageControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -723,9 +761,13 @@ module.exports = function(io, socket){
      */
     socket.on('message', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            messageControler(data, processMessage, dataError);
+            try {
+                messageControler(data, processMessage, handleDataError);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -736,11 +778,11 @@ module.exports = function(io, socket){
         server.trace.add("party", "set card", JSON.stringify(data));
     }
 
-    function cardPickedControler(data, success, unsuccess){
+    function cardPickedControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -753,9 +795,13 @@ module.exports = function(io, socket){
      */
     socket.on('cardPicked', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            cardPickedControler(data, processCardPicked, dataError);
+            try {
+                cardPickedControler(data, processCardPicked);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -763,11 +809,11 @@ module.exports = function(io, socket){
         socket.broadcast.to(socket.room).emit('playersProduction', data);
     }
 
-    function shareMyProductionControler(data, success, unsuccess){
+    function shareMyProductionControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -780,9 +826,13 @@ module.exports = function(io, socket){
      */
     socket.on('shareMyProduction', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            shareMyProductionControler(data, processShareMyProduction, dataError);
+            try {
+                shareMyProductionControler(data, processShareMyProduction);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -802,11 +852,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function stopGameProcessControler(data, success, unsuccess){
+    function stopGameProcessControler(data, callback){
         if(rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -819,9 +869,13 @@ module.exports = function(io, socket){
      */
     socket.on('processStopGame', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            stopGameProcessControler(data, processStopGameProcess, dataError);
+            try {
+                stopGameProcessControler(data, processStopGameProcess);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -843,11 +897,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function stopGameControler(data, success, unsuccess){
+    function stopGameControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -859,9 +913,13 @@ module.exports = function(io, socket){
      */
     socket.on('stopGame', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            stopGameControler(data, processStopGame, dataError);
+            try {
+                stopGameControler(data, processStopGame);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
     });
 
@@ -889,11 +947,11 @@ module.exports = function(io, socket){
         }
     }
 
-    function quitGameControler(data, success, unsuccess){
+    function quitGameControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
-            success(data);
+            callback(data);
         }else{
-            unsuccess('IGNORE');
+            throw new Error(cst.IGNORE_ERROR_MSG);
         }
     }
 
@@ -909,9 +967,25 @@ module.exports = function(io, socket){
      */
     socket.on('quitGame', function(data){
         if(getPseudoWithId(socket.id) == null){
-            dataError('FATAL');
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            quitGameControler(data, processQuitGame, dataError);
+            try {
+                quitGameControler(data, processQuitGame);
+            } catch (err) {
+                handleDataError(err);
+            }
         }
+    });
+
+    /**
+     * Process trace
+     * - Informs server that the player perform an action worth to be traced
+     * form of received data : {'actor': [actor], 'action': [action], 'value': [value], 'target': [target]}
+     */
+    socket.on('trace', function(data){
+        let server = rooms[socket.room];
+        if(data.actor === "me")
+            data.actor = getPseudoWithId(socket.id);
+        server.trace.add(data.actor, data.action, data.value, data.target);
     });
 };
