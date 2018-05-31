@@ -34,11 +34,6 @@
   text-align: center;
 }
 
-#productionPanel > :first-child > :nth-child(2) {
-  display: flex;
-  align-items: center;
-}
-
 button#setPrivacy {
   background-image: url("/img/gamerModule/private.svg");
 }
@@ -63,13 +58,13 @@ button#setPrivacy {
   text-align: center;
 }
 
-#productionPanel > :first-child > :nth-child(4) {
+#productionList {
   height: 80%;
   border: none;
   overflow-y: auto;
 }
 
-#productionPanel > :first-child > :nth-child(4) > div {
+#productionList > div {
   height: 10%;
   padding-left: 5%;
   padding-right: 5%;
@@ -79,22 +74,20 @@ button#setPrivacy {
   cursor: pointer;
 }
 
-#productionPanel > :first-child > :nth-child(1) > div.currentPlayer,
-#productionPanel > :first-child > :nth-child(4) > div.currentPlayer {
+.currentPlayer {
   background-color: #1269E6;
 }
 
-#productionPanel > :first-child > :nth-child(1) > div.nextPlayer,
-#productionPanel > :first-child > :nth-child(4) > div.nextPlayer {
+.nextPlayer {
   background-color: #0AA6E1;
 }
 
-#productionPanel > :first-child > :nth-child(4) > div > img {
+#productionList img {
   width: 30%;
   padding-bottom: 5%;
 }
 
-#productionPanel > :first-child > :nth-child(4) > div > span {
+#productionList span {
   width: 70%;
   font-size: 0.8vw;
   font-weight: bold;
@@ -103,8 +96,7 @@ button#setPrivacy {
   color: black;
 }
 
-#productionPanel > :first-child > :nth-child(4) > div.selectedProduction > span,
-#productionPanel > :first-child > :nth-child(1) > div.selectedProduction > span {
+div.selectedProduction > span {
   text-decoration: underline;
   text-decoration-style: double;
   text-decoration-color: black;
@@ -116,7 +108,7 @@ button#setPrivacy {
   justify-content: flex-start;
 }
 
-#divProduction > button#displayList {
+button#displayList {
   width: 1%;
   border-right: 1px solid black;
   background-color: grey;

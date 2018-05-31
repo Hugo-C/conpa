@@ -12,7 +12,7 @@
     "loginOptionForm" : "Rester connecté",
     "createAccountLink" : "Pas encore de compte? Inscription ici",
     "forgotPasswordLink" : "Mot de passe oublié?",
-    "forgotPasswordForm" : "Récupération du mot de passe",
+    "forgotPasswordForm" : "Récupération",
     "loginLink" : "Mot de passe retrouvé? Connection ici",
     "resetPasswordForm" : "Réinitialiser le mot de passe",
     "pseudoAlert": "Pseudo indisponible",
@@ -157,5 +157,6 @@
     "timersValue": "La valeur d'un timer doit être supérieur à 0",
     "cardgameIsRequired": "Vous devez selectionner un jeu de cartes",
     "indivLessThanApp": "Le timer individuel ne doit pas être inférieur au temps d'appropriation",
-    "globalLessThanIndiv": "Le timer global ne doit pas être inférieur au timer individuel"
+    "globalLessThanIndiv": "Le timer global ne doit pas être inférieur au timer individuel",
+    "selectCard": "Prenez une carte !"
 }

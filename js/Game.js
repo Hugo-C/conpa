@@ -1,5 +1,6 @@
-const logger = require("../js/logger");
-const Trace = require("../js/Trace");
+const logger = require("./logger.js");
+const Trace = require("./Trace.js");
+const cst = require('./socketConstants.js');
 
 module.exports = class Game {
     constructor(name, places, host, cardGameName, cardGameLanguage, useTimers,
@@ -320,6 +321,11 @@ module.exports = class Game {
      */
     isInServer(playerPseudo){
         return this.getPlayer(playerPseudo) != null;
+    }
+
+    isJoinable(){
+        return this.getNbPlayer() < this.getPlaces()
+            && this.getStatus() === cst.WAITING_PLAYERS;
     }
 
     removePlayerFromActivePlayersList(pseudo){

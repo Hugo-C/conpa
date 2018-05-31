@@ -10,7 +10,7 @@
  * @param {string} pseudo : player's pseudo
  */
 function addPlayerBox(pseudo){
-    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-2 col-md-2 col-sm-2 col-xs-2">' +
                       '<div class="row">' +
                           '<img class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>' +
                       '</div>' +
@@ -59,7 +59,7 @@ function initGUI(){
 $("#exit").on("click", function(){
     if(sessionStorage.role === 'player')
         clientGame.getProduction().centerSVGToDefaultPosition();
-    $('#gamePanel > :nth-child(2)').css('display', 'none'); // hide productionArea panel
+    $('#productionPanel').css('display', 'none'); // hide productionArea panel
     $('#exitPanel').css('display', 'block'); // display exit panel
     initGUI(); // initialize exit panel
 });
@@ -69,7 +69,7 @@ $("#exit").on("click", function(){
  * On click in this button, hide the exit panel and display the productionArea panel
  */
 $("#closeExitPanel").on("click", function(){
-    $('#gamePanel > :nth-child(2)').css('display', 'block'); // display productionArea panel
+    $('#productionPanel').css('display', 'block'); // display productionArea panel
     $('#exitPanel').css('display', 'none'); // hide exit panel
 });
 

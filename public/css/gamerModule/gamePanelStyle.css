@@ -1,19 +1,11 @@
 @import 'playerProductionPanel.css';
+@import 'exitPanelStyle.css';
+@import 'selectCardPanel.css';
 @import 'mosaic.css';
 
 body, html {
   height: 100%;
   width: 100%;
-}
-
-.basicContainer {
-  height: 100%;
-  padding: 0;
-  margin: 0;
-}
-
-.bordered {
-  border: 2px solid black;
 }
 
 #gameContent {
@@ -27,28 +19,13 @@ body, html {
   height: 100%;
 }
 
-/* -------------------------------------------------------------------------- */
-/* ----------------------- Size of main blocs ------------------------------- */
-/* -------------------------------------------------------------------------- */
-
 #gamePanel > div {
   margin: 0;
   padding: 0;
   border-bottom: 2px solid black;
 }
 
-#gamePanel > :nth-child(1) {
-  height: 5%;
-}
-
-#gamePanel > :nth-child(2) {
-  height: 70%;
-}
-
-/* The exit panel bloc is defined in the exitPanelStyle.css file */
-
 div#chatInfos {
-  height: 25%;
   border: none;
 }
 

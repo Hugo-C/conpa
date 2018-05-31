@@ -21,7 +21,7 @@ function createProductionAccess(pseudo, productionList){
         prodStatus.src = '/img/gamerModule/privateFlag.svg';
     }
     parent.appendChild(prodStatus);
-    // create a tag for the player's pseudo
+    // create a span to display the player's pseudo
     let prodName = document.createElement('span');
     prodName.innerHTML = pseudo;
     parent.appendChild(prodName);

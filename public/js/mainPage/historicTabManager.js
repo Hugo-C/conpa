@@ -32,7 +32,6 @@ function refreshHistoric(){
             if(response === 'ERROR'){
                 console.log("historic retrieving has failed");
             }else{
-                console.log(response);
                 displayHistoric(response);
             }
         }
@@ -138,7 +137,6 @@ $('#open').on('click', function(){
                 if(response === 'ERROR'){
                     console.log("details retrieving has failed");
                 }else{
-                    console.log(response);
                     response['server'] = selectedParty.children()[0].innerHTML;
                     response['animator'] = selectedParty.children()[1].innerHTML;
                     response['date'] = selectedParty.children()[2].innerHTML;
@@ -213,7 +211,6 @@ function loadSelectedPlayer(selectedPlayer){
                 if(response === 'ERROR'){
                     console.log("player's details retrieving has failed");
                 }else{
-                    console.log(response);
                     refreshInfos(response);
                 }
             }
@@ -275,7 +272,6 @@ function getPlayerProduction(callback){
             if(response === 'ERROR'){
                 console.log("production retrieving has failed");
             }else{
-                console.log(response);
                 callback(response);
             }
         }

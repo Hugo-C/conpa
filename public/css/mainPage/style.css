@@ -3,6 +3,10 @@ html, body {
   width: 100%;
   overflow: hidden;
 }
+body {
+  overflow: auto;
+  min-height: 16cm;
+}
 
 header {
   height: 20%;

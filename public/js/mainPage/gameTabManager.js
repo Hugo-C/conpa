@@ -51,7 +51,6 @@ socket.on('serverListUpdate', function(data){
  * We receive this message when the server in which we are has been removed
  */
 socket.on('serverRemoved', function(){
-    console.log('my server has been removed');
     sessionStorage.server = null;
     sessionStorage.role = null;
 });
@@ -60,13 +59,10 @@ socket.on('serverRemoved', function(){
  *  When this message is received, we move to the game module page
  */
 socket.on('gameStart', function(data){
-    console.log("GAME START !!!!");
     sessionStorage.server = data['server'];
     if(data['animator'] !== sessionStorage.pseudo){
-        console.log(data['animator'] + " != " + sessionStorage.pseudo);
         sessionStorage.role = 'player';
     }else{
-        console.log(data['animator'] + " == " + sessionStorage.pseudo);
         sessionStorage.role = 'animator';
     }
     sessionStorage.unload = 'false';
@@ -228,7 +224,6 @@ function checkServerCreationForm(serverData){
         basicErrorDisplayer.text($.i18n("onePlaceMin"));
         conform = false;
     }
-
     if($('#cardgames tbody .selected').length === 0){
         cardgameErrorDisplayer.text($.i18n("cardgameIsRequired"));
         conform = false;
@@ -344,12 +339,8 @@ socket.on('serverUnreachable', function(data){
 });
 
 $(window).on("load", function () {
-    // If the client reload his page and is connected to a server, we
-    // reconnect his socket with his server
-    if(sessionStorage.server != null
-    && $('.' + sessionStorage.server) != null
-    && sessionStorage.unload === 'false'){
-        socket.emit('joinServer', {'server': sessionStorage.server});
+    if(sessionStorage.unload === 'false'){
+        socket.emit('reconnexion', null);
     }
     $('#join').text('Join');
 });

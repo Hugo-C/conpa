@@ -1,0 +1,14 @@
+#selectCardPanel {
+  display: none;
+}
+
+div#selectCardPanel .gamePanelHeader {
+  height: 30%;
+}
+
+div#selectCardPanel .gamePanelBody {
+  height: 50%;
+}
+div#selectCardPanel .gamePanelBody > div {
+  height: 100%;
+}

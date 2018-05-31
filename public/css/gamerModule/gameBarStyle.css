@@ -41,13 +41,6 @@ div.row {
   margin: 0;
 }
 
-div#gameBar > div > div:nth-child(2) {
-  height: 5%;
-}
-
-div#gameBar > div > div:nth-child(4) {
-  height: 10%;
-}
 #playerQuestion {
   height: 100%;
   padding: 3px;
@@ -61,37 +54,20 @@ div#gameBar > div > div:nth-child(4) {
   font-size: 0.9vw;
 }
 
-div#gameBar > div > div:nth-child(6) {
-  height: 35%;
-}
-
-div#gameBar > div > div:nth-child(7) {
-  margin-top: 8%;
-  height: 28%;
-}
-
-div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child {
-  height: 80%;
-}
-
-div#gameBar > div > div:nth-child(7) > div.box > div.row:last-child {
-  height: 20%;
-}
-
-div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child > button {
+button#startDice {
   height: 70%;
   display: none;
   position: absolute;
   background-image: url('/img/gamerModule/dice.png');
 }
 
-div#gameBar > div > div:nth-child(7) > div.box > div.row:first-child > svg {
+svg#hourglassSVG {
   height: 100%;
   width: 100%;
   padding: 0;
 }
 
-div#gameBar > div > div:nth-child(7) > div.box > div.row:last-child > button {
+button#endOfTurn {
   height: 75%;
 }
 

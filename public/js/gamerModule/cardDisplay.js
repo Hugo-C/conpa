@@ -33,16 +33,19 @@ function displayNewCard(family){
         let familiesId = Object.keys(cards);
         family = familiesId[family % familiesId.length];
     }
-    if(cards[family] === undefined || cards[family]['cards'].length === 0){
+    if(cards[family] === undefined){
+        displaySelectCardPanel();
+        return true;
+    }else if(cards[family]['cards'].length === 0){
         cardTextNode.nodeValue = $.i18n("noMoreCards");
         return false;
-    } else {
+    }else{
         let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];
         displayCard(family, cardPick);
         removeFromArray(cards[family]["cards"], cardPick);  // we don't want to pick it again
         shareMyCard(family, cardPick);
+        return true;
     }
-    return true;
 }
 
 /**
@@ -106,4 +109,65 @@ function triggerCssAnimation(element){
     element.id = null;
     void element.offsetWidth;
     element.id = id;
+}
+
+/**
+ * Display each card's family to allow the user to pick a new card
+ * @param {String} family : card's family to display
+ */
+function displayFamily(family){
+    // container in which there are an image to represent a cardgame and a button
+    // to pick a card
+    let parent = document.createElement('div');
+    parent.classList.add('familyDisplayer', 'col-lg-2', 'col-md-2',
+                         'col-sm-2', 'col-xs-2');
+
+    let imageContainer = document.createElement('div');
+    imageContainer.classList.add('row');
+    let image = document.createElement('img');
+    image.classList.add('col-lg-12', 'col-md-12',
+                        'col-sm-12', 'col-xs-12',
+                        'imageBackground');
+    image.setAttribute('style', 'height: 100%; padding: 0px;');
+    imageContainer.appendChild(image);
+    image.src = '/img/gamerModule/family.png';
+    parent.appendChild(imageContainer);
+
+    let selector = document.createElement('button');
+    selector.classList.add('col-lg-12', 'col-md-12',
+                           'col-sm-12', 'col-xs-12',
+                           'myCustomButton');
+    selector.setAttribute('style', 'padding: 0px; font-weight: normal;');
+    selector.setAttribute('onclick', 'selectNewCard("' + family + '")');
+    selector.innerHTML = family;
+    parent.appendChild(selector);
+
+    $('#selectCardPanel .gamePanelBody > div')[0].appendChild(parent);
+}
+
+/**
+ * Display and refresh the card's selector
+ */
+function displaySelectCardPanel(){
+    $('#selectCardPanel').css('display', 'block');
+    $('#productionPanel').css('display', 'none');
+    // we need to clear the container because some cardgames can have been
+    // already displayed
+    $('#selectCardPanel .gamePanelBody > div').empty();
+    for(let family in cards){
+        if(cards[family]['cards'].length > 0){
+            displayFamily(family);
+        }
+    }
+}
+
+/**
+ * This function is called when a player clicks on the buttons used to
+ * pick a new card
+ * @param {String} family : card's family in which the player has picked a card
+ */
+function selectNewCard(family){
+    displayNewCard(family);
+    $('#selectCardPanel').css('display', 'none');
+    $('#productionPanel').css('display', 'block');
 }

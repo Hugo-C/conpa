@@ -157,5 +157,6 @@
   "timersValue": "Game can't have less than 1 places",
   "cardgameIsRequired": "You must select a cardgame",
   "indivLessThanApp": "Individual timer can't be less than the appropriation time",
-  "globalLessThanIndiv": "Global timer can't be less than the individual timer"
+  "globalLessThanIndiv": "Global timer can't be less than the individual timer",
+  "selectCard": "Pick a card !"
 }

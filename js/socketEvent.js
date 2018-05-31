@@ -1,12 +1,11 @@
 const Player = require('./Player.js');
 const Game = require('./Game.js');
-const db = require('../js/db');
-const logger = require('../js/logger');
+const db = require('./db.js');
+const cst = require('./socketConstants.js');
+const logger = require('./logger.js');
 const i18n_module = require('i18n-nodejs');
 
-const WAITING_PLAYERS = "waitingForPlayers";
-const QUESTION_TIME = "questionTime";
-const GAME_TIME = "gameTime";
+
 
 var clients = {}; // keeps a link between user's pseudo and socket's id
 var rooms = {}; // list of available servers (rooms)
@@ -66,7 +65,7 @@ module.exports = function(io, socket){
               .emit('gameStart', {'server': server.getName(),
                                   'animator': server.getAnimatorPseudo(),
                                   'players': server.getActivePlayers()});
-            server.setStatus(QUESTION_TIME);
+            server.setStatus(cst.QUESTION_TIME);
             io.sockets.emit('serverListUpdate', listAllServers());
             logger.info('A game start : ' + server.getName());
         }
@@ -100,7 +99,7 @@ module.exports = function(io, socket){
                                          'useTimer': server.getUseTimers(),
                                          'globalTimer': server.getGlobalTimer()});
         recordGameServer(server);
-        server.setStatus(GAME_TIME);
+        server.setStatus(cst.GAME_TIME);
         server.productionSharingManager = setInterval(productionSharingManager,
                                                       server.getSharingInterval(),
                                                       server.getName());
@@ -215,7 +214,7 @@ module.exports = function(io, socket){
                     removeServer(server);
                 }else{
                     logger.verbose('updating server data');
-                    if(server.getStatus() === QUESTION_TIME){
+                    if(server.getStatus() === cst.QUESTION_TIME){
                         logger.verbose('question time');
                         if(server.isAllQuestionsDefined()){
                             logger.verbose('all questions are defined !');
@@ -227,7 +226,7 @@ module.exports = function(io, socket){
                             io.sockets.in(server.getName())
                                       .emit('actualizeQuestions', getQuestionTimeState(server));
                         }
-                    }else if(server.getStatus() === GAME_TIME){
+                    }else if(server.getStatus() === cst.GAME_TIME){
                         logger.verbose('updating game time');
                         io.sockets.in(server.getName())
                                   .emit('changeDuringGameTime', {'players': server.getActivePlayers()});
@@ -342,7 +341,7 @@ module.exports = function(io, socket){
                                   data["forceEndOfTurn"],
                                   data["delayBeforeForcing"],
                                   data["sharingInterval"],
-                                  WAITING_PLAYERS);
+                                  cst.WAITING_PLAYERS);
             server.inactivePlayerManager = setInterval(inactivePlayerManager, 10000, server);
 
             rooms[data["name"]] = server;
@@ -386,7 +385,7 @@ module.exports = function(io, socket){
     function processRemoveServer(data){
         let server = rooms[data["server"]];
         // A player can only remove his own server if the game hasn't started
-        if(server != null && server.getStatus() === WAITING_PLAYERS
+        if(server != null && server.getStatus() === cst.WAITING_PLAYERS
         && server.getHost().getPseudo() === getPseudoWithId(socket.id)){
             logger.verbose('Removing game server : ' + server.getName());
 
@@ -428,17 +427,16 @@ module.exports = function(io, socket){
     function processJoinServer(data){
         let server = rooms[data["server"]];
         if(socket.translater == null) initTranslater();
-        if(socket.room != null) processExitServer({'server': socket.room});
+
         if(server != null){
             // we can join a server if he's not full and not in game
-            if(server.getNbPlayer() < server.getPlaces()
-            && !(server.isInServer(getPseudoWithId(socket.id)))
-            && server.getStatus() === WAITING_PLAYERS){
+            if(server.isJoinable() && !server.isInServer(getPseudoWithId(socket.id))){
+                // player is already waiting for another game
+                if(socket.room != null) processExitServer({'server': socket.room});
 
                 let player = new Player(getPseudoWithId(socket.id), "player");
                 logger.info("Player " + player.getPseudo() + " joined " + server.getName());
 
-                if(socket.room != null) rooms[socket.room].removePlayer(player);
                 server.addNewPlayer(player);
                 socket.room = server.getName();
                 socket.join(socket.room);
@@ -449,9 +447,7 @@ module.exports = function(io, socket){
                 startGameOnServerFull(server.getName());
 
             // case of reconnection (if a player has lost his connection)
-            }else if(server.isInServer(getPseudoWithId(socket.id))
-                  && socket.room == null){
-
+            }else if(server.isInServer(getPseudoWithId(socket.id)) && socket.room == null){
                 socket.room = server.getName();
                 socket.join(socket.room);
 
@@ -521,6 +517,23 @@ module.exports = function(io, socket){
             dataError('FATAL');
         }else{
             exitServerControler(data, processExitServer, dataError);
+        }
+    });
+
+    function processReconnexion(data){
+        for(let gameServer in rooms){
+            if(rooms[gameServer].isInServer(getPseudoWithId(socket.id))){
+                socket.room = rooms[gameServer].getName();
+                socket.join(socket.room);
+            }
+        }
+    }
+
+    socket.on('reconnexion', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            dataError('FATAL');
+        }else{
+            processReconnexion(data);
         }
     });
 
