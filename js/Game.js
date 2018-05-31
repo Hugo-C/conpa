@@ -384,6 +384,7 @@ module.exports = class Game {
     dispose(){
         clearInterval(this.inactivePlayerManager);
         clearInterval(this.productionSharingManager);
-        this.trace.save(this.name + "_" + new Date());
+        let myDate = new Date().toJSON().replace(new RegExp(':', 'g'),'.');  // we replace colon for a better support of multiple OS
+        this.trace.save(this.name + "_" + myDate);
     }
 };

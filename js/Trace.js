@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const logger = require("../js/logger");
 
 module.exports = class Trace {
@@ -28,15 +29,16 @@ module.exports = class Trace {
         if(filename == null){
             filename = "test.json";
         }
-        filename = "./traces/" + filename;
+        filename = path.join(__dirname, "..", "traces", filename);
         if(!filename.endsWith(".json")){
             filename += ".json";
         }
         fs.writeFile(filename, JSON.stringify(this.data), function(err) {
                 if (err){
                     logger.error(err);
+                } else {
+                    logger.verbose("saved a trace file : " + filename);
                 }
-                logger.verbose("saved a trace file : " + filename);
             }
         );
     }
