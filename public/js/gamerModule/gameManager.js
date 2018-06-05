@@ -230,6 +230,29 @@ $('#wizz').on('click', function(){
     socket.emit('message', {'dest': targetedPlayer, 'msg': 'I would like to consult your production'});
 });
 
+/**
+ * Send a trace to the server
+ * @param {String} actor : the actor of the action
+ * @param {String} action : the action to be traced
+ * @param {String} value : the value associate to the action
+ * @param {String} target : the action's target
+ */
+function sendTrace(actor, action, value, target){
+    socket.emit('trace', {'actor': actor, 'action': action, 'value': value, 'target': target});
+}
+
+let notes = $("#notesArea");
+notes.change(notes, onNotesChange);  // call the function when the element loose focus and is changed
+
+/**
+ * Handle the change of the notes area
+ */
+function onNotesChange(event){
+    let data = event.data;
+    let textarea = data[0];
+    sendTrace("me", "changed text", textarea.value, "notes");
+}
+
 function addCenterButtonToToolBar(toolBar, player){
     // button used to center the view on the modified production's area
     let centerButton = document.createElement('button');
@@ -401,6 +424,7 @@ function initializeProductionPanel(){
 function execNotesAreaCommand(cmd){
     document.getElementById("notesArea").select();
     document.execCommand(cmd);
+    sendTrace("me", cmd, null, "notes");
 }
 
 function individualTimerColor(sandColor, hourglassColor){

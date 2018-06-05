@@ -51,12 +51,23 @@ class Rectangle {
         text.style.overflow = "hidden";
         text.style.backgroundColor = "transparent";
         text.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-
+        $(text).change(this, Rectangle.onTextareaChange);  // call the function when the element loose focus and is changed
         htmlCompatibilyTag.appendChild(text);
         group.add(this.rect);
         document.getElementById(group.attr('id')).appendChild(htmlCompatibilyTag);
 
         this.text = htmlCompatibilyTag;
+    }
+
+    /**
+     * Handle the change of a textarea's value
+     */
+    static onTextareaChange(event){
+        if (typeof sendTrace === "function") {  // sendTrace is defined only in multiplayers and not in historic panel
+            let rectangle = event.data;
+            let textarea = rectangle.text.firstChild;
+            sendTrace("me", "changed text", textarea.value, rectangle.toString());
+        }
     }
 
     /**
@@ -105,6 +116,10 @@ class Rectangle {
    */
     getFillColor(){
         return this.rect.attr('fill');
+    }
+
+    toString(){
+        return `rectangle, color : ${this.getFillColor()}, x : ${this.getX()}, y : ${this.getY()}, width : ${this.getWidth()}, height : ${this.getHeight()}`;
     }
 
     /**
