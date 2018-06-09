@@ -124,11 +124,11 @@ class Production {
             let menuWidth = self.menu.get(0).offsetWidth + 4;
             let menuHeight = self.menu.get(0).offsetHeight + 4;
 
-            let productionWidth = self.parent.get(0).offsetWidth;
-            let productionHeight = self.parent.get(0).offsetHeight;
+            let productionWidth = self.parent.find('.SWA_SVGContainer').get(0).offsetWidth;
+            let productionHeight = self.parent.find('.SWA_SVGContainer').get(0).offsetHeight;
 
             let menuPositionX = e.clientX;
-            let menuPositionY = e.clientY;
+            let menuPositionY = e.clientY + 50;
 
             menuPositionX -= (2 * menuWidth) / 3;
             menuPositionY -= menuHeight / 5;
@@ -401,7 +401,7 @@ class Production {
             parent.find('.SWA_CtxtMenuColorTool').css('display', 'block');
         });
 
-        parent.find('.contextMenu button.colorTool').bind('click', function(){
+        parent.find('.SWA_ContextualMenu button.SWA_CtxtMenuColorTool').bind('click', function(){
             self.setSelectedLinkColor($(this).val());
             parent.find('.SWA_CtxtMenuMainTool').css('display', 'block');
             parent.find('.SWA_CtxtMenuColorTool').css('display', 'none');

@@ -333,9 +333,9 @@ module.exports = function(io, socket){
      * form of received data : { 'pseudo': value }
      */
     socket.on('pseudo', function(data){
-        try {
+        try{
             pseudoControler(data, processPseudoMessage);
-        } catch (err) {
+        }catch(err){
             handleDataError(err);
         }
     });
@@ -426,7 +426,7 @@ module.exports = function(io, socket){
         }else{
             try{
                 createServerControler(data, processCreateServer);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -476,9 +476,9 @@ module.exports = function(io, socket){
         if(getPseudoWithId(socket.id) == null){
             handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            try {
+            try{
                 removeServerControler(data, processRemoveServer);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -545,9 +545,9 @@ module.exports = function(io, socket){
         if(getPseudoWithId(socket.id) == null){
             handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else {
-            try {
+            try{
                 joinServerControler(data, processJoinServer);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -594,7 +594,7 @@ module.exports = function(io, socket){
         }else{
             try{
                 exitServerControler(data, processExitServer);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -637,9 +637,6 @@ module.exports = function(io, socket){
                 socket.join(socket.room);
                 clients[player.getPseudo()] = socket.id;
                 initTranslater();
-
-                socket.emit('downloadCardGame', {'cardGameName': server.getCardGameName(),
-                                                 'cardGameLanguage': server.getCardGameLanguage()});
                 if(server.isAllQuestionsDefined()){
                     socket.emit('allQuestionsDefined', getQuestionTimeState(server));
                     socket.emit('initGameTime', {'players': server.getActivePlayers(),
@@ -651,6 +648,8 @@ module.exports = function(io, socket){
                 }else{
                     socket.emit('initQuestionTime', {'players': server.getPlayers(), 'animator': server.getAnimatorPseudo()});
                     socket.emit('actualizeQuestions', getQuestionTimeState(server));
+                    socket.emit('downloadCardGame', {'cardGameName': server.getCardGameName(),
+                                                     'cardGameLanguage': server.getCardGameLanguage()});
                 }
             }
         }
@@ -677,9 +676,9 @@ module.exports = function(io, socket){
      *                          'pseudo': [player's pseudo]}
      */
     socket.on('joinGame', function(data){
-        try {
+        try{
             joinGameControler(data, processJoinGame);
-        } catch (err) {
+        }catch(err){
             handleDataError(err);
         }
     });
@@ -724,9 +723,9 @@ module.exports = function(io, socket){
         if(getPseudoWithId(socket.id) == null){
             handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            try {
+            try{
                 recordQuestionControler(data, processRecordQuestion);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -766,9 +765,9 @@ module.exports = function(io, socket){
         if(getPseudoWithId(socket.id) == null){
             handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            try {
+            try{
                 animatorValidationControler(data, processAnimatorValidation);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -818,9 +817,9 @@ module.exports = function(io, socket){
         if(getPseudoWithId(socket.id) == null){
             handleDataError(new Error(cst.FATAL_ERROR_MSG));
         }else{
-            try {
+            try{
                 endOfTurnControler(data, processEndOfTurn);
-            } catch (err) {
+            }catch(err){
                 handleDataError(err);
             }
         }
@@ -837,7 +836,7 @@ module.exports = function(io, socket){
                 let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
                 socket.broadcast.to(socket.room).emit('message', rep);
                 server.trace.add(getPseudoWithId(socket.id), "send public message", data["msg"], data['dest']);
-            } else {
+            }else{
                 let rep = {"sender": getPseudoWithId(socket.id), "dest": data["dest"], "msg": data["msg"]};
                 io.to(clients[data["dest"]]).emit("message", rep);
                 server.trace.add(getPseudoWithId(socket.id), "send private message", data["msg"], data['dest']);
@@ -1160,9 +1159,6 @@ module.exports = function(io, socket){
      * Controls data send with the "castProduction" message
      */
     function castProductionControler(data, callback){
-
-
-
         if(data != null && nullDataControler(data) && rooms[socket.room] != null
         && rooms[socket.room].isInServer(data['pseudo'])
         && rooms[socket.room].isAnimator(getPseudoWithId(socket.id))
