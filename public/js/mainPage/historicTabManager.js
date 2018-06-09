@@ -1,6 +1,7 @@
 var myProduction;
 
-refreshGameList('historicTab', 'historic'); // display historic on page load
+if(sessionStorage.pseudo !== undefined)
+    refreshGameList('historicTab', 'historic'); // display historic on page load
 
 /** allow to select a row in the games historic list */
 $('#historicTab .gameList table').on('click', 'tbody tr', function(){

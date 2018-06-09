@@ -6,7 +6,8 @@ function initProfilPanel(email){
     $('#accountTab .gameList .bottom > div').css('visibility', 'visible');
 }
 
-getEmail(sessionStorage.pseudo, initProfilPanel);
+if(sessionStorage.pseudo !== undefined)
+    getEmail(sessionStorage.pseudo, initProfilPanel);
 
 $('.myProductions button').on('click', function(){
     displayPanel($('#accountTab'), $('#accountTab .gameList'), '100%', '100%');

@@ -20,6 +20,7 @@ function getEmail(pseudo, callback){
         url: '/users/email',
         data: { username: pseudo },
         error: function(){
+            console.trace();
             console.log("Request Failed, cannot use gravatar PP");
         },
         success: function(response){
@@ -34,7 +35,8 @@ function setPP(container, pseudo){
         setPPFromEmail(container, email);
     });
 }
-setPP($('#profilePicture'), sessionStorage.pseudo);
+if(sessionStorage.pseudo !== undefined)
+    setPP($('#profilePicture'), sessionStorage.pseudo);
 
 $('#disconnect').on('click', function(){
     $.ajax({

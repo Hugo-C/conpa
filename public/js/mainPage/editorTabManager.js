@@ -2,8 +2,10 @@ function populateEditorTable(data){
     displayCardGames('editorTab', 'myCardgames', data);
 }
 
-refreshCardGames([], populateEditorTable);
-refreshTags($('.tabContent select'));
+if(sessionStorage.pseudo !== undefined){
+    refreshCardGames([], populateEditorTable);
+    refreshTags($('.tabContent select'));
+}
 
 $('#editorTab button.filter').on('click', function(){
         var selected = $(".tabContent select option:selected");
