@@ -24,7 +24,7 @@ function initCards(cardGame, language){
 }
 
 /**
- * Pick a new card from the deck and display it
+ * Pick a new card from the deck, display it and share it with the other player
  * @param family {String} : the family to pick from, if it's not available it'll pick from the closest family available
  * @return {boolean} : true if a card is pick, false if all cards from the family were already picked
  */
@@ -42,7 +42,6 @@ function displayNewCard(family){
     }else{
         let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];
         displayCard(family, cardPick);
-        removeFromArray(cards[family]["cards"], cardPick);  // we don't want to pick it again
         shareMyCard(family, cardPick);
         return true;
     }
@@ -81,7 +80,7 @@ socket.on('downloadCardGame', function(data){
 });
 
 /**
- * Display a card and it's family with the specified text content
+ * Display a card and it's family with the specified text content then remove it from local deck
  * @param family {String} : the family of the card picked
  * @param text {String} : the content of the card picked
  */
@@ -98,6 +97,7 @@ function displayCard(family, text){
     }
     document.getElementById("familyLogoDiv").style.display = "inline-block";
     document.getElementById("familyLogoText").textContent = family;
+    removeCard(family, text);
 }
 
 /**
@@ -170,4 +170,14 @@ function selectNewCard(family){
     displayNewCard(family);
     $('#selectCardPanel').css('display', 'none');
     $('#productionPanel').css('display', 'flex');
+}
+
+/**
+ * Remove a card from the local deck of card
+ * @param family {String} : the family of the card to be removed
+ * @param card {String} : the content of the card to be removed
+ */
+function removeCard(family, card){
+    let myCards = cards[family]["cards"];
+    removeFromArray(myCards, card);
 }
