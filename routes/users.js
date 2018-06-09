@@ -11,15 +11,19 @@ const db = require('../js/db');
  */
 router.post('/email', urlencodedParser, function(req, res) {
     logger.debug("retrieving the email for user : " + req.body.username);
-    db.getEmail(req.body.username, function(err, pp){
-        if(err){
-            logger.error(err);
-            res.sendStatus(500);
-        }else{
-            let myRes = {pp: pp};
-            res.send(myRes);
-        }
-    });
+    if(req.body.username == null){
+        res.sendStatus(400);
+    }else{
+        db.getEmail(req.body.username, function(err, pp){
+            if(err){
+                logger.error(err);
+                res.sendStatus(500);
+            }else{
+                let myRes = {pp: pp};
+                res.send(myRes);
+            }
+        });
+    }
 });
 
 /**

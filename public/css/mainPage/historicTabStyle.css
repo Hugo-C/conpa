@@ -22,7 +22,6 @@
 /* -------------------------------------------------------------------------- */
 
 .partySheet {
-  height: 100%;
   display: none;
 }
 
@@ -33,110 +32,55 @@
   padding-right: 2%;
 }
 
-.partySheet > .body > div:first-child {
+.gameInfo {
   height: 30%;
 }
 
-.partySheet > .body > div:first-child > div {
+.gameInfo > div {
   height: 100%;
   padding: 0;
 }
 
-.partySheet > .body > div:first-child > div:first-child > div.row {
+.aboutGame > div {
   height: 50%;
 }
 
-.partySheet > .body > div:first-child > div:first-child > div.row > input {
+.aboutGame input {
   height: 60%;
 }
-.partySheet > .body > div:first-child > div:first-child > div.row > label {
+.aboutGame label {
   padding: 0;
   font-size: 1.2vw;
 }
 
-.partySheet > .body > div:first-child > div:last-child > input {
+.aboutPlayer > input {
   height: 35%;
 }
-.partySheet > .body > div:first-child > div:last-child > label {
+.aboutPlayer > label {
   padding: 0;
   font-size: 1.2vw;
 }
 
-.partySheet > .body > :last-child {
+.playersProduction {
   height: 70%;
 }
 
-.partySheet > .body > :last-child > div {
+.playersProduction > div {
   height: 90%;
 }
 
-div#productionViewer {
+.partySheet .SWA_SVGContainer {
   padding: 0;
   border: 2px solid black;
 }
 
-.partySheet > .body > :last-child > div:last-child > div.row {
+.playersProduction .row {
   height: 95%;
   overflow-y: scroll;
 }
 
 input#partyDate {
     display: none;
-}
-
-/* -------------------------------------------------------------------------- */
-/* ------------------------- Production editor ------------------------------ */
-/* -------------------------------------------------------------------------- */
-
-.productionEditor {
-  display: none;
-  height: 100%;
-  padding: 0;
-}
-
-.productionEditor .body button {
-  border: none;
-  background-color: Transparent;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-.productionEditor .body button:focus {
-  outline: 0;
-}
-
-.productionEditor > .body {
-  display: flex;
-  padding: 0;
-}
-
-.productionEditor > .body > .menu {
-  width: 5%;
-  height: 100%;
-  padding-top: 15px;
-  padding-bottom: 5px;
-  border-right: 2px solid black;
-  background-color: lightgrey;
-}
-
-.productionEditor > .body > .menu > button {
-  height: 10%;
-  padding: 0;
-}
-
-.productionEditor > .body > #colorMenu {
-  dis
-  play: none;
-}
-.productionEditor > .body > #svgMenu > button {
-  margin-bottom: 15px;
-}
-
-.productionEditor > .body > #productionEditor {
-  width: 95%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
 }
 
 /* -------------------------------------------------------------------------- */

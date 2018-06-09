@@ -9,9 +9,7 @@ function refreshCardGames(myTags, callback){
             console.log("card games retrieving has failed");
         },
         success: function(response){
-            if(response === 'ERROR'){
-                console.log("card games retrieving has failed");
-            }else{
+            if(response !== 'ERROR'){
                 callback(response);
             }
         }
@@ -55,12 +53,8 @@ function refreshTags(container){
             console.log("tags retrieving has failed");
         },
         success: function(response){
-            if(response['msg'] === 'ERROR'){
-                console.log("tags retrieving has failed");
-            }else if(response['msg'] === 'OK'){
+            if(response['msg'] !== 'ERROR'){
                 refreshTagsSelector(container, response['tags']);
-            }else{
-                console.log('an error has occured');
             }
         }
     });
@@ -111,9 +105,7 @@ function getCardGameInfo(parent, table){
                 console.log("card games retrieving has failed");
             },
             success: function(response){
-                if(response['msg'] === 'ERROR'){
-                    console.log('error getCardGameInfo');
-                }else if(response['msg'] === 'OK'){
+                if(response['msg'] !== 'ERROR'){
                     displayCardGameInfoPage(parent.id, response);
                 }
             }
@@ -123,9 +115,9 @@ function getCardGameInfo(parent, table){
 
 function displayAlert(parentId, type, message, button){
     $('#' + parentId + ' > div').css("display", "none");
-    $(".alert").animate({"display": "block"}, 1000, function(){
-        $(".alert").css("display", "block");
-        $("#editorTab > div:not(.alert)").css("display", "none");
+    $('#' + parentId + ' .alert').animate({"display": "block"}, 1000, function(){
+        $('#' + parentId + ' .alert').css("display", "block");
+        $('#' + parentId + ' > div:not(.alert)').css("display", "none");
     });
     $('#' + parentId + ' .alertTitle').text('Confirmation');
     $('#' + parentId + ' .alertMessage').text(message);
@@ -138,6 +130,56 @@ function displayAlert(parentId, type, message, button){
     let tab = $('#' + parentId);
     tab.css('height', '40%');
     tab.css('width', '35%');
+}
+
+/**
+  * Creates an url to download a production
+  * @param {DOMElement} parent : parent tag in which we will create the container
+  *                              used to download the production
+  * @param {object} production : data of the production to download
+  * @param {object} legend : data of the production's legend
+  * @param {String} question : question of the player who has worked on this production
+  */
+function getProductionImageUrl(parent, production, legend, question){
+    // container used to build the production
+    let downloadContainer = document.createElement('div');
+    downloadContainer.style.visibility = 'hidden';
+    let tempSVGContainer = document.createElement('div');
+    tempSVGContainer.classList.add('SWA_SVGContainer');
+    downloadContainer.appendChild(tempSVGContainer);
+    parent.appendChild(downloadContainer);
+    // Production instance used to restore the production, the legend,
+    // integrate the legend inside the production (inside the main SVG)
+    // and convert the production to a String
+    let downloadedProduction = new Production($(downloadContainer), false);
+    downloadedProduction.restoreProduction(JSON.parse(production));
+    downloadedProduction.integrateLegendToProduction(JSON.parse(legend), question);
+    let blob = new Blob([downloadedProduction.getInlineSvg()], {type: "image/svg+xml;charset=utf-8"});
+    let urlCreator = window.URL || window.webkitURL;
+    parent.removeChild(downloadContainer);
+    return urlCreator.createObjectURL(blob);
+}
+
+/**
+  * Creates an 'a' tag to download a production
+  * @param {DOMElement} parent : parent tag in which we will create the container
+  *                              used to download the production
+  * @param {object} production : data of the production to download
+  * @param {object} legend : data of the production's legend
+  * @param {String} question : question of the player who has worked on this production
+  */
+function downloadProduction(parent, production, legend, question){
+    let productionUrl = getProductionImageUrl(parent, production, legend, question);
+    if(productionUrl.match("blob")){
+        let downloader = document.createElement("a");
+        document.body.appendChild(downloader);
+        downloader.href = productionUrl;
+        downloader.download = 'production';
+        downloader.click();
+        downloader.remove();
+    }
+    let urlCreator = window.URL || window.webkitURL;
+    urlCreator.revokeObjectURL(productionUrl);
 }
 
 function sortTable(n, tableId) {

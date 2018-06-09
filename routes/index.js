@@ -20,13 +20,119 @@ router.get('/', function (req, res) {
 });
 
 router.post('/checkConnection', urlencodedParser, function (req, res) {
-    db.isConnected(req.body.username, function (connected) {
-        if (connected) {
-            res.send("OK");
-            logger.log("silly", req.body.username + " is already connected");
-        } else {
-            res.send("REJECT");
-            logger.log("silly", req.body.username + " has been rejected from the server");
+    if(req.body.username == null){
+        res.sendStatus(400);
+    }else{
+        db.isConnected(req.body.username, function (connected) {
+            if (connected) {
+                res.send("OK");
+                logger.log("silly", req.body.username + " is already connected");
+            } else {
+                res.send("REJECT");
+                logger.log("silly", req.body.username + " has been rejected from the server");
+            }
+        });
+    }
+});
+
+/**
+ * Retrieves the production's id of a player inside the games historic table
+ * @param {String} pseudo : pseudo of the production's owner
+ * @param {String} partyName : name of the game during which he has created the production
+ * @param {String} partyDate : date at which the game has been played
+ * @param requestRes : used to inform the client when an error occurred
+ * @param {callback} callback : function used to return the result
+ */
+function getHistoricProductionID(pseudo, partyName, partyDate, requestRes, callback){
+    db.getProductionIDFromPlayerHistoric(pseudo, partyName, partyDate, function(err, prodID){
+        if(err){
+            logger.debug(err);
+            requestRes.send('ERROR');
+        }else{
+            if(prodID != null){
+                callback(prodID);
+            }else{
+                requestRes.send('ERROR');
+            }
+        }
+    });
+}
+
+/**
+ * Removes a production with the given id
+ * @param {Number} prodID : id of the production to remove
+ * @param requestRes : used to inform the client about the operation's result
+ */
+function removeProduction(prodID, requestRes){
+    db.removeProduction(prodID, function(err){
+        if(err){
+            logger.error(err);
+            requestRes.send('ERROR');
+        }else{
+            requestRes.send('OK');
+        }
+    });
+}
+
+/**
+ * Sends the production's data to the client
+ * @param {Number} prodID : production's id to retrieve
+ * @param {object} dataToSend : dictionnary in which we stored production's and
+ *                              legend's data
+ * @param requestRes : used to send the data
+ */
+function sendProduction(prodID, dataToSend, requestRes){
+    db.getProduction(prodID, function(err, production, legend){
+        if(err){
+            logger.error(err);
+            requestRes.send('ERROR');
+        }else{
+            if(production != null && legend != null){
+                dataToSend['production'] = production;
+                dataToSend['legend'] = legend;
+                requestRes.send(dataToSend);
+            }else{
+                requestRes.send('ERROR');
+            }
+        }
+    });
+}
+
+router.post('/deleteArchive', urlencodedParser, function(req, res){
+    db.removeProductionsInArchive(req.body.partyName, req.body.partyDate, req.body.username, function(err){
+        if(err){
+            res.send('ERROR');
+        }else{
+            res.send('OK');
+        }
+    });
+});
+
+router.post('/deleteArchivedProduction', urlencodedParser, function(req, res){
+    db.getProductionIDFromPlayerArchive(req.body.username, req.body.insertDate, function(err, prodID){
+        if(err){
+            logger.error(err);
+            res.send('ERROR');
+        }else{
+            removeProduction(prodID, res);
+        }
+    });
+});
+
+router.post('/getArchivedProductions', urlencodedParser, function(req, res){
+    db.getProductionsFromArchive(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
+        if(err){
+            logger.error(err);
+            res.send('ERROR');
+        }else{
+            let productions = [];
+            for(let index = 0; index < result.length; index++){
+                let data = {
+                    'prodDate': result[index][keys.AT_KEY_DATE]
+                };
+                productions.push(data);
+            }
+            res.send(productions);
         }
     });
 });
@@ -39,80 +145,169 @@ router.post('/getHistoric', urlencodedParser, function(req, res){
         }else{
             let historic = []; // used to store historic entries
             for(let entry in result){
-                let data = {'name': result[entry][keys.PT_KEY_SERVER],
-                            'animator': result[entry][keys.PT_KEY_ANIMATOR],
-                            'date': result[entry][keys.PT_KEY_DATE],
-                            'question': result[entry][keys.HPT_KEY_QUESTION]};
+                let data = {
+                    'name': result[entry][keys.PT_KEY_NAME],
+                    'animator': result[entry][keys.PT_KEY_ANIMATOR],
+                    'date': result[entry][keys.PT_KEY_DATE],
+                    'question': result[entry][keys.HPT_KEY_QUESTION]
+                };
                 historic.push(data);
             }
             res.send(historic);
-            logger.log("silly", historic);
+        }
+    });
+});
+
+router.post('/getArchive', urlencodedParser, function(req, res){
+    db.getArchiveEntries(req.body.username, function(err, result){
+        if(err){
+            logger.error(err);
+            res.send('ERROR');
+        }else{
+            let archive = [];
+            for(let entry in result){
+                let data = {
+                    'name': result[entry][keys.PT_KEY_NAME],
+                    'animator': result[entry][keys.PT_KEY_ANIMATOR],
+                    'date': result[entry][keys.PT_KEY_DATE],
+                    'question': result[entry][keys.HPT_KEY_QUESTION]
+                };
+                archive.push(data);
+            }
+            res.send(archive);
         }
     });
 });
 
 router.post('/removeHistoric', urlencodedParser, function(req, res){
-    db.removePlayerPartyHistoric(req.body.username, req.body.server, req.body.date, function(err){
+    getHistoricProductionID(req.body.username, req.body.server, req.body.date, res, function(prodID){
+        removeProduction(prodID, res);
+    });
+});
+
+router.post('/getProductionFromArchive', urlencodedParser, function(req, res){
+    db.getProductionIDFromPlayerArchive(req.body.username, req.body.insertDate, function(err, prodID){
         if(err){
             logger.error(err);
             res.send('ERROR');
         }else{
-            res.send('OK');
-            logger.debug("one historic successfully removed");
+            if(prodID != null){
+                sendProduction(prodID, {}, res);
+            }else{
+                res.send('ERROR');
+            }
         }
     });
 });
 
 router.post('/getPlayerProduction', urlencodedParser, function(req, res){
-    var details = {'production': '', 'legend': ''};
-    db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
-        if(err){
-            logger.error(err);
-            res.send('ERROR');
-        }else{
-            logger.log("silly", result != null);
-            if(result != null){
-                details['production'] = result[keys.HPT_KEY_PRODUCTION];
-                details['legend'] = result[keys.HPT_KEY_LEGEND];
-            }
-            res.send(details);
-        }
+    getHistoricProductionID(req.body.username, req.body.partyName, req.body.partyDate, res, function(prodID){
+        sendProduction(prodID, {}, res);
     });
 });
 
 router.post('/recordPlayerProduction', urlencodedParser, function(req, res){
-    logger.log("silly", req.body.production);
-    db.recordPlayerProduction(req.body.username, req.body.partyName, req.body.partyDate, req.body.production, req.body.legend, function(err){
+    function getActualizedProductionsList(){
+        db.getProductionsFromArchive(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
+            if(err){
+                logger.error(err);
+                res.send('ERROR');
+            }else{
+                let productions = [];
+                for(let index = 0; index < result.length; index++){
+                    let data = {
+                        'prodDate': result[index][keys.AT_KEY_DATE]
+                    };
+                    productions.push(data);
+                }
+                res.send(productions);
+            }
+        });
+    }
+
+    function addArchive(gameID, prodID){
+        db.archivePlayerProduction(req.body.username, gameID, prodID, function(err){
+            if(err){
+                logger.error(err);
+                res.send('ERROR');
+            }else{
+                if(req.body.returnActList === 'true'){
+                    getActualizedProductionsList();
+                }else{
+                    res.send('OK');
+                }
+            }
+        });
+    }
+
+    function addProduction(gameID){
+        db.addNewProduction(req.body.production, req.body.legend, function(err, prodID){
+            if(err){
+                logger.error(err);
+                res.send('ERROR');
+            }else{
+                addArchive(gameID, prodID);
+            }
+        });
+    }
+
+    db.getGameID(req.body.partyName, req.body.partyDate, function(err, gameID){
+        if(err){
+            logger.error(err);
+            requestRes.send('ERROR');
+        }else{
+            if(gameID != null){
+                addProduction(gameID);
+            }else{
+                res.send('ERROR');
+            }
+        }
+    });
+});
+
+router.post('/overwriteProduction', urlencodedParser, function(req, res){
+    function updateProduction(prodID){
+        db.updateProduction(prodID, req.body.production, req.body.legend, function(err){
+            if(err){
+                logger.error(err);
+                res.send('ERROR');
+            }else{
+                res.send('OK');
+            }
+        });
+    }
+
+    db.getProductionIDFromPlayerArchive(req.body.username, req.body.insertDate, function(err, prodID){
         if(err){
             logger.error(err);
             res.send('ERROR');
         }else{
-            res.send('OK');
-            logger.debug("production saved : " + req.body.production);
+            if(prodID != null){
+                updateProduction(prodID);
+            }else{
+                res.send('ERROR');
+            }
         }
     });
 });
 
 router.post('/getDetails', urlencodedParser, function(req, res){
     var details = {'production': '', 'legend': '', 'players': []};
-
     function processPlayersList(players){
-
         for(let index in players){
             details['players'].push(players[index][keys.HPT_KEY_PSEUDO]);
         }
-
-        db.getProduction(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
+        db.getPlayerPartyDetails(req.body.username, req.body.partyName, req.body.partyDate, function(err, prodID, question){
             if(err){
                 logger.error(err);
                 res.send('ERROR');
             }else{
-                logger.log("silly", result != null);
-                if(result != null){
-                    details['production'] = result[keys.HPT_KEY_PRODUCTION];
-                    details['legend'] = result[keys.HPT_KEY_LEGEND];
+                if(prodID != null){
+                    details['question'] = question;
+                    sendProduction(prodID, details, res);
+                }else{
+                    res.send('ERROR');
                 }
-                res.send(details);
             }
         });
     }
@@ -126,37 +321,76 @@ router.post('/getDetails', urlencodedParser, function(req, res){
     });
 });
 
-router.post('/getPlayerDetails', urlencodedParser, function(req, res){
-    var details = {};
-    db.getPlayerPartyDetails(req.body.username, req.body.partyName, req.body.partyDate, function(err, result){
+router.post('/downloadArchivedProduction', urlencodedParser, function(req, res){
+    let details = {};
+    function getArchivedProductionID(){
+        db.getProductionIDFromPlayerArchive(req.body.username, req.body.insertDate, function(err, prodID){
+            if(err){
+                logger.error(err);
+                res.send('ERROR');
+            }else{
+                if(prodID != null){
+                    sendProduction(prodID, details, res);
+                }else{
+                    res.send('ERROR');
+                }
+            }
+        });
+    }
+
+    db.getPlayerPartyDetails(req.body.username, req.body.partyName, req.body.partyDate, function(err, prodID, question){
         if(err){
+            logger.error(err);
             res.send('ERROR');
         }else{
-            details['question'] = result[0][keys.HPT_KEY_QUESTION];
-            details['production'] = result[0][keys.HPT_KEY_PRODUCTION];
-            details['legend'] = result[0][keys.HPT_KEY_LEGEND];
-            res.send(details);
+            if(prodID != null){
+                details['question'] = question;
+                getArchivedProductionID();
+            }else{
+                res.send('ERROR');
+            }
+        }
+    });
+});
+
+router.post('/getPlayerDetails', urlencodedParser, function(req, res){
+    let details = {};
+    db.getPlayerPartyDetails(req.body.username, req.body.partyName, req.body.partyDate, function(err, prodID, question){
+        if(err){
+            logger.error(err);
+            res.send('ERROR');
+        }else{
+            if(prodID != null){
+                details['question'] = question;
+                sendProduction(prodID, details, res);
+            }else{
+                res.send('ERROR');
+            }
         }
     });
 });
 
 router.post('/getCardGames', urlencodedParser, function(req, res){
-    logger.debug("retrieving cards with tags : " + req.body.tags);
-    db.getCardGamesByTags(JSON.parse(req.body.tags), function(err, result){
-        if(err){
-            logger.error(err);
-            res.send('ERROR');
-        }else{
-            let cardGames = []; //used to send all card games
-            for(let entry in result){
-                let data = {'name': result[entry][keys.CGT_KEY_NAME],
-                            'language': result[entry][keys.CGT_KEY_LANGUAGE],
-                            'author': result[entry][keys.CGT_KEY_AUTHOR]};
-                cardGames.push(data);
+    if(req.body.tags == null){
+        res.sendStatus(400);
+    }else{
+        logger.debug("retrieving cards with tags : " + req.body.tags);
+        db.getCardGamesByTags(JSON.parse(req.body.tags), function(err, result){
+            if(err){
+                logger.error(err);
+                res.send('ERROR');
+            }else{
+                let cardGames = []; //used to send all card games
+                for(let entry in result){
+                    let data = {'name': result[entry][keys.CGT_KEY_NAME],
+                                'language': result[entry][keys.CGT_KEY_LANGUAGE],
+                                'author': result[entry][keys.CGT_KEY_AUTHOR]};
+                    cardGames.push(data);
+                }
+                res.send(cardGames);
             }
-            res.send(cardGames);
-        }
-    });
+        });
+    }
 });
 
 router.post('/getAllTags', urlencodedParser, function(req, res){

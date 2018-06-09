@@ -76,8 +76,8 @@ $("#inputBox").on('keyup', function (e) {
  * Displays the received message
  *
  * form of received data :
- * {'sender': [sender's pseudo], 'msg': [message body],
- *  'whisper': [boolean which indicates if message is public or private]}
+ * {'sender': sender's pseudo, 'msg': message body,
+ *  'whisper': boolean which indicates if message is public or private}
  */
 socket.on('message', function(data){
     insertTextInChat(data["msg"], data["sender"], getColor(data["dest"]));

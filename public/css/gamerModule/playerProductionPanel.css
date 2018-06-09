@@ -1,32 +1,116 @@
 @import 'verticalText.css';
 
 #productionPanel {
-  display: block;
+  display: flex;
 }
 
-#productionPanel > :first-child {
+.productionHeader {
+  height: 100%;
+  padding: 0;
+}
+.productionBottom {
+  display: none;
+  padding: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ---------------------------- CAST PANEL STYLE ---------------------------- */
+/* -------------------------------------------------------------------------- */
+
+.spectatorsList {
+  width: 9%;
+  height: 100%;
+  border-right: 2px solid black;
+  background: linear-gradient(to bottom, grey , #1B1919);
+  display: none;
+}
+.spectatorsListContent {
+  padding-top: 10%;
+  padding-left: 0;
+  padding-right: 5%;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.spectatorsListBottom {
+  height: 100%;
+  background: linear-gradient(to top, grey , #1B1919);
+  display: none;
+}
+.spectatorsListBottom > div {
+  height: 55%;
+}
+
+.spectatorsListBottom input, .spectatorsListBottom button {
+  height: 100%;
+  padding: 0;
+}
+.spectatorsListBottom input {
+  font-size: 1.2vw;
+}
+
+.spectatorsListContent .playerDisplayer {
+  height: 22%;
+  min-height: 22%;
+  margin-left: 0;
+  margin-bottom: 10%;
+  border-width: 2px;
+}
+.spectatorsListContent .playerDisplayer > :first-child {
+  border-width: 2px;
+}
+.spectatorsListContent .playerDisplayer > :last-child {
+  padding: 0;
+}
+.spectatorsListContent .playerDisplayer span {
+  font-size: 0.6vw !important;
+}
+
+.castedProdSpan {
+  font-size: 1vw;
+}
+.spectatorsListBottom .castedProdSpan {
+  font-size: 1.2vw;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --------------------- FOREIGN PRODUCTIONS ACCESS ------------------------- */
+/* -------------------------------------------------------------------------- */
+
+.productionsAccessBar {
+  height: 100%;
+  width: 9%;
+}
+
+.productionsAccessBarContent {
+  width: 90%;
   border-right: 2px solid black;
   background: linear-gradient(to right, grey , #1B1919);
   display: block;
 }
+.productionsAccessBarDisplayer {
+  width: 10%;
+  border-right: 1px solid black;
+  background-color: grey;
+  background-image: url("/img/gamerModule/hide.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
 
-#productionPanel > :first-child > :nth-child(1),
-#productionPanel > :first-child > :nth-child(2) {
-  height: 5%;
+.myAccess, .myPrivacy {
+  height: 8%;
   border-bottom: 2px solid black;
 }
 
-#productionPanel > :first-child > :nth-child(1) {
-  background-color: grey;
-}
-
-#productionPanel > :first-child > :nth-child(1) > div {
+.myAccess div {
   height: 100%;
   width: 100%;
   cursor: pointer;
 }
 
-#productionPanel > :first-child > :nth-child(1) > div > span {
+.myAccess > div > span {
   width: 100%;
   font-size: 0.8vw;
   font-weight: bold;
@@ -34,23 +118,21 @@
   text-align: center;
 }
 
-button#setPrivacy {
-  background-image: url("/img/gamerModule/private.svg");
-}
+button#setPrivacy { background-image: url("/img/gamerModule/private.svg"); }
+button#setPrivacy[value='public'] { background-color: green; }
+button#setPrivacy[value='private'] { background-color: darkred; }
+button#setPrivacy[value='limited'] { background-color: #E8900A; }
 
-#productionPanel > :first-child > :nth-child(3) {
+.prodSeparator {
   height: 10%;
+  width: 100%;
   border-bottom: 2px solid black;
   background-color: grey;
-}
-
-#productionPanel > :first-child > :nth-child(3) {
-  width: 100%;
   font-size: 0.7vw;
   font-weight: bold;
 }
 
-#productionPanel > :first-child > :nth-child(3) > p {
+.prodSeparator p {
   margin: 0;
   padding: 0;
   color: black;
@@ -58,14 +140,15 @@ button#setPrivacy {
   text-align: center;
 }
 
-#productionList {
-  height: 80%;
+.foreingProdAccess {
+  height: 64%;
   border: none;
   overflow-y: auto;
 }
 
-#productionList > div {
-  height: 10%;
+.foreingProdAccess > div {
+  height: 15%;
+  min-height: 15%;
   padding-left: 5%;
   padding-right: 5%;
   display: flex;
@@ -82,12 +165,12 @@ button#setPrivacy {
   background-color: #0AA6E1;
 }
 
-#productionList img {
+.foreingProdAccess img {
   width: 30%;
   padding-bottom: 5%;
 }
 
-#productionList span {
+.foreingProdAccess span {
   width: 70%;
   font-size: 0.8vw;
   font-weight: bold;
@@ -103,27 +186,27 @@ div.selectedProduction > span {
   font-style: italic;
 }
 
-#divProduction {
+button#questions {
+  height: 10%;
+  padding: 0;
+  border-top: 2px solid black;
+  font-size: 1vw;
+  font-weight: bold;
+  background-color: grey;
+  color: black;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------- PLAYER PRODUCTION ----------------------------- */
+/* -------------------------------------------------------------------------- */
+
+.productionContainer {
+  width: 91%;
   display: flex;
   justify-content: flex-start;
 }
 
-button#displayList {
-  width: 1%;
-  border-right: 1px solid black;
-  background-color: grey;
-  background-image: url("/img/gamerModule/hide.svg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-div#production {
-  width: 92%;
-  overflow: hidden;
-}
-
-button#wizz {
+#wizz {
   width: 30%;
   height: 8%;
   top: 80%;
@@ -131,4 +214,36 @@ button#wizz {
   font-size: 1vw;
   float: none;
   display: none;
+}
+
+#scene {
+  height: 100%;
+  width: 100%;
+}
+
+#castRequest {
+  height: 20%;
+  bottom: 0;
+  right: 0;
+  display: none;
+}
+#castOption {
+  height: 40%;
+  top: 30%;
+  left: 40%;
+  display: none;
+}
+
+.castAlertPanel {
+  margin-bottom: 5px;
+  margin-right: 5px;
+  position: absolute;
+  display: block;
+  z-index: 10;
+  background: white;
+  box-shadow: 0px 0px 10px 2px inset;
+}
+
+.multiselect {
+  font-size: 1vw;
 }

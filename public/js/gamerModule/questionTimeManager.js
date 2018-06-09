@@ -100,27 +100,26 @@ function addPlayerBox(pseudo){
  * @param {string} player1 : first player's pseudo
  * @param {string} player2 : second player's pseudo
  */
-function addTwoPlayers(player1, player2){
-    let parentTag = $('#playersQuestion');
-    let html ='<div class="questionsDisplayer rowFlexContainer">' +
-                  addPlayerBox(player1) +
+function addTwoPlayers(parent, player1, player2){
+    let html ='<div class="questionsDisplayer rowFlexContainer col-lg-10 col-md-10 col-sm-10">' +
+                  addPlayerBox(player1, 'col-lg-2 col-md-2 col-sm-2') +
                   '<div class="col-lg-8 col-md-8 col-sm-8">' +
                       '<div class="row">' +
-                          '<div id="question' + player1 + '" class="rowFlexContainer col-lg-8 col-md-8 col-sm-8 oval-thought-left">' +
+                          '<div id="question' + player1 + '" class="rowFlexContainer col-lg-10 col-md-10 col-sm-10 oval-thought-left">' +
                               '<div class="col-lg-12 col-md-12 col-sm-12">' +
                                   '<span class="col-lg-12 col-md-12 col-sm-12"></span>' +
                               '</div>' +
                           '</div>' +
-                          '<div id="question' + player2 + '" class="rowFlexContainer col-lg-offset-4 col-lg-8 col-md-offset-4 col-md-8 col-sm-offset-4 col-sm-8 oval-thought-right">' +
+                          '<div id="question' + player2 + '" class="rowFlexContainer col-lg-offset-2 col-lg-10 col-md-offset-2 col-md-10 col-sm-offset-2 col-sm-10 oval-thought-right">' +
                               '<div class="col-lg-12 col-md-12 col-sm-12">' +
                                   '<span class="col-lg-12 col-md-12 col-sm-12"></span>' +
                               '</div>' +
                           '</div>' +
                       '</div>' +
                   '</div>' +
-                  addPlayerBox(player2) +
+                  addPlayerBox(player2, 'col-lg-2 col-md-2 col-sm-2') +
               '</div>';
-    parentTag.append(html);
+    parent.append(html);
 }
 
 /**
@@ -132,13 +131,12 @@ function addTwoPlayers(player1, player2){
  *
  * @param {string} player : player's pseudo
  */
-function addOnePlayer(player){
-    let parentTag = $('#playersQuestion');
-    let html ='<div class="questionsDisplayer rowFlexContainer">' +
-                  addPlayerBox(player) +
+function addOnePlayer(parent, player){
+    let html ='<div class="questionsDisplayer rowFlexContainer col-lg-10 col-md-10 col-sm-10">' +
+                  addPlayerBox(player, 'col-lg-2 col-md-2 col-sm-2') +
                   '<div class="col-lg-8 col-md-8 col-sm-8">' +
                       '<div class="row">' +
-                          '<div id="question' + player + '" class="rowFlexContainer col-lg-8 col-md-8 col-sm-8 oval-thought-left">' +
+                          '<div id="question' + player + '" class="rowFlexContainer col-lg-10 col-md-10 col-sm-10 oval-thought-left">' +
                               '<div class="col-lg-12 col-md-12 col-sm-12">' +
                                   '<span class="col-lg-12 col-md-12 col-sm-12"></span>' +
                               '</div>' +
@@ -149,7 +147,7 @@ function addOnePlayer(player){
 
                   '<div class="col-lg-2 col-md-2 col-sm-2" style="visibility: hidden"/>' +
               '</div>';
-    parentTag.append(html);
+    parent.append(html);
 }
 
 /**
@@ -171,9 +169,9 @@ function actualizeNbReady(ready, total){
  * @param {string} pseudo : pseudo of the player for which we want to refresh the question
  * @param {string} question : question to display
  */
-function actualizePlayerQuestion(pseudo, question){
+function actualizePlayerQuestion(parent, pseudo, question){
     console.log(pseudo + ' : ' + question);
-    $('#question' + pseudo + ' span').text(question);
+    parent.find('#question' + pseudo + ' span').text(question);
 }
 
 /**
@@ -182,9 +180,9 @@ function actualizePlayerQuestion(pseudo, question){
  *
  * @param {string} pseudo : pseudo of the player for which we want to change the box border color
  */
-function actualizeBorderColor(pseudo){
-    $('#profil' + pseudo).css('border-color', '#4FAB1A');
-    $('#profil' + pseudo + '> div').css('border-color', '#4FAB1A');
+function actualizePlayerState(parent, pseudo){
+    parent.find('#profil' + pseudo).css('border-color', '#4FAB1A');
+    parent.find('#profil' + pseudo + '> div').css('border-color', '#4FAB1A');
 }
 
 /**
@@ -196,6 +194,34 @@ function displayMyQuestion(playersQuestion){
     for(let index = 0; index < playersQuestion.length; index++){
         if(playersQuestion[index]['player'] === sessionStorage.pseudo){
             $('#question span').text(playersQuestion[index]['question']);
+        }
+    }
+}
+
+function createQuestionDisplayer(parent, players){
+    if(players.length > 0){
+        if(players.length < 2){ // only one player in the game, we display it alone
+            addOnePlayer(parent, players[0]);
+            setPP(players[0]);
+        }else{ // more than one player
+            for(let index = 0; index < players.length - 1; index += 2){
+                addTwoPlayers(parent, players[index], players[index + 1]); // we display two players in the same line while we can
+                setPP(players[index]);
+                setPP(players[index + 1]);
+            }
+            if(players.length % 3 === 0){
+                addOnePlayer(parent, players[players.length - 1]); // impair numbers of player, we display the last one alone
+                setPP(players[players.length - 1]);
+            }
+        }
+    }
+}
+
+function displayPlayersQuestion(parent, playersQuestion){
+    for(let index = 0; index < playersQuestion.length; index++){
+        actualizePlayerQuestion(parent, playersQuestion[index]['player'], playersQuestion[index]['question']);
+        if(playersQuestion[index]['question'] !== ''){
+            actualizePlayerState(parent, playersQuestion[index]['player']);
         }
     }
 }
@@ -219,22 +245,7 @@ socket.on('initQuestionTime', function(data){
     $('#myQuestion').attr('placeholder', $.i18n('questionPlaceholder'));
     actualizeNbReady(0, players.length);
 
-    if(players.length > 0){
-        if(players.length < 2){ // only one player in the game, we display it alone
-            addOnePlayer(players[0]);
-            setPP(players[0]);
-        }else{ // more than one player
-            for(let index = 0; index < players.length - 1; index += 2){
-                addTwoPlayers(players[index], players[index + 1]); // we display two players in the same line while we can
-                setPP(players[index]);
-                setPP(players[index + 1]);
-            }
-            if(players.length % 3 === 0){
-                addOnePlayer(players[players.length - 1]); // impair numbers of player, we display the last one alone
-                setPP(players[players.length - 1]);
-            }
-        }
-    }
+    createQuestionDisplayer($('#playersQuestion'), players);
 
     if(data['animator'] == null){
         $('#animatorProfil').css('display', 'none');
@@ -242,6 +253,7 @@ socket.on('initQuestionTime', function(data){
         $('#animatorProfil').css('display', 'block');
         $('#animatorProfil span').text(data['animator']);
         $('.questionsDisplayer').css('height', '40%');
+        setPP(data['animator']);
     }
 
     if(sessionStorage.role === 'animator'){
@@ -260,13 +272,7 @@ socket.on('initQuestionTime', function(data){
 socket.on('actualizeQuestions', function(data){
     let playersQuestion = data['playersQuestion'];
     actualizeNbReady(data['ready'], playersQuestion.length);
-
-    for(let index = 0; index < playersQuestion.length; index++){
-        actualizePlayerQuestion(playersQuestion[index]['player'], playersQuestion[index]['question']);
-        if(playersQuestion[index]['question'] !== ''){
-            actualizeBorderColor(playersQuestion[index]['player']);
-        }
-    }
+    displayPlayersQuestion($('#playersQuestion'), playersQuestion);
     if(data['ready'] === playersQuestion.length && sessionStorage.role === 'animator'){
         $('#validate').css('display', 'block'); // TODO : create an animation instead of hide the button
     }

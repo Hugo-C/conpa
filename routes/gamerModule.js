@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const upload = multer().single('uploadProduction');
 const querystring = require('querystring');
 const url = require('url');
 const logger = require('../js/logger.js');
@@ -60,27 +58,6 @@ router.get('/cards', function(req, res) {
 
 router.get('/', function(req, res) {
     res.render('gamerModuleMainView');
-});
-
-router.post('/uploadProduction', function(req, res){
-    upload(req, res, function(err){
-        if(err){
-            logger.error(err);
-            res.send('ERROR');
-        }else{
-            let file = req.file;
-            let dest = "./upload/" + file.originalname;
-            fs.writeFile(dest, file.buffer, function(err){
-                if(err){
-                    logger.error(err);
-                    res.send('ERROR');
-                }else{
-                    res.send('OK');
-                    logger.log("silly", "production uploaded");
-                }
-            });
-        }
-    });
 });
 
 module.exports = router;

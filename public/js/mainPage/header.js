@@ -9,8 +9,12 @@ setInterval(function(){
 // display user pseudo
 $('#pseudo').text(sessionStorage.pseudo);
 
-// change profile picture to gravatar
-function setPP(pseudo){
+function setPPFromEmail(imageContainer, email){
+    let picture_url = GRAVATAR_URL + md5(email) + "?d=" + DEFAULT_IMG_URL;
+    imageContainer.attr("src", picture_url);
+}
+
+function getEmail(pseudo, callback){
     $.ajax({
         type: 'POST',
         url: '/users/email',
@@ -19,14 +23,18 @@ function setPP(pseudo){
             console.log("Request Failed, cannot use gravatar PP");
         },
         success: function(response){
-            $(document).ready(function(){
-                let picture_url = GRAVATAR_URL + md5(response["pp"]) + "?d=" + DEFAULT_IMG_URL;
-                $('#profilePicture').attr("src", picture_url);
-            });
+            callback(response["pp"]);
         }
     });
 }
-setPP(sessionStorage.pseudo);
+
+// change profile picture to gravatar
+function setPP(container, pseudo){
+    getEmail(pseudo, function(email){
+        setPPFromEmail(container, email);
+    });
+}
+setPP($('#profilePicture'), sessionStorage.pseudo);
 
 $('#disconnect').on('click', function(){
     $.ajax({

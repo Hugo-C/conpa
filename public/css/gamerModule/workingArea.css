@@ -1,0 +1,68 @@
+.SWA_BasicContainer {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.SWA_MyIndicator {
+  background: #e3e3e3;
+	border: 1px solid #ccc;
+	color: #333;
+	font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+	font-size: 1vw;
+	font-weight: bold;
+	text-align: center;
+	float:right;
+	text-shadow: 0 1px 0px #fff;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+  box-shadow: 2px 2px 10px 0px inset;
+}
+
+.SWA_MyTitle {
+  font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
+	font-size: 1.2vw;
+	font-weight: bold;
+	text-align: center;
+  text-shadow: 0 1px 0px;
+}
+
+.SWA_RowFlexContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.SWA_CenteredItems {
+  display: flex;
+  align-items: center;
+}
+
+.SWA_CenteredImageBackground {
+  background-size: auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+}
+
+.SWA_ImageButton {
+  border: none;
+  background-color: Transparent;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.SWA_Production {
+  overflow: hidden;
+  width: 93%;
+}
+
+.SWA_Menu {
+  width: 7%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-right: 2px solid black;
+  background: linear-gradient(to left, grey , #1B1919);
+}

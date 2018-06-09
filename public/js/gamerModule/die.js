@@ -72,7 +72,7 @@ render = function () {
         zGravity -= 0.25;
         scene.setGravity(new THREE.Vector3(0, -30, zGravity));
     }
-    
+
 };
 
 function updateScene() {
@@ -180,9 +180,9 @@ function deleteScene() {
     scene.remove(camera);
 
     divDie.removeChild(divDie.lastChild);
-    $('#divProduction').css('display', 'flex');
+    $('.productionContainer').css('display', 'flex');
     $('#scene').remove();
-    Legend.show();
+    clientGame.getProduction().showLegend();
 }
 
 function handleDie() {
@@ -199,7 +199,7 @@ function throwDie() {
         Math.random() * Math.PI
     );
     scene.add(box);
-    Legend.hide();
+    clientGame.getProduction().hideLegend();
 
     vectAngularVelocity = new THREE.Vector3(
         Math.random() * Math.PI,

@@ -20,6 +20,7 @@ class GameState {
         this.delayForRollingTheDice = 0;
         this.waitsForDice = null;
         this.timersData;
+        this.castedProductionData;
     }
 
     setAnimator(animator){
@@ -95,6 +96,12 @@ class GameState {
             this.indivTimerControler = null;
         }
         this.indivTimerControler = setInterval(this.indivTimerManager.bind(this), 1000);
+    }
+
+    stopIndivTimer(){
+        clearInterval(this.indivTimerControler);
+        this.indivTimerControler = null;
+        indivTimerAnimation(0, 0);
     }
 
     forceEndOfTurnProcess(callback){
@@ -217,20 +224,33 @@ class GameState {
         return this.playersProduction[pseudo] != null;
     }
 
-    setProduction(container, panning, zoomIndicator){
-        this.production = new Production(container, panning, zoomIndicator);
+    initProduction(container, panning){
+        this.production = new Production(container, panning);
+        this.production.initToolsListeners();
     }
 
     getProduction(){
         return this.production;
     }
 
-    getMosaicProduction(pseudo){
-        return this.mosaic[pseudo];
+    createMosaic(container, players){
+        this.mosaic = new Mosaic(container);
+        let channels = [];
+        let onlinePlayers = this.getOnlinePlayers();
+        for(let index = 0; index < onlinePlayers.length; index++){
+            if(onlinePlayers[index] != sessionStorage.pseudo){
+                channels.push(onlinePlayers[index]);
+            }
+        }
+        this.mosaic.initMosaic(channels);
     }
 
-    attachProductionToMosaicChannel(pseudo, container, panning, zoomIndicator){
-        this.mosaic[pseudo] = new Production(container, panning, zoomIndicator);
+    getMosaicProduction(pseudo){
+        return this.mosaic.getMosaicChannels()[pseudo];
+    }
+
+    getMosaic(){
+        return this.mosaic;
     }
 
     getNextPlayer(){
@@ -245,21 +265,6 @@ class GameState {
         this.state = state;
     }
 
-    saveMosaicProductions(){
-        let productions = {};
-        for(let pseudo in this.mosaic){
-            productions[pseudo] = this.mosaic[pseudo].saveProduction();
-        }
-        return productions;
-    }
-
-    restoreMosaicProductions(productions){
-        for(let pseudo in this.mosaic){
-            this.mosaic[pseudo].restoreProduction(productions[pseudo]);
-            this.mosaic[pseudo].centerSVGToDefaultPosition();
-        }
-    }
-
     playerExists(pseudo){
         for(let index = 0; index < this.players.length; index++){
             if(pseudo == this.players[index]['pseudo']){
@@ -269,7 +274,7 @@ class GameState {
         return false;
     }
 
-    restorePlayersList(players){
+    setPlayersList(players){
         for(let index = 0; index < players.length; index++){
             if(!this.playerExists(players[index]['pseudo'])){
                 this.players.push(players[index]);
@@ -277,30 +282,125 @@ class GameState {
         }
     }
 
+    /**
+     * Used to save the data about the casted production until the player has
+     * accepted the cast or not
+     * @param {Object} data : {'pseudo': owner of the casted production,
+     *                         'question': question of the production's owner,
+     *                         'production': production data,
+     *                         'legend': production's legend}
+     */
+    setCastedProductionData(data){
+        this.castedProductionData = data;
+    }
+
+    /**
+     * Used to display the casted production of the player has accepted the cast
+     * @return {Object} : {'pseudo': owner of the casted production,
+     *                     'question': question of the production's owner,
+     *                     'production': production data,
+     *                     'legend': production's legend}
+     */
+    getCastedProductionData(){
+        return this.castedProductionData;
+    }
+
+// -----------------------------------------------------------------------------
+// Functions used to saved and restored the game's state
+// /!\ We used "try ... catch" in these functions to prevent error with the
+// functions "JSON.stringify" and "JSON.parse".
+// -----------------------------------------------------------------------------
+
+    /**
+     * Saves the last version of the player's production (production + legend)
+     * - if player is working on his production, the last version is the current
+     *   state of the production on which he works
+     * - if player is consulting an other production, the last version is the one
+     *   stored in 'playersProduction' dictionnary
+     */
     saveProduction(){
-        let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
-        if(currentProductionOwner === sessionStorage.pseudo){
-            sessionStorage.productionData = JSON.stringify(this.production.saveProduction());
-            sessionStorage.legendData = JSON.stringify(Legend.saveLegend());
-        }else{
-            sessionStorage.productionData = JSON.stringify(this.getPlayersProduction()[sessionStorage.pseudo]['production']);
-            sessionStorage.legendData = JSON.stringify(this.getPlayersProduction()[sessionStorage.pseudo]['legend']);
+        try{
+            let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
+            if(currentProductionOwner === sessionStorage.pseudo){
+                sessionStorage.productionData = JSON.stringify(this.getProduction().saveProduction());
+                sessionStorage.legendData = JSON.stringify(this.getProduction().saveLegend());
+            }else{
+                sessionStorage.productionData = JSON.stringify(this.getPlayersProduction()[sessionStorage.pseudo]['production']);
+                sessionStorage.legendData = JSON.stringify(this.getPlayersProduction()[sessionStorage.pseudo]['legend']);
+            }
+        }catch(err){
+            console.log(err);
         }
     }
 
     restoreProduction(){
-        this.production.restoreProduction(JSON.parse(sessionStorage.productionData));
-        Legend.restoreLegend(JSON.parse(sessionStorage.legendData));
+        try{
+            this.getProduction().restoreProduction(JSON.parse(sessionStorage.productionData));
+            this.getProduction().restoreLegend(JSON.parse(sessionStorage.legendData));
+        }catch(err){
+            console.log(err);
+        }
         delete sessionStorage.productionData;
         delete sessionStorage.legendData;
     }
 
+    savePlayersList(){
+        try{
+            sessionStorage.players = JSON.stringify(this.players);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    restorePlayersList(){
+        try{
+            this.setPlayersList(JSON.parse(sessionStorage.players));
+        }catch(err){
+            console.log(err);
+        }
+        delete sessionStorage.players;
+    }
+
+    savePlayersProductionList(){
+        try{
+            sessionStorage.playersProduction = JSON.stringify(this.playersProduction);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    restorePlayersProductionList(){
+        try{
+            this.playersProduction = JSON.parse(sessionStorage.playersProduction);
+        }catch(err){
+            console.log(err);
+        }
+        delete sessionStorage.playersProduction;
+    }
+
+    saveState(){
+        try{
+            sessionStorage.state = JSON.stringify(this.state);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    restoreState(){
+        try{
+            this.state = JSON.parse(sessionStorage.state);
+        }catch(err){
+            console.log(err);
+        }
+        delete sessionStorage.state;
+    }
+
     saveGameState(){
         sessionStorage.animator = this.animator;
-        sessionStorage.players = JSON.stringify(this.players);
-        sessionStorage.playersProduction = JSON.stringify(this.playersProduction);
-        this.saveProduction();
-        sessionStorage.state = JSON.stringify(this.state);
+        this.savePlayersList();
+        if(sessionStorage.pseudo != this.getAnimator()) this.saveProduction();
+        this.savePlayersProductionList();
+        this.saveState();
         sessionStorage.useTimer = this.useTimer;
         sessionStorage.globalTimerValue = this.globalTimerValue;
         sessionStorage.indivTimerValue = this.indivTimerValue;
@@ -314,17 +414,16 @@ class GameState {
 
     restoreGameState(){
         this.animator = sessionStorage.animator === "" ? null : sessionStorage.animator;
-        this.restorePlayersList(JSON.parse(sessionStorage.players));
+        this.restorePlayersList();
         createPlayersProductionList(this.getPlayersPseudo());
-        this.playersProduction = JSON.parse(sessionStorage.playersProduction);
         actualizeChatPlayersList(this.getOnlinePlayers());
-        this.restoreProduction();
         if(sessionStorage.role === 'animator'){
-            clearMosaic();
-            createMosaic(this.getOnlinePlayers());
-            refreshMosaic();
+            this.createMosaic($('.SWA_Master'), this.getOnlinePlayers());
+        }else{
+            this.restoreProduction();
         }
-        this.state = JSON.parse(sessionStorage.state);
+        this.restorePlayersProductionList();
+        this.restoreState();
         this.useTimer = (sessionStorage.useTimer === 'true');
         this.globalTimerValue = parseInt(sessionStorage.globalTimerValue);
         this.indivTimerValue = parseInt(sessionStorage.indivTimerValue);
@@ -341,6 +440,7 @@ class GameState {
             deactivateNextPlayerButton();
         }else if(sessionStorage.isDiceDisplayed === 'true'){
             showDice();
+            this.startDiceDelay(delayToRollTheDie, rollTheDice);
         }
         if(this.getCurrentPlayer() === sessionStorage.pseudo){
             individualTimerColor('#1F5473', '#0AA6E1');
@@ -350,9 +450,6 @@ class GameState {
         actualizePlayersProductionList();
 
         delete sessionStorage.animator;
-        delete sessionStorage.players;
-        delete sessionStorage.playersProduction;
-        delete sessionStorage.state;
         delete sessionStorage.useTimer;
         delete sessionStorage.globalTimerValue;
         delete sessionStorage.indivTimerValue;

@@ -34,13 +34,24 @@ exports.UT_CONNECT = "status";
 
 exports.PARTY_TABLE = "Party";
 exports.PT_KEY_ID = "id";
-exports.PT_KEY_SERVER = "server";
+exports.PT_KEY_NAME = "name";
 exports.PT_KEY_ANIMATOR = "animator";
 exports.PT_KEY_DATE = "gameDate";
 
 exports.HAS_PLAYED_IN_TABLE = "HasPlayedIn";
 exports.HPT_KEY_PSEUDO = "pseudo";
 exports.HPT_KEY_PARTY = "idParty";
+exports.HPT_KEY_PRODUCTION = "idProd";
 exports.HPT_KEY_QUESTION = "question";
-exports.HPT_KEY_PRODUCTION = "production";
-exports.HPT_KEY_LEGEND = "legend";
+
+exports.PRODUCTION_TABLE = "Production";
+exports.PRODT_KEY_ID = "id";
+exports.PRODT_KEY_PRODUCTION = "production";
+exports.PRODT_KEY_LEGEND = "legend";
+
+exports.ARCHIVE_TABLE = "IsArchived";
+exports.AT_KEY_ID = "id";
+exports.AT_KEY_PARTY = "idParty";
+exports.AT_KEY_DATE = "date",
+exports.AT_KEY_PRODUCTION = "idProd";
+exports.AT_KEY_PSEUDO = "pseudo";

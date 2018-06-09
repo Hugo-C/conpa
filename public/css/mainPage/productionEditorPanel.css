@@ -1,0 +1,27 @@
+.productionEditor {
+  display: none;
+}
+
+.productionEditor .body button {
+  border: none;
+  background-color: Transparent;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.productionEditor .body button:focus {
+  outline: 0;
+}
+
+.productionEditor > .body {
+  display: flex;
+  padding: 0;
+}
+
+.SWA_Menu {
+  width: 5%;
+}
+
+.SWA_Production {
+  width: 95%;
+}

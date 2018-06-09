@@ -1,11 +1,9 @@
 html, body {
   height: 100%;
-  width: 100%;
-  overflow: hidden;
 }
 body {
-  overflow: auto;
-  min-height: 16cm;
+  min-height: 12cm;
+  min-width: 22cm;
 }
 
 header {

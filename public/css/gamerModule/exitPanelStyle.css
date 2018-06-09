@@ -23,7 +23,7 @@ div#exitPanel .gamePanelBottom button {
   height: 40%;
 }
 
-.playerDisplayer {
+div#exitPanel .playerDisplayer {
   margin-left: 20px;
 }
 

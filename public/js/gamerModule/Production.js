@@ -14,10 +14,10 @@ const colors = {'red': '#ED1723', 'green': '#0FB32D', 'yellow': '#FFEE24', 'blue
 
 class Production {
 
-    constructor(parent, panning, zoomIndicator){
+    constructor(parent, panning){
         this.parent = parent;
-        this.zoomIndicator = zoomIndicator;
-        this.draw = SVG(parent).size('100%', '100%').panZoom({
+        this.zoomIndicator = parent.find('.SWA_ZoomIndicator');
+        this.draw = SVG(parent.find('.SWA_SVGContainer')[0]).size('100%', '100%').panZoom({
             doPanning: panning,
             zoomFactor: 0.25,
             zoomMin: 0.25,
@@ -27,26 +27,38 @@ class Production {
 
         this.pt = this.draw['node'].createSVGPoint();
 
-        this.myElements = []; // list all elements in the svg
+        this.myRectangles = []; // list all rectangles in the svg
         this.myLinks = []; // list all links in the svg
 
         this.selectedColor = colors['red'];
 
         // Rectangle manipulation variables
-        this.rectCreate = false;
-        this.creatingRect = null;
+        this.creatingRect = false;
+        this.rectCreate = null;
         this.resizingRect = false;
-        this.lastSelectedItem = null;
-        this.selectedItem = null;
+        this.lastselectedRect = null;
+        this.selectedRect = null;
         this.selectedLink = null;
         this.move = false;
         this.dx = null;
         this.dy = null;
 
         // Contextual menu variables
-        this.menu = $('#linkContextMenu');
+        this.menu = parent.find('.SWA_ContextualMenu');
         this.menuState = 0;
-        this.active = "contextMenu--active";
+        this.active = "SWA_ContextualMenu--active";
+
+        // used to know if the casted production has change
+        // if it has not changed, we don't need to clear and restore the production
+        this.hasBeenUpdate = false;
+        // used to know if the animator has moved in the casted production
+        this.castedProductionData = null;
+
+        if(parent.find('.SWA_Overlay').length > 0){
+            this.legend = new Legend(parent);
+        }else{
+            this.legend = null;
+        }
 
         var self = this;
 
@@ -59,9 +71,9 @@ class Production {
 
         this.getElementAtCoordinates = function(x, y){
             let res = null;
-            for(let index in self.myElements){
-                if(self.myElements[index].isInside(x, y)){
-                    res = self.myElements[index];
+            for(let index in self.myRectangles){
+                if(self.myRectangles[index].isInside(x, y)){
+                    res = self.myRectangles[index];
                 }
             }
             return res;
@@ -85,7 +97,7 @@ class Production {
         this.clickInsideElement = function(e) {
             let el = e.srcElement || e.target;
 
-            if ($(self.parent)[0].contains(el)){
+            if (self.parent[0].contains(el)){
                 return el;
             }else{
                 return false;
@@ -104,16 +116,16 @@ class Production {
                 self.menuState = 0;
                 self.menu.removeClass(self.active);
             }
-            $('.colorTool').css('display', 'none');
-            $('.mainTool').css('display', 'block');
+            parent.find('.SWA_CtxtMenuColorTool').css('display', 'none');
+            parent.find('.SWA_CtxtMenuMainTool').css('display', 'block');
         };
 
         this.positionMenu = function(e) {
             let menuWidth = self.menu.get(0).offsetWidth + 4;
             let menuHeight = self.menu.get(0).offsetHeight + 4;
 
-            let productionWidth = $(self.parent).get(0).offsetWidth;
-            let productionHeight = $(self.parent).get(0).offsetHeight;
+            let productionWidth = self.parent.get(0).offsetWidth;
+            let productionHeight = self.parent.get(0).offsetHeight;
 
             let menuPositionX = e.clientX;
             let menuPositionY = e.clientY;
@@ -140,19 +152,16 @@ class Production {
 
         this.onMouseDown = function(evt){
             let coord = self.cursorPoint(evt);
-            if($('#bouton').is(":focus")) {
-                self.rectCreate = true;
+            if(parent.find('button[name="createRect"]').is(":focus")) {
+                self.creatingRect = true;
                 doPanning = false;
-                let panningButton = $("#moveElement");  // to visualy indicate the panning state we change the button
-                panningButton.removeClass("selected");  // TODO make it consistent with gameManager.js
-                panningButton.css('background-image', 'url("/img/gamerModule/move.png")');
-                self.creatingRect = new Rectangle(coord.x, coord.y, 1, 1, self.selectedColor, self);
-            }else if($('#moveElement').hasClass('selected')){
-                if(self.selectedItem != null){
+                self.rectCreate = new Rectangle(coord.x, coord.y, 1, 1, self.selectedColor, self);
+            }else if(parent.find('button[name="moveElement"]').hasClass('selected')){
+                if(self.selectedRect != null){
                     self.move = true;
                     doPanning = false;  // temporally disable the panning until the element is moved
-                    self.dx = coord.x - self.selectedItem.getX();
-                    self.dy = coord.y - self.selectedItem.getY();
+                    self.dx = coord.x - self.selectedRect.getX();
+                    self.dy = coord.y - self.selectedRect.getY();
                 }
             }else if(document.body.style.cursor === 'se-resize'){
                 self.resizingRect = true;
@@ -161,26 +170,26 @@ class Production {
 
         this.onMouseMove = function(evt){
             let coord = self.cursorPoint(evt);
-            if(self.rectCreate && self.creatingRect != null){
-                let rectX = self.creatingRect.getX();
-                let rectY = self.creatingRect.getY();
+            if(self.creatingRect && self.rectCreate != null){
+                let rectX = self.rectCreate.getX();
+                let rectY = self.rectCreate.getY();
                 if(coord.x >= rectX && coord.y >= rectY){
-                    self.creatingRect.setWidth(coord.x - rectX);
-                    self.creatingRect.setHeight(coord.y - rectY);
+                    self.rectCreate.setWidth(coord.x - rectX);
+                    self.rectCreate.setHeight(coord.y - rectY);
                 }
             }else if(self.move){
-                self.selectedItem.setX(coord.x - self.dx);
-                self.selectedItem.setY(coord.y - self.dy);
+                self.selectedRect.setX(coord.x - self.dx);
+                self.selectedRect.setY(coord.y - self.dy);
             }else if (self.resizingRect){
-                let rectX = self.selectedItem.getX();
-                let rectY = self.selectedItem.getY();
+                let rectX = self.selectedRect.getX();
+                let rectY = self.selectedRect.getY();
                 if(coord.x >= rectX && coord.y >= rectY){
-                    self.selectedItem.setWidth(coord.x - rectX);  // Demander s'il faut ajouter une limite ? Si oui, laquelle ?
-                    self.selectedItem.setHeight(coord.y - rectY);  //probleme adaptation du texte && curseur ne veut pas changer sur texte
+                    self.selectedRect.setWidth(coord.x - rectX);  // Demander s'il faut ajouter une limite ? Si oui, laquelle ?
+                    self.selectedRect.setHeight(coord.y - rectY);  //probleme adaptation du texte && curseur ne veut pas changer sur texte
                 }
             }
-            else if(self.selectedItem != null){
-                if (self.selectedItem.isAroundBottomRightCorner(coord.x, coord.y) && !($('#moveElement').hasClass('selected'))){
+            else if(self.selectedRect != null){
+                if (self.selectedRect.isAroundBottomRightCorner(coord.x, coord.y) && !(parent.find('button[name="moveElement"]').hasClass('selected'))){
                     document.body.style.cursor = 'se-resize';
                 }
                 else{
@@ -190,10 +199,11 @@ class Production {
         };
 
         this.onMouseUp = function(){
-            if(self.rectCreate && self.creatingRect != null){
-                self.creatingRect.addTextArea();
-                self.rectCreate = false;
-                self.creatingRect = null;
+            if(self.creatingRect && self.rectCreate != null){
+                self.rectCreate.addTextArea();
+                self.creatingRect = false;
+                self.rectCreate = null;
+                self.hasBeenUpdate = true;
             } else if(self.move){
                 self.move = false;
                 doPanning = true;  // the panning is reestablished
@@ -210,20 +220,23 @@ class Production {
             let item = self.getElementAtCoordinates(coord.x, coord.y);
 
             if(item != null){
-                self.lastSelectedItem = self.selectedItem;
-                if (self.lastSelectedItem != null && self.lastSelectedItem !== item){
-                    self.lastSelectedItem.unselect(); // hide the selection border to don't have two rectangle with it
+                self.lastselectedRect = self.selectedRect;
+                if (self.lastselectedRect != null && self.lastselectedRect !== item){
+                    self.lastselectedRect.unselect(); // hide the selection border to don't have two rectangle with it
+                    self.hasBeenUpdate = true;
                 }
-                self.selectedItem = item;
-                self.selectedItem.select(); // display the selection border
-            }else if(self.selectedItem != null){
-                self.lastSelectedItem = self.selectedItem;
-                self.selectedItem.unselect();
-                self.selectedItem = null;
+                self.selectedRect = item;
+                self.selectedRect.select(); // display the selection border
+            }else if(self.selectedRect != null){
+                self.lastselectedRect = self.selectedRect;
+                self.selectedRect.unselect();
+                self.selectedRect = null;
+                self.hasBeenUpdate = true;
             }
 
-            if(self.lastSelectedItem != null && self.selectedItem != null){
-                self.selectedItem.linkRect(self.lastSelectedItem);
+            if(self.lastselectedRect != null && self.selectedRect != null){
+                self.selectedRect.linkRect(self.lastselectedRect);
+                self.hasBeenUpdate = true;
             }
 
             if(self.selectedLink != null){
@@ -233,9 +246,9 @@ class Production {
 
         this.onKeydown = function(event){
             if(event.keyCode === 46){
-                if(self.selectedItem !== null){
-                    self.selectedItem.myRemove();
-                    self.selectedItem = null;
+                if(self.selectedRect !== null){
+                    self.selectedRect.myRemove();
+                    self.selectedRect = null;
                 }else if(self.selectedLink !== null){
                     self.selectedLink.myRemove();
                     self.selectedLink = null;
@@ -248,8 +261,8 @@ class Production {
         // ---------------------------------------------------------------------
 
         this.resizeSVG = function(){
-            let dimHeight = $(self.parent).height();
-            let dimWidth = $(self.parent).width();
+            let dimHeight = self.parent.height();
+            let dimWidth = self.parent.width();
             self.draw.attr({'height': dimHeight, 'width': dimWidth});
         }
 
@@ -298,15 +311,198 @@ class Production {
         document.addEventListener('click', this.documentClick);
     }
 
-    resizeSVG(){
+    selectTools(tools){
+        this.parent.find('.SWA_Tools button').css('display', 'none');
+        for(let index = 0; index < tools.length; index++){
+            this.parent.find('button[name="' + tools[index] + '"]').css('display', 'block');
+        }
+    }
+
+    initToolsListeners(){
+        let parent = this.parent;
+        let self = this;
+
+        parent.find('button[name="color"]').bind("click", function(){
+            parent.find('.SWA_Tools').css('display', 'none');
+            parent.find('.SWA_Colors').css('display', 'block');
+        });
+
+        parent.find('.SWA_Colors button').bind("click", function(){
+            let selectedColor = $(this).val();
+            parent.find('.SWA_Colors').css('display', 'none');
+            parent.find('.SWA_Tools').css('display', 'block');
+            parent.find('button[name="color"]').val(selectedColor);
+            parent.find('button[name="createRect"]').val(selectedColor);
+            self.setSelectedColor(selectedColor);
+        });
+
+        parent.find('button[name="moveElement"]').bind('click', function(){
+            let moveImage = "/img/gamerModule/move.png";
+            let movingImage = "/img/gamerModule/moving.png";
+            if($(this).hasClass("selected")){
+                $(this).removeClass("selected");
+                $(this).css('background-image', 'url(' + moveImage + ')');
+                Production.updatePanningState(false);
+            }else{
+                $(this).addClass("selected");
+                $(this).css('background-image', 'url(' + movingImage + ')');
+                Production.updatePanningState(true);
+            }
+        });
+
+        parent.find('button[name="legend"]').bind('click', function(){
+            if($(this).val() === 'visible'){
+                self.forceHideLegend();
+                $(this).val('hide');
+            }else{
+                self.forceShowLegend();
+                $(this).val('visible');
+            }
+        });
+
+        parent.find('button[name="centerSVG"]').bind('click', function(){
+            self.centerSVGToDefaultPosition();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="removeLink"]').bind('click', function(){
+            self.removeSelectedLink();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="dashLink"]').bind('click', function(){
+            self.setSelectedLinkDasharray(10.10);
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="linearLink"]').bind('click', function(){
+            self.setSelectedLinkDasharray(0);
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="increaseWidth"]').bind('click', function(){
+            self.increaseSelectedLinkWidth();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="decreaseWidth"]').bind('click', function(){
+            self.decreaseSelectedLinkWidth();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="navigability"]').bind('click', function(){
+            self.addNavigabilityToSelectedLink();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="reverseNavigability"]').bind('click', function(){
+            self.reverseSelectedLinkNavigability();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="removeNavigability"]').bind('click', function(){
+            self.removeSelectedLinkNavigability();
+        });
+
+        parent.find('.SWA_ContextualMenu button[name="linkColor"]').bind('click', function(){
+            parent.find('.SWA_CtxtMenuMainTool').css('display', 'none');
+            parent.find('.SWA_CtxtMenuColorTool').css('display', 'block');
+        });
+
+        parent.find('.contextMenu button.colorTool').bind('click', function(){
+            self.setSelectedLinkColor($(this).val());
+            parent.find('.SWA_CtxtMenuMainTool').css('display', 'block');
+            parent.find('.SWA_CtxtMenuColorTool').css('display', 'none');
+        });
+    }
+
+    disposeToolsListeners(){
+        this.parent.find('.SWA_Tools button').unbind('click');
+        this.parent.find('.SWA_Colors button').unbind('click');
+        this.parent.find('.SWA_ContextualMenu button').unbind('click');
+    }
+
+    dispose(){
+        this.disposeToolsListeners();
+        this.clearSVG();
+        this.clearLegend();
+        this.parent.find('.SWA_SVGContainer > svg').remove();
+    }
+
+    refreshLegend(){
+        if(this.legend != null){
+            this.legend.refresh(this.myRectangles, this.myLinks);
+        }
+    }
+
+    clearLegend(){
+        if(this.legend != null){
+            this.legend.clear();
+        }
+    }
+
+    forceHideLegend(){
+        if(this.legend != null){
+            this.legend.forceHide();
+        }
+    }
+
+    forceShowLegend(){
+        if(this.legend != null){
+            this.legend.forceShow();
+        }
+    }
+
+    hideLegend(){
+        if(this.legend != null){
+            this.legend.hide();
+        }
+    }
+
+    showLegend(){
+        if(this.legend != null){
+            this.legend.show();
+        }
+    }
+
+    restoreLegend(legendData){
+        if(this.legend != null){
+            this.legend.restoreLegend(legendData);
+        }
+    }
+
+    saveLegend(){
+        if(this.legend != null){
+            return this.legend.saveLegend();
+        }else{
+            return {'rectangles': [], 'links': []};
+        }
+    }
+
+    /**
+     * Selects the rectangle which contains the point (x, y)
+     * @param {Float} x : x coordinate of the point
+     * @param {Float} y : y coordinate of the point
+     */
+    selectRectangle(x, y){
+        for(let index = 0; index < this.myRectangles.length; index++){
+            if(this.myRectangles[index].isInside(x, y)){
+                this.selectedRect = this.myRectangles[index];
+                this.selectedRect.select();
+                break;
+            }
+        }
+    }
+
+    /**
+     * Resize the SVG to fit the container
+     */
+    resizeProductionArea(){
         this.resizeSVG();
     }
 
+    /**
+     * Changes the color of the selected rectangle
+     * @param {String} color : color's code ( ex : 'black', '#ffff' )
+     */
     setSelectedColor(color){
         this.selectedColor = colors[color];
-        if(this.selectedItem != null){
-            this.selectedItem.setFillColor(colors[color]);
+        if(this.selectedRect != null){
+            this.selectedRect.setFillColor(colors[color]);
         }
+        this.hasBeenUpdate = true;
     }
 
     static updatePanningState(pann){
@@ -318,12 +514,18 @@ class Production {
             this.selectedLink.myRemove();
             this.selectedLink = null;
         }
+        this.hasBeenUpdate = true;
     }
 
+    /**
+     * Updates the selected link's dasharray value
+     * @param {Float} value : dasharray value
+     */
     setSelectedLinkDasharray(value){
         if(this.selectedLink != null){
             this.selectedLink.setDasharray(value);
         }
+        this.hasBeenUpdate = true;
     }
 
     increaseSelectedLinkWidth(){
@@ -334,6 +536,7 @@ class Production {
                 this.selectedLink.setWidth(strokeWidth);
             }
         }
+        this.hasBeenUpdate = true;
     }
 
     decreaseSelectedLinkWidth(){
@@ -344,12 +547,14 @@ class Production {
                 this.selectedLink.setWidth(strokeWidth);
             }
         }
+        this.hasBeenUpdate = true;
     }
 
     addNavigabilityToSelectedLink(){
         if(this.selectedLink != null){
             this.selectedLink.addNavigability();
         }
+        this.hasBeenUpdate = true;
     }
 
     reverseSelectedLinkNavigability(){
@@ -357,32 +562,94 @@ class Production {
             this.selectedLink.reverseNavigability();
             this.selectedLink.addNavigability();
         }
+        this.hasBeenUpdate = true;
     }
 
     removeSelectedLinkNavigability(){
         if(this.selectedLink != null){
             this.selectedLink.removeNavigability();
         }
+        this.hasBeenUpdate = true;
     }
 
     setSelectedLinkColor(color){
-        $('.mainTool').css('display', 'none');
-        $('.colorTool').css('display', 'block');
+        $('.SWA_CtxtMenuMainTool').css('display', 'none');
+        $('.SWA_CtxtMenuColorTool').css('display', 'block');
         if(this.selectedLink != null){
             this.selectedLink.setColor(colors[color]);
         }
+        this.hasBeenUpdate = true;
     }
 
     productionPrivate(){
-        this.parent.style.backgroundImage = 'url("/img/gamerModule/privateContent.png")';
+        this.parent.find('.SWA_SVGContainer').css('background-image', 'url("/img/gamerModule/privateContent.png")');
+        $('#wizz').css('display', 'block');
     }
 
     isPrivate(){
-        return this.parent.style.backgroundImage == 'url("/img/gamerModule/privateContent.png")';
+        return this.parent.find('.SWA_SVGContainer').css('background-image') == 'url("/img/gamerModule/privateContent.png")';
     }
 
     productionPublic(){
-        this.parent.style.backgroundImage = '';
+        this.parent.find('.SWA_SVGContainer').css('background-image', '');
+        $('#wizz').css('display', 'none');
+    }
+
+    /**
+     * checks ( with received data ) if the casted production has changed
+     * This function is used to avoid to refresh a no change production
+     */
+    castedProductionHasChange(data){
+        if(this.castedProductionData == null){
+            return true;
+        }
+        for(let key in data){
+            if(key !== 'production' && data[key] !== this.castedProductionData[key]){
+                return true;
+            }
+        }
+        return data['hasBeenUpdate'];
+    }
+
+    /**
+     * Applies changes on the casted production to make them visible on
+     * the player side
+     * @param {Object} data : data required to display the casted production on
+     *                        the player side
+     */
+    updateCastedProduction(data){
+        if(this.castedProductionHasChange(data)){
+            this.clearSVG();
+            this.draw.viewbox({x: data['x'], y: data['y'], height: data['height'], width: data['width']});
+            this.draw.zoom(data['zoom']);
+            this.restoreProduction(data['production']);
+        }
+        if(data['selectX'] != null && data['selectY'] != null){
+            this.selectRectangle(data['selectX'], data['selectY']);
+        }else if(this.selectedRect != null){
+            this.selectedRect.unselect();
+            this.selectedRect = null;
+        }
+        this.castedProductionData = data;
+    }
+
+    /**
+     * @return {Object} : data required to display the production on the player
+     *                    side
+     */
+    getDataToCastProduction(){
+        let box = this.draw.viewbox();
+        let zoom = this.draw.zoom();
+        let data = {'zoom': zoom, 'x': box.x, 'y': box.y,
+                    'height': box.height, 'width': box.width,
+                    'hasBeenUpdate': this.hasBeenUpdate,
+                    'production': this.saveProduction()};
+        if(this.selectedRect != null){
+            data['selectX'] = this.selectedRect.center().x;
+            data['selectY'] = this.selectedRect.center().y;
+        }
+        this.hasBeenUpdate = false;
+        return data;
     }
 
     // -------------------------------------------------------------------------
@@ -540,15 +807,15 @@ class Production {
     saveProduction(){
         let index;
         let production = {'rectangles': [], 'links': []};
-        for(let index in this.myElements){
+        for(let index in this.myRectangles){
             let data = {};
-            data['id'] = this.myElements[index].getId();
-            data['x'] = this.myElements[index].getX();
-            data['y'] = this.myElements[index].getY();
-            data['width'] = this.myElements[index].getWidth();
-            data['height'] = this.myElements[index].getHeight();
-            data['fill'] = this.myElements[index].getFillColor();
-            data['text'] = $(this.myElements[index].text).children().val();
+            data['id'] = this.myRectangles[index].getId();
+            data['x'] = this.myRectangles[index].getX();
+            data['y'] = this.myRectangles[index].getY();
+            data['width'] = this.myRectangles[index].getWidth();
+            data['height'] = this.myRectangles[index].getHeight();
+            data['fill'] = this.myRectangles[index].getFillColor();
+            data['text'] = $(this.myRectangles[index].text).children().val();
             production['rectangles'].push(data);
         }
 
@@ -577,7 +844,7 @@ class Production {
                                     rectangles[index]['fill'],
                                     this);
             rect.addTextArea();
-            $(this.myElements[index].text).children().val(rectangles[index]['text']);
+            $(this.myRectangles[index].text).children().val(rectangles[index]['text']);
             buffer[rectangles[index]['id']] = rect;
         }
 
@@ -609,7 +876,7 @@ class Production {
     }
 
     /**
-     * Cut a text in several lines that do not exceed a certain size
+     * Cut a text in several lines that do not exceed a given size
      * Add a '\n' character between each line of the cut text
      * @param {String} text : text to cut
      * @param {Number} maxWidth : max size of a line
@@ -782,6 +1049,10 @@ class Production {
     // ------------------------ Utils functions --------------------------------
     // -------------------------------------------------------------------------
 
+    /**
+     * This function is used to move the viewbox somewhere where player has
+     * working.
+     */
     centerSVGToDefaultPosition(){
         let clientWidth = this.draw['node'].clientWidth;
         let clientHeight = this.draw['node'].clientHeight;
@@ -791,14 +1062,26 @@ class Production {
         if(this.zoomIndicator != null) this.zoomIndicator.text('Zoom x1.00');
     }
 
+    /**
+     * clears the SVG and resets all working variables
+     */
     clearSVG(){
-        this.myElements = [];
+        this.myRectangles = [];
         this.myLinks = [];
+        if(this.selectedRect != null){
+            this.selectedRect = null;
+        }
+        if(this.selectedLink != null){
+            this.selectedLink = null;
+        }
+        this.creatingRect = false;
+        this.resizingRect = false;
+        this.move = false;
         this.master['node'].innerHTML = "";
     }
 
     isEmpty(){
-        if(this.myLinks.length == 0 && this.myElements.length == 0){
+        if(this.myLinks.length == 0 && this.myRectangles.length == 0){
             return true;
         }else{
             return false;

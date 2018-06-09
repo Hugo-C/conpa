@@ -12,3 +12,13 @@ div#selectCardPanel .gamePanelBody {
 div#selectCardPanel .gamePanelBody > div {
   height: 100%;
 }
+
+.familyDisplayer {
+  height: 90%;
+}
+.familyDisplayer > :first-child {
+  height: 70%;
+}
+.familyDisplayer > :last-child {
+  height: 25%;
+}

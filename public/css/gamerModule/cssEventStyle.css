@@ -22,10 +22,6 @@ button#sendButton:hover {
   background-color: green;
 }
 
-button#sendButton:active {
-  background-color: lightgreen;
-}
-
 button#skipButton:hover {
   background-image: url("/img/gamerModule/skipButtonOnHover.svg");
 }

@@ -13,4 +13,6 @@ $.i18n().load( {
     $('#gameTab').i18n();
     // Historic tab texts
     $('#historicTab').i18n();
+    // Account tab texts
+    $('#accountTab').i18n();
 });

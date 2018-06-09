@@ -50,19 +50,35 @@ CREATE TABLE IF NOT EXISTS Users(
 
 CREATE TABLE IF NOT EXISTS Party(
   id INT UNSIGNED AUTO_INCREMENT,
-  server VARCHAR(30),
-  animator VARCHAR(30),
+  name VARCHAR(30),
+  animator VARCHAR(20),
   gameDate DATETIME,
   PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS Production(
+  id INT UNSIGNED AUTO_INCREMENT,
+  production TEXT NOT NULL,
+  legend TEXT NOT NULL,
+  PRIMARY KEY (id));
 
 CREATE TABLE IF NOT EXISTS HasPlayedIn(
   pseudo VARCHAR(20) NOT NULL,
   idParty INT UNSIGNED NOT NULL,
-  question VARCHAR(255),
-  production TEXT,
-  legend TEXT,
-  FOREIGN KEY (pseudo) REFERENCES Users(pseudo),
-  FOREIGN KEY (idParty) REFERENCES Party(id));
+  question TEXT,
+  idProd INT UNSIGNED,
+  FOREIGN KEY (pseudo) REFERENCES Users(pseudo) ON DELETE CASCADE,
+  FOREIGN KEY (idParty) REFERENCES Party(id) ON DELETE CASCADE,
+  FOREIGN KEY (idProd) REFERENCES Production(id) ON DELETE SET NULL);
+
+CREATE TABLE IF NOT EXISTS IsArchived(
+  idParty INT UNSIGNED NOT NULL,
+  idProd INT UNSIGNED NOT NULL,
+  pseudo VARCHAR(20) NOT NULL,
+  date DATETIME NOT NULL,
+  FOREIGN KEY (pseudo) REFERENCES Users(pseudo) ON DELETE CASCADE,
+  FOREIGN KEY (idParty) REFERENCES Party(id) ON DELETE CASCADE,
+  FOREIGN KEY (idProd) REFERENCES Production(id) ON DELETE CASCADE
+  UNIQUE INDEX uniq_archive_at_date (date, pseudo));
 
 DELETE TRIGGER IF NOT EXISTS AfterDeleteHistoricEntry;
 

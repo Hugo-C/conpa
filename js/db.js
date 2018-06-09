@@ -26,10 +26,10 @@ const TOKEN_SALT = "conpa174567";
  */
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
-        host: '78.240.16.90',
-        user: 'julien',
-        port: '50000',
-        password: 'StimpflingMysql73100',
+        host: '',
+        user: '',
+        port: '',
+        password: '',
         database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
     });
     state.mode = mode;
@@ -663,17 +663,17 @@ exports.disconnectUser = function(pseudo, callback){
 /**
  * Record a new party in the historic of parties
  *
- * @param {string} server : server's party name
+ * @param {string} name : party's name
  * @param {string} animator : name of the party's animator
  * (contains the string "no animator" if there has not had an animator in this party)
  * @param {Date} date : date at which the party has been played
  * @param {callback} callback : function used to return the id of the party
  */
-exports.recordNewParty = function(server, animator, date, callback){
+exports.recordNewParty = function(name, animator, date, callback){
     let sql = 'INSERT INTO ' + keys.PARTY_TABLE +
-              ' (' + keys.PT_KEY_SERVER + ', ' + keys.PT_KEY_ANIMATOR + ', ' + keys.PT_KEY_DATE + ')' +
+              ' (' + keys.PT_KEY_NAME + ', ' + keys.PT_KEY_ANIMATOR + ', ' + keys.PT_KEY_DATE + ')' +
               ' VALUES (?, ?, ?);';
-    let values = [server, animator, date];
+    let values = [name, animator, date];
     state.pool.query(sql, values, function(err, result){
         if(err) callback(err);
         else callback(null, result.insertId);
@@ -699,86 +699,140 @@ exports.linkPlayerAndParty = function(pseudo, party, question, callback){
     });
 };
 
-/**
- * Remove an entry in the table 'hasPlayedIn'
- *
- * @param {string} pseudo : pseudo of the player who wants to remove an entry of his historic
- * @param {string} party : name of the party for which concerned by the process
- * @param {date} date : date at which the party was played
- * @param {callback} callback :  function used to return errors
- */
-exports.removePlayerPartyHistoric = function(pseudo, party, date, callback){
-    let sql = 'SELECT ' + keys.PT_KEY_ID +
-              ' FROM ' + keys.PARTY_TABLE +
-              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
-              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
-    let values = [party, date];
+exports.getProductionIDFromPlayerHistoric = function(pseudo, partyName, partyDate, callback){
+    let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
+              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.PT_KEY_ID + ' = ' + keys.HPT_KEY_PARTY +
+              ' WHERE ' + keys.PT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?' +
+              ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+    let values = [partyName, partyDate, pseudo];
     state.pool.query(sql, values, function(err, result){
-        if(err) callback(err);
-        else{
-            if(result.length === 0) callback(err);
-            else{
-                let sql = 'DELETE FROM ' + keys.HAS_PLAYED_IN_TABLE +
-                      ' WHERE ' + keys.HPT_KEY_PARTY + ' = ?' +
-                      ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-                let values = [result[0][keys.PT_KEY_ID], pseudo];
-                state.pool.query(sql, values, function(err){
-                    if(err) callback(err);
-                    else callback(null);
-                });
-            }
+        if(err){
+            callback(err);
+        }else{
+            logger.debug(result);
+            callback(null, result.length > 0 ? result[0][keys.HPT_KEY_PRODUCTION] : null);
         }
     });
 };
 
 /**
+ * Remove a player production
+ *
+ * @param {string} prodID : the id of production to remove
+ * @param {callback} callback :  function used to return errors
+ */
+exports.removeProduction = function(prodID, callback){
+    let sql = 'DELETE FROM ' + keys.PRODUCTION_TABLE +
+              ' WHERE ' + keys.PRODT_KEY_ID + ' = ?;';
+    let value = [prodID];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            logger.debug(result);
+            callback(null);
+        }
+    });
+};
+
+exports.addNewProduction = function(production, legend, callback){
+    let sql = 'INSERT INTO ' + keys.PRODUCTION_TABLE +
+              ' (' + keys.PRODT_KEY_PRODUCTION + ', ' + keys.PRODT_KEY_LEGEND + ')' +
+              ' VALUE(?, ?);';
+    let values = [production, legend];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            logger.debug(result);
+            callback(null, result.insertId);
+        }
+    });
+};
+
+exports.updateProduction = function(prodID, production, legend, callback){
+    let sql = 'UPDATE ' + keys.PRODUCTION_TABLE +
+              ' SET ' + keys.PRODT_KEY_PRODUCTION + ' = ?' +
+              ', ' + keys.PRODT_KEY_LEGEND + ' = ?' +
+              ' WHERE ' + keys.PRODT_KEY_ID + ' = ?;';
+    let values = [production, legend, prodID];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null);
+        }
+    });
+}
+
+/**
  * Record a player's production in the historic of the party
  *
  * @param {string} pseudo : player's pseudo for which we want recorded the production
- * @param {number} party : party's id in which player has played
+ * @param {number} partyID : party's id in which player has played
  * @param {blob} production : name of the player's production file on the server
  * @param {callback} callback : function used to return errors
  */
-exports.recordPlayerProductionWithPartyId = function(pseudo, party, production, legend, callback){
+exports.recordPlayerProductionWithPartyId = function(pseudo, partyID, prodID, callback){
     let sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
-              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?, ' + keys.HPT_KEY_LEGEND + ' = ?' +
-              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
-              ' AND ' + keys.HPT_KEY_PARTY + ' = ?;';
-    let values = [production, legend, pseudo, party];
+              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?' +
+              ' WHERE ' + keys.HPT_KEY_PARTY + ' = ?' +
+              ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+    let values = [prodID, partyID, pseudo];
     state.pool.query(sql, values, function(err){
         if(err) callback(err);
         else callback(null);
     });
 };
 
-exports.recordPlayerProduction = function(pseudo, serverName, date, production, legend, callback){
-    let sql = 'UPDATE ' + keys.HAS_PLAYED_IN_TABLE +
-              ' INNER JOIN ' + keys.PARTY_TABLE +
-              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
-              ' SET ' + keys.HPT_KEY_PRODUCTION + ' = ?, ' + keys.HPT_KEY_LEGEND + ' = ?' +
-              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
-              ' AND ' + keys.PT_KEY_SERVER + ' = ?' +
-              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
-    let values = [production, legend, pseudo, serverName, date];
-    state.pool.query(sql, values, function(err){
+exports.archivePlayerProduction = function(pseudo, partyID, prodID, callback){
+    let sql = 'INSERT INTO ' + keys.ARCHIVE_TABLE +
+              ' (' + keys.AT_KEY_PARTY + ', ' + keys.AT_KEY_PRODUCTION +
+              ', ' + keys.AT_KEY_DATE + ', ' + keys.AT_KEY_PSEUDO + ')' +
+              ' VALUE(?, ?, NOW(), ?);';
+    let values = [partyID, prodID, pseudo];
+    state.pool.query(sql, values, function(err, result){
         if(err){
             callback(err);
-            logger.error(err);
         }else{
+            logger.debug(result);
             callback(null);
         }
     });
 };
 
+exports.getProductionsFromArchive = function(pseudo, partyName, partyDate, callback){
+    let sql = 'SELECT DATE_FORMAT(' + keys.AT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") AS ' + keys.AT_KEY_DATE +
+              ' FROM ' + keys.ARCHIVE_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + keys.PT_KEY_ID + ' = ' + keys.AT_KEY_PARTY +
+              ' WHERE ' + keys.PT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?' +
+              ' AND ' + keys.AT_KEY_PSEUDO + ' = ?;';
+    let values = [partyName, partyDate, pseudo];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            logger.debug(result);
+            callback(null, result);
+        }
+    });
+};
+
 exports.getHistoricEntries = function(pseudo, callback){
-    let sql = 'SELECT ' + keys.PT_KEY_SERVER +
+    let sql = 'SELECT ' + keys.PT_KEY_NAME +
               ', ' + keys.PT_KEY_ANIMATOR +
               ', DATE_FORMAT(' + keys.PT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") AS ' + keys.PT_KEY_DATE +
               ', ' + keys.HPT_KEY_QUESTION +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
-              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?;';
+              ' WHERE ' + keys.HPT_KEY_PSEUDO + ' = ?' +
+              ' AND ' + keys.HPT_KEY_PRODUCTION + ' IS NOT NULL;';
     let value = [pseudo];
     state.pool.query(sql, value, function(err, result){
         if(err) callback(err);
@@ -791,7 +845,7 @@ exports.getPlayersInParty = function(party, date, callback){
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
               ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
-              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' WHERE ' + keys.PT_KEY_NAME + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?;';
     let values = [party, date];
     state.pool.query(sql, values, function(err, result){
@@ -800,39 +854,186 @@ exports.getPlayersInParty = function(party, date, callback){
     });
 };
 
-exports.getProduction = function(pseudo, party, date, callback){
-    let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION + ', ' + keys.HPT_KEY_LEGEND +
-              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
-              ' INNER JOIN ' + keys.PARTY_TABLE +
-              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
-              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
-              ' AND ' + keys.PT_KEY_DATE + ' = ?' +
-              ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-    let values = [party, date, pseudo];
-    state.pool.query(sql, values, function(err, result){
-        logger.debug(JSON.stringify(result));
-        if(err) callback(err);
-        else callback(null, result[0]);
+exports.getProduction = function(prodID, callback){
+    let sql = 'SELECT ' + keys.PRODT_KEY_PRODUCTION +
+              ', ' + keys.PRODT_KEY_LEGEND +
+              ' FROM ' + keys.PRODUCTION_TABLE +
+              ' WHERE ' + keys.PRODT_KEY_ID + ' = ?;';
+    let value = [prodID];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            if(result.length > 0){
+                callback(null, result[0][keys.PRODT_KEY_PRODUCTION], result[0][keys.PRODT_KEY_LEGEND]);
+            }else{
+                callback(null, null, null);
+            }
+        }
     });
 };
 
-exports.getPlayerPartyDetails = function(pseudo, party, date, callback){
+exports.getProductionIDFromPlayerArchive = function(pseudo, insertDate, callback){
+    let sql = 'SELECT ' + keys.AT_KEY_PRODUCTION +
+              ' FROM ' + keys.ARCHIVE_TABLE +
+              ' WHERE ' + keys.AT_KEY_PSEUDO + ' = ?' +
+              ' AND DATE_FORMAT(' + keys.AT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") = ?;';
+    let values = [pseudo, insertDate];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null, result.length > 0 ? result[0][keys.AT_KEY_PRODUCTION] : null);
+        }
+    });
+}
+
+exports.getPlayerPartyDetails = function(pseudo, partyName, partyDate, callback){
     let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
               ', ' + keys.HPT_KEY_QUESTION +
-              ', ' + keys.HPT_KEY_LEGEND +
               ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
               ' INNER JOIN ' + keys.PARTY_TABLE +
-              ' ON ' + keys.HPT_KEY_PARTY + ' = ' + keys.PT_KEY_ID +
-              ' WHERE ' + keys.PT_KEY_SERVER + ' = ?' +
+              ' ON ' + keys.PT_KEY_ID + ' = ' + keys.HPT_KEY_PARTY +
+              ' WHERE ' + keys.PT_KEY_NAME + ' = ?' +
               ' AND ' + keys.PT_KEY_DATE + ' = ?' +
               ' AND ' + keys.HPT_KEY_PSEUDO + ' = ?;';
-    let values = [party, date, pseudo];
+    let values = [partyName, partyDate, pseudo];
     state.pool.query(sql, values, function(err, result){
-        logger.debug(result);
-        if(err) callback(err);
-        else callback(null, result);
+        if(err){
+            callback(err);
+        }else{
+            logger.debug(result);
+            callback(null, result[0][keys.HPT_KEY_PRODUCTION], result[0][keys.HPT_KEY_QUESTION]);
+        }
     });
 };
+
+exports.getNumberRecordsForGameInHistoric = function(partyID, callback){
+    let sql = 'SELECT COUNT(*) AS COUNTER' +
+              ' FROM ' + keys.HAS_PLAYED_IN_TABLE +
+              ' WHERE ' + keys.HPT_KEY_PARTY + ' = ?;';
+    let value = [partyID];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null, result[0]['COUNTER']);
+        }
+    });
+}
+
+exports.getNumberRecordsForGameInArchive = function(partyID, callback){
+    let sql = 'SELECT COUNT(*) AS COUNTER' +
+              ' FROM ' + keys.ARCHIVE_TABLE +
+              ' WHERE ' + keys.AT_KEY_ID_PARTY + ' = ?;';
+    let value = [partyID];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null, result[0]['COUNTER']);
+        }
+    });
+}
+
+exports.removePartyHistoric = function(name, date, callback){
+    let sql = 'DELETE FROM ' + keys.PARTY_TABLE +
+              ' WHERE  ' + keys.PT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
+    let values = [name, date];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null);
+        }
+    });
+}
+
+exports.getArchiveEntries = function(pseudo, callback){
+    let pt_prefix = keys.PARTY_TABLE + '.';
+    let hpt_prefix = keys.HAS_PLAYED_IN_TABLE + '.';
+    let at_prefix = keys.ARCHIVE_TABLE + '.';
+    let sql = 'SELECT DISTINCT ' + hpt_prefix + keys.HPT_KEY_QUESTION +
+              ', ' + pt_prefix + keys.PT_KEY_NAME +
+              ', ' + pt_prefix + keys.PT_KEY_ANIMATOR +
+              ', DATE_FORMAT(' + pt_prefix + keys.PT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") AS ' + keys.PT_KEY_DATE +
+              ' FROM ' + keys.ARCHIVE_TABLE +
+              ' INNER JOIN ' + keys.HAS_PLAYED_IN_TABLE +
+              ' ON ' + at_prefix + keys.AT_KEY_PARTY + ' = ' + hpt_prefix + keys.HPT_KEY_PARTY +
+              ' AND ' + at_prefix + keys.AT_KEY_PSEUDO + ' = ' + at_prefix + keys.AT_KEY_PSEUDO +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + hpt_prefix + keys.HPT_KEY_PARTY + ' = ' + pt_prefix + keys.PT_KEY_ID +
+              ' WHERE ' + at_prefix + keys.AT_KEY_PSEUDO + ' = ?;';
+    let value = [pseudo];
+    state.pool.query(sql, value, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null, result);
+        }
+    });
+}
+
+exports.removeProductionsInArchive = function(partyName, partyDate, pseudo, callback){
+    let pt_prefix = keys.PARTY_TABLE + '.';
+    let prodt_prefix = keys.PRODUCTION_TABLE + '.';
+    let sql = 'DELETE FROM ' + keys.PRODUCTION_TABLE +
+              ' WHERE ' + prodt_prefix + keys.PRODT_KEY_ID + ' IN' +
+              ' (SELECT ' + keys.AT_KEY_PRODUCTION +
+              ' FROM ' + keys.ARCHIVE_TABLE +
+              ' INNER JOIN ' + keys.PARTY_TABLE +
+              ' ON ' + pt_prefix + keys.PT_KEY_ID + ' = ' + keys.AT_KEY_PARTY +
+              ' WHERE ' + keys.PT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?' +
+              ' AND ' + keys.AT_KEY_PSEUDO + ' = ?);';
+    let values = [partyName, partyDate, pseudo];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null);
+        }
+    });
+}
+
+exports.removeGameArchive = function(partyName, partyDate, pseudo, callback){
+    let sql = 'DELETE at' +
+              ' FROM ' + keys.ARCHIVE_TABLE + ' AS ' + ' at' +
+              ' INNER JOIN ' + keys.PARTY_TABLE + ' AS ' + ' pt' +
+              ' ON at.' + keys.AT_KEY_PARTY + ' = pt.' + keys.PT_KEY_ID +
+              ' WHERE pt.' + keys.PT_KEY_NAME + ' = ?' +
+              ' AND pt.' + keys.PT_KEY_DATE + ' = ?' +
+              ' AND at.' + keys.AT_KEY_PSEUDO + ' = ?;';
+    let values = [partyName, partyDate, pseudo];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null);
+        }
+    });
+}
+
+/**
+ * @param {String} name : game server's name
+ * @param {String} date : data at which game has been played ("%Y-%m-%d %k:%i:%s")
+ * @return {Number} : game server's id
+ */
+exports.getGameID = function(name, date, callback){
+    let sql = 'SELECT ' + keys.PT_KEY_ID +
+              ' FROM ' + keys.PARTY_TABLE +
+              ' WHERE ' + keys.PT_KEY_NAME + ' = ?' +
+              ' AND ' + keys.PT_KEY_DATE + ' = ?;';
+    let values = [name, date];
+    state.pool.query(sql, values, function(err, result){
+        if(err){
+            callback(err);
+        }else{
+            callback(null, result.length > 0 ? result[0][keys.PT_KEY_ID] : null);
+        }
+    });
+}
 
 /**
  * Convert a js Date to a mysql DATETIME

@@ -1,5 +1,7 @@
-
-.contextMenu {
+.SWA_ContextualMenu {
+  height: auto;
+  width: 15%;
+  height: 40%;
   display: none;
   position: absolute;
   z-index: 10;
@@ -9,48 +11,46 @@
   box-shadow: 2px 2px 4px #cfcfcf;
 }
 
-.contextMenu button {
-  -moz-border-radius: 0px;
-	-webkit-border-radius: 0px;
-	border-radius: 0px;
-}
-
-.contextMenu--active {
+.SWA_ContextualMenu--active {
   display: block;
 }
 
-.colorTool {
+.SWA_CtxtMenuColorTool {
   display: none;
-}
-.mainTool {
-  display: block;
-}
-
-div#linkContextMenu {
-  height: auto;
-  width: 15%;
-  height: 40%;
-}
-
-div#linkContextMenu > div.mainTool {
-  padding: 0;
-  height: calc(100% / 9);
-}
-div#linkContextMenu > div.colorTool {
   padding: 0;
   height: calc(100% / 7);
 }
+.SWA_CtxtMenuMainTool {
+  display: block;
+  padding: 0;
+  height: calc(100% / 9);
+}
 
-div#linkContextMenu > div > img {
+.SWA_ContextualMenu > div {
+  border-bottom: 1px solid black;
+  border-bottom-style: dotted;
+  padding: 2%;
+}
+.SWA_ContextualMenu > :last-child {
+  border-bottom: none;
+}
+
+.SWA_ContextualMenu img, .SWA_ContextualMenu button {
+  border: none;
+  background-color: Transparent;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.SWA_ContextualMenu img {
   padding: 0;
   padding-top: 1px;
   padding-bottom: 1px;
   height: 100%;
-  background: #e3e3e3;
-  border: 1px solid #ccc;
   background-size: contain;
 }
-div#linkContextMenu > div > button {
+.SWA_ContextualMenu button {
   height: 100%;
   background: #e3e3e3;
   color: #333;
@@ -58,4 +58,7 @@ div#linkContextMenu > div > button {
   font-size: 1vw;
 	font-weight: bold;
 	text-align: center;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
 }

@@ -1,3 +1,8 @@
+.alert {
+  height: 100%;
+  display: none;
+}
+
 .alert > .header {
   height: 20%;
 }

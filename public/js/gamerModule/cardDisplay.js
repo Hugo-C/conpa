@@ -169,5 +169,5 @@ function displaySelectCardPanel(){
 function selectNewCard(family){
     displayNewCard(family);
     $('#selectCardPanel').css('display', 'none');
-    $('#productionPanel').css('display', 'block');
+    $('#productionPanel').css('display', 'flex');
 }

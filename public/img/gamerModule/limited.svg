@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="95"
+   width="120"
    height="30"
-   viewBox="0 0 25.135417 7.9375002"
+   viewBox="0 0 31.750001 7.9375002"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="private.svg">
+   sodipodi:docname="limited.svg">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8.8380291"
-     inkscape:cx="51.271089"
+     inkscape:cx="62.163585"
      inkscape:cy="27.4241"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -88,25 +88,25 @@
            y="816.60681" /></flowRegion><flowPara
          id="flowPara4587">Qu</flowPara></flowRoot>    <path
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.36568192;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       d="m 0.8,292.69327 v 3.24476 h 5.2916666 v -3.24476 z m 2.6587522,0.60254 a 0.5016542,0.48668574 0 0 1 0.034106,5.2e-4 0.5016542,0.48668574 0 0 1 0.4728393,0.51211 l -5.168e-4,0.006 a 0.5016542,0.48668574 0 0 1 -0.3684529,0.43667 l 0.053227,0.24908 0.1772502,0.82527 -0.4237469,-0.003 -0.4242634,-0.003 0.2470132,-0.82217 0.076481,-0.25476 a 0.5016542,0.48668574 0 0 1 -0.3389973,-0.48886 0.5016542,0.48668574 0 0 1 0.4950606,-0.45786 z"
+       d="m 0.8,293.22244 v 3.24476 h 5.2916666 v -3.24476 z m 2.6587522,0.60254 a 0.5016542,0.48668574 0 0 1 0.034106,5.2e-4 0.5016542,0.48668574 0 0 1 0.4728393,0.51211 l -5.168e-4,0.006 a 0.5016542,0.48668574 0 0 1 -0.3684529,0.43667 l 0.053227,0.24908 0.1772502,0.82527 -0.4237469,-0.003 -0.4242634,-0.003 0.2470132,-0.82217 0.076481,-0.25476 a 0.5016542,0.48668574 0 0 1 -0.3389973,-0.48886 0.5016542,0.48668574 0 0 1 0.4950606,-0.45786 z"
        id="rect876"
        inkscape:connector-curvature="0" />
     <path
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.54196137;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       d="m 3.3843382,289.71929 a 2.3443772,3.0360741 0 0 0 -1.116211,0.40824 2.3443772,3.0360741 0 0 0 -1.1689208,2.6355 l 0.5648234,-0.002 a 1.7350831,2.4774398 0 0 1 0.8645467,-2.13837 1.7350831,2.4774398 0 0 1 1.7363281,-0.003 1.7350831,2.4774398 0 0 1 0.8686807,2.13527 l 0.6547403,5.2e-4 a 2.3443772,3.0360741 0 0 0 -1.1740885,-2.63137 2.3443772,3.0360741 0 0 0 -1.2298989,-0.40462 z"
+       d="m 3.3843382,289.19012 a 2.3443772,3.0360741 0 0 0 -1.116211,0.40824 2.3443772,3.0360741 0 0 0 -1.1689208,2.6355 l 0.5648234,-0.002 a 1.7350831,2.4774398 0 0 1 0.8645467,-2.13837 1.7350831,2.4774398 0 0 1 1.7363281,-0.003 1.7350831,2.4774398 0 0 1 0.8686807,2.13527 l 0.6547403,5.2e-4 a 2.3443772,3.0360741 0 0 0 -1.1740885,-2.63137 2.3443772,3.0360741 0 0 0 -1.2298989,-0.40462 z"
        id="path878"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:4.53467655px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.11336691"
-       x="6.4464455"
+       x="7.487484"
        y="300.84604"
        id="text891"
        transform="scale(1.016613,0.98365848)"><tspan
          sodipodi:role="line"
          id="tspan889"
-         x="6.4464455"
+         x="7.487484"
          y="300.84604"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.53461266px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.11336691">Private</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.53461266px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.11336691">Animator</tspan></text>
   </g>
 </svg>

@@ -12,6 +12,7 @@ module.exports = class Game {
         this.players = require('fifo')();
         this.activePlayers = [];
         this.activePlayers.push(host.getPseudo());
+        this.playersProduction = {};
         this.cardGameName = cardGameName;
         this.cardGameLanguage = cardGameLanguage;
         this.useTimers = useTimers;
@@ -42,6 +43,10 @@ module.exports = class Game {
         if(!host.isAnimator()){
             this.players.push(host);
         }
+    }
+
+    isAnimator(pseudo){
+        return this.host.pseudoEquals(pseudo);
     }
 
     /**
@@ -98,7 +103,7 @@ module.exports = class Game {
     }
 
     /**
-     * Returns the list of all players's pseudos (only players, not animator)
+     * @return {String array} : the list of all players's pseudos (only players, not animator)
      */
     getPlayers(){
         let result = []; // used to store players pseudo
@@ -275,19 +280,41 @@ module.exports = class Game {
      * @param {string} pseudo : player's pseudo for which we want to update the question
      * @param {string} question : player's question
      */
-    recordPlayerQuestion(pseudo, question){
+    setPlayerQuestion(pseudo, question){
         let playerNode = this.getPlayerNode(pseudo);
         if(playerNode != null) playerNode.value.setQuestion(question);
         this.trace.add(pseudo, "set his question", question);
     }
 
+    /**
+     * @return {Object} : (production + legend)
+     */
+    getPlayerProduction(pseudo){
+        return this.playersProduction[pseudo];
+    }
+
+    /**
+     * Records a player production. We record players production on server side
+     * to avoid than a player lose his work because of a connection problem
+     *
+     * @param {String} pseudo : pseudo of the production's owner
+     * @param {Object} production : production's data
+     * @param {Object} legend : production's legend's data
+     */
+    setPlayerProduction(pseudo, production, legend){
+        this.playersProduction[pseudo] = {'production': production, 'legend': legend};
+    }
+
+    /**
+     * defines animator as ready
+     */
     setAnimReady(){
         this.host.setIsAnimReady(true);
         this.trace.add(this.host.pseudo, "the animator is ready");
     }
 
     /**
-     * Change the status of the party
+     * Changes the status of the party
      * @param {string} newStatus : new status of the party
      */
     setStatus(newStatus){
@@ -306,7 +333,7 @@ module.exports = class Game {
     }
 
     /**
-     * Add a new player to the game
+     * Adds a new player to the game
      * @param {Player} player : player to add in the game
      */
     addNewPlayer(player){
@@ -316,13 +343,18 @@ module.exports = class Game {
     }
 
     /**
-     * Check if the given player is recorded in this game server
+     * Checks if the given player is recorded in this game server
      * @param {string} playerPseudo : pseudo of the player that we are searching for
+     * @return {Boolean}
      */
     isInServer(playerPseudo){
         return this.getPlayer(playerPseudo) != null;
     }
 
+    /**
+     * Checks if the server is in a state during which he accepts new players
+     * @return {Boolean}
+     */
     isJoinable(){
         return this.getNbPlayer() < this.getPlaces()
             && this.getStatus() === cst.WAITING_PLAYERS;

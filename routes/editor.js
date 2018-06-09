@@ -62,10 +62,11 @@ function checkIfCardGameExists(csvPath, cardGameExistsCallback){
     fs.readFile(csvPath, function(err, data) {
         let records = parse(data, {columns: true}); // data of the file
         logger.log("silly", records);
-        if(records.length > 0) // file is not empty
+        if(records.length > 0){ // file is not empty
             db.cardGameExists(records[0]['nom jeu'], records[0]['langue'], function(exists){
                 cardGameExistsCallback(exists, records);
             });
+        }
     });
 }
 

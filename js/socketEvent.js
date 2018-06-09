@@ -78,7 +78,7 @@ module.exports = function(io, socket){
      *
      * @param {Game} server : the game server for which we want the current state of the game time
      * @return {object} : { 'ready': number of players who are ready,
-     *                     'playersQuestion': dictionnary of (pseudo, player's question) couple }
+     *                      'playersQuestion': dictionnary of (pseudo, player's question) couple }
      */
     function getQuestionTimeState(server){
         return {'ready': server.nbPlayersReady(), 'playersQuestion': server.getPlayersQuestion()};
@@ -185,8 +185,14 @@ module.exports = function(io, socket){
      */
     function recordProduction(pseudo, partyHistoricId, production, legend){
         logger.log("silly", production);
-        db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, production, legend, function(err){
-            if(err) logger.error(err);
+        db.addNewProduction(production, legend, function(err, result){
+            if(err){
+                logger.error(err);
+            }else{
+                db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, result, function(err){
+                    if(err) logger.error(err);
+                });
+            }
         });
     }
 
@@ -202,12 +208,20 @@ module.exports = function(io, socket){
     function inactivePlayerManager(server){
         if(socket.translater == null) initTranslater();
         for(let index in server.inactivePlayer){
-            if(io.sockets.connected[clients[server.inactivePlayer[index]]] == null
-            || io.sockets.connected[clients[server.inactivePlayer[index]]].room == null){
+            let inactivePlayer = server.inactivePlayer[index];
+            if(io.sockets.connected[clients[inactivePlayer]] == null
+            || io.sockets.connected[clients[inactivePlayer]].room == null){
 
-                server.removePlayerByPseudo(server.inactivePlayer[index]);
-                sendSystemMessage(server.getName(), server.inactivePlayer[index] + socket.translater.__('playerLeavingMessage'));
-                logger.verbose(server.inactivePlayer[index] + ' is removed');
+                server.removePlayerByPseudo(inactivePlayer);
+                sendSystemMessage(server.getName(), inactivePlayer + socket.translater.__('playerLeavingMessage'));
+                let playerProduction = server.getPlayerProduction(inactivePlayer);
+                if(playerProduction != null){
+                    recordProduction(inactivePlayer,
+                                     server.getHistoricId(),
+                                     JSON.stringify(playerProduction['production']),
+                                     JSON.stringify(playerProduction['legend']));
+                }
+                logger.verbose(inactivePlayer + ' is removed');
 
                 // a player has been removed, we need to inform clients
                 if(server.getNbPlayer() === 0){
@@ -277,6 +291,12 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Checks if data'values are not null
+     * @param {Object} : object to check
+     * ( if a value is a dictionary or an array, the values inside it will not be checked )
+     * @return {Boolean} : true if no value is equal to null, else false
+     */
     function nullDataControler(data){
         for(keys in data){
             if(data[keys] == null){
@@ -294,6 +314,9 @@ module.exports = function(io, socket){
         io.sockets.emit('serverListUpdate', listAllServers());
     }
 
+    /**
+     * Controls data send with the "pseudo" message
+     */
     function pseudoControler(data, callback){
         if(data != null && nullDataControler(data) && data['pseudo'].match('[A-Za-z0-9]{4,15}')){
             callback(data);
@@ -317,21 +340,23 @@ module.exports = function(io, socket){
         }
     });
 
-    function createServerControler(data, callback){
-        if(data != null && nullDataControler(data) && data['places'] >= 1
-        && (data['useTimers'] == true || data['useTimers'] == false)
-        && data['indivTimer'] >= 1 && data['globalTimer'] >= 1
-        && (data['forceEndOfTurn'] == true || data['forceEndOfTurn'] == false)
-        && data['delayBeforeForcing'] >= 1 && data['sharingInterval'] >= 5){
-            callback(data);
-        }else{
-            throw new Error(cst.IGNORE_ERROR_MSG);
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function getPlayerGame(pseudo){
+        for(let game in rooms){
+            if(rooms[game].isInServer(pseudo)){
+                return game;
+            }
         }
+        return null;
     }
 
     function processCreateServer(data){
         if(socket.translater == null) initTranslater();
-        if(socket.room != null) processExitServer({'server': socket.room});
+        if(getPlayerGame(getPseudoWithId(socket.id)) != null){
+            processExitServer({'server': getPlayerGame(getPseudoWithId(socket.id))});
+        }
         if(!(data["name"] in rooms)){
             logger.verbose("New game server : " + data["name"]);
 
@@ -342,8 +367,8 @@ module.exports = function(io, socket){
                                   data["cardGameName"],
                                   data["cardGameLanguage"],
                                   data["useTimers"],
-                                  data["indivTimer"],
-                                  data["globalTimer"],
+                                  Math.ceil(data["indivTimer"] * 60),
+                                  Math.ceil(data["globalTimer"] * 60),
                                   data["forceEndOfTurn"],
                                   data["delayBeforeForcing"],
                                   data["sharingInterval"],
@@ -368,6 +393,21 @@ module.exports = function(io, socket){
     }
 
     /**
+     * Controls data send with the "createServer" message
+     */
+    function createServerControler(data, callback){
+        if(data != null && nullDataControler(data) && data['places'] >= 1
+        && (data['useTimers'] == true || data['useTimers'] == false)
+        && data['indivTimer'] >= 1 && data['globalTimer'] >= 1
+        && (data['forceEndOfTurn'] == true || data['forceEndOfTurn'] == false)
+        && data['delayBeforeForcing'] >= 1 && data['sharingInterval'] >= 5){
+            callback(data);
+        }else{
+            throw new Error(cst.IGNORE_ERROR_MSG);
+        }
+    }
+
+    /**
      * Process createServer message
      * - Creates a new player (the host of the server)
      * - Creates a new server (a new Game) with given parameters
@@ -376,9 +416,9 @@ module.exports = function(io, socket){
      *
      * form of received data :
      * { 'role': [host's role],
-     *   'server': {'name': ['server's name], 'places': [max nb of players],
-     *              'indivTimer': [value of the individual timer],
-     *              'globalTimer': [value of the global timer] } }
+     *   'server': {'name': server's name, 'places': max nb of players,
+     *              'indivTimer': value of the individual timer,
+     *              'globalTimer': value of the global timer} }
      */
     socket.on('createServer', function(data){
         if(getPseudoWithId(socket.id) == null){
@@ -391,6 +431,9 @@ module.exports = function(io, socket){
             }
         }
     });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     function processRemoveServer(data){
         let server = rooms[data["server"]];
@@ -411,6 +454,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "removeServer" message
+     */
     function removeServerControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null){
             callback(data);
@@ -437,6 +483,9 @@ module.exports = function(io, socket){
             }
         }
     });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     function processJoinServer(data){
         let server = rooms[data["server"]];
@@ -471,6 +520,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Process message send with the "joinServer" message
+     */
     function joinServerControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null){
             callback(data);
@@ -487,7 +539,7 @@ module.exports = function(io, socket){
      * - Sends to all players the new list of available servers
      * - launch the game if the server is full
      *
-     * form of received data : {'server': [destination server's name]}
+     * form of received data : {'server': destination server's name}
      */
     socket.on('joinServer', function(data){
         if(getPseudoWithId(socket.id) == null){
@@ -500,6 +552,9 @@ module.exports = function(io, socket){
             }
         }
     });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     function processExitServer(data){
         logger.info(getPseudoWithId(socket.id) + ' leaved ' + socket.room);
@@ -517,6 +572,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "exitServer" message
+     */
     function exitServerControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null){
             callback(data);
@@ -542,6 +600,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processReconnexion(data){
         for(let gameServer in rooms){
             if(rooms[gameServer].isInServer(getPseudoWithId(socket.id))){
@@ -551,6 +612,13 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Process "reconnexion" message
+     * This message is send by a player when he has lost his connection with the
+     * server and try to reconnect his self
+     *
+     * form of received data : no data (null)
+     */
     socket.on('reconnexion', function(data){
         if(getPseudoWithId(socket.id) == null){
             handleDataError(new Error(cst.FATAL_ERROR_MSG));
@@ -588,6 +656,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * process message send with the "joinGame" message
+     */
     function joinGameControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[data['server']] != null
         && rooms[data['server']].isInServer(data['pseudo'])){
@@ -613,11 +684,14 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processRecordQuestion(data){
         logger.verbose(getPseudoWithId(socket.id) + ' recorded his question');
         let server = rooms[socket.room];
         if(server != null){
-            server.recordPlayerQuestion(getPseudoWithId(socket.id), data['question']);
+            server.setPlayerQuestion(getPseudoWithId(socket.id), data['question']);
             if(server.isAllQuestionsDefined()){ // all questions are defined, we can starts the game
                 startGameTime(server);
             }else{
@@ -626,6 +700,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "recordMyQuestion" message
+     */
     function recordQuestionControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
             callback(data)
@@ -655,6 +732,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processAnimatorValidation(data){
         logger.verbose(socket.room + ' : received animator validation');
         let server = rooms[socket.room];
@@ -664,6 +744,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "animatorValidation" message
+     */
     function animatorValidationControler(data, callback){
         if(rooms[socket.room] != null){
             callback(data);
@@ -691,6 +774,20 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    socket.on('startIndivTimer', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            socket.broadcast.to(socket.room).emit('startIndivTimer', data);
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processEndOfTurn(data){
         logger.verbose(getPseudoWithId(socket.id) + ' finished his turn');
         let server = rooms[socket.room];
@@ -699,6 +796,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "endOfTurn" message
+     */
     function endOfTurnControler(data, callback){
         if(rooms[socket.room] != null){
             callback(data);
@@ -726,6 +826,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processMessage(data){
         let server = rooms[socket.room];
         if(server != null){
@@ -742,6 +845,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "message" message
+     */
     function messageControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
             callback(data);
@@ -771,6 +877,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processCardPicked(data){
         let server = rooms[socket.room];
         logger.verbose(getPseudoWithId(socket.id) + ' picked a new card');
@@ -778,6 +887,9 @@ module.exports = function(io, socket){
         server.trace.add("party", "set card", JSON.stringify(data));
     }
 
+    /**
+     * Controls data send with the "cardPicked" message
+     */
     function cardPickedControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
             callback(data);
@@ -805,10 +917,37 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processShareMyProduction(data){
-        socket.broadcast.to(socket.room).emit('playersProduction', data);
+        let server = rooms[socket.room];
+        server.setPlayerProduction(data['pseudo'], data['production'], data['legend']);
+        switch (data['privacy']) {
+            case 'private':
+                data['production'] = '';
+                socket.broadcast.to(socket.room).emit('playersProduction', data);
+                break;
+            case 'public':
+                socket.broadcast.to(socket.room).emit('playersProduction', data);
+                break;
+            case 'limited':
+                let animator = server.getAnimatorPseudo();
+                if(animator != null){
+                    socket.to(clients[animator]).emit('playersProduction', data);
+                }
+                data['production'] = '';
+                let players = server.getPlayers();
+                for(let index = 0; index < players.length; index++){
+                    socket.to(clients[players[index]]).emit('playersProduction', data);
+                }
+                break;
+        }
     }
 
+    /**
+     * Controls data send with the "shareMyProduction" message
+     */
     function shareMyProductionControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
             callback(data);
@@ -822,7 +961,9 @@ module.exports = function(io, socket){
      * The message is received when a player has send his production
      * When this message is received, we share the production to the other players
      *
-     * form of received data : {'pseudo' : player's pseudo, 'production': player's production}
+     * form of received data : {'pseudo' : player's pseudo,
+     *                          'production': player's production,
+     *                          'lagend': player's legend}
      */
     socket.on('shareMyProduction', function(data){
         if(getPseudoWithId(socket.id) == null){
@@ -836,6 +977,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processStopGameProcess(data){
         logger.debug(getPseudoWithId(socket.id) + ' started a stop game process');
         let server = rooms[socket.room];
@@ -846,12 +990,14 @@ module.exports = function(io, socket){
                 io.sockets.in(server.getName()).emit('gameEnd', null);
             }else{
                 // ask to all players if they agree
-                socket.broadcast.to(server.getName())
-                                .emit('stopGame?', server.exitBuffer);
+                socket.broadcast.to(server.getName()).emit('stopGame?', server.exitBuffer);
             }
         }
     }
 
+    /**
+     * Controls data send with the "processStopGame" message
+     */
     function stopGameProcessControler(data, callback){
         if(rooms[socket.room] != null){
             callback(data);
@@ -879,6 +1025,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processStopGame(data){
         logger.debug(getPseudoWithId(socket.id) + ' wants to stop game ? : ' + data['exit']);
         let server = rooms[socket.room];
@@ -897,6 +1046,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "stopGame" message
+     */
     function stopGameControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
             callback(data);
@@ -923,6 +1075,9 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
     function processQuitGame(data){
         logger.verbose(data['pseudo'] + ' leaved game server ' + socket.room);
         let server = rooms[data['server']];
@@ -947,6 +1102,9 @@ module.exports = function(io, socket){
         }
     }
 
+    /**
+     * Controls data send with the "quitGame" message
+     */
     function quitGameControler(data, callback){
         if(data != null && nullDataControler(data) && rooms[socket.room] != null){
             callback(data);
@@ -977,10 +1135,204 @@ module.exports = function(io, socket){
         }
     });
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function processCastProduction(data){
+       let server = rooms[socket.room];
+       data['question'] = server.getPlayer(data['pseudo']).getQuestion();
+       for(let index = 0; index < data['players'].length; index++){
+            io.to(clients[data['players'][index]]).emit('castProductionRequest', data);
+       }
+       socket.emit('castedProductionQuestion', {'pseudo': data['pseudo'], 'question': data['question']});
+    }
+
+    function allPlayersConnected(players){
+        for(let index = 0; index < players.length; index++){
+            if(clients[players[index]] == null){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Controls data send with the "castProduction" message
+     */
+    function castProductionControler(data, callback){
+
+
+
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null
+        && rooms[socket.room].isInServer(data['pseudo'])
+        && rooms[socket.room].isAnimator(getPseudoWithId(socket.id))
+        && allPlayersConnected(data['players'])){
+            callback(data);
+        }else{
+            throw new Error(cst.IGNORE_ERROR_MSG);
+        }
+    }
+
+    socket.on('castProduction', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            try {
+                castProductionControler(data, processCastProduction);
+            } catch (err) {
+                handleDataError(err);
+            }
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function processNewSpectator(data){
+        let server = rooms[socket.room];
+        io.sockets.in(server.getName()).emit('newSpectator', data);
+    }
+
+    /**
+     * Controls data send with the "newSpectator" message
+     */
+    function newSpectatorControler(data, callback){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            callback(data);
+        }else{
+            throw new Error(cst.IGNORE_ERROR_MSG);
+        }
+    }
+
+    socket.on('newSpectator', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            try {
+                newSpectatorControler(data, processNewSpectator);
+            } catch (err) {
+                handleDataError(err);
+            }
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function processCastedProductionData(data){
+        socket.to(socket.room).emit('castedProductionData', data);
+    }
+
+    /**
+     * Controls data send with the "castedProductionData" message
+     */
+    function castedProductionControler(data, callback){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            callback(data);
+        }else{
+            throw new Error(cst.IGNORE_ERROR_MSG);
+        }
+    }
+
+    socket.on('castedProductionData', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            try {
+                castedProductionControler(data, processCastedProductionData);
+            } catch (err) {
+                handleDataError(err);
+            }
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function processLeaveCast(data){
+        socket.to(socket.room).emit('leaveCast', data);
+    }
+
+    /**
+     * Controls data send with the "leaveCast" message
+     */
+    function leaveCastControler(data, callback){
+        if(data != null && nullDataControler(data) && rooms[socket.room] != null){
+            callback(data);
+        }else{
+            throw new Error(cst.IGNORE_ERROR_MSG);
+        }
+    }
+
+    socket.on('leaveCast', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            try {
+                leaveCastControler(data, processLeaveCast);
+            } catch (err) {
+                handleDataError(err);
+            }
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function processEndOfCast(data){
+        io.sockets.in(socket.room).emit('endOfCast', data);
+    }
+
+    /**
+     * Controls data send with the "endOfCast" message
+     */
+    function endOfCastControler(data, callback){
+        if(rooms[socket.room] != null
+        && rooms[socket.room].isAnimator(getPseudoWithId(socket.id))){
+            callback(data);
+        }else{
+            throw new Error(cst.IGNORE_ERROR_MSG);
+        }
+    }
+
+    socket.on('endOfCast', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            try {
+                endOfCastControler(data, processEndOfCast);
+            } catch (err) {
+                handleDataError(err);
+            }
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    function processGetPlayersQuestion(data){
+        let server = rooms[socket.room];
+        let players = server.getPlayers();
+        let questions = server.getPlayersQuestion();
+        socket.emit('playersQuestion', {'players': players, 'questions': questions});
+    }
+
+    socket.on('getPlayersQuestion', function(data){
+        if(getPseudoWithId(socket.id) == null){
+            handleDataError(new Error(cst.FATAL_ERROR_MSG));
+        }else{
+            try {
+                processGetPlayersQuestion(data);
+            } catch (err) {
+                handleDataError(err);
+            }
+        }
+    });
+
     /**
      * Process trace
      * - Informs server that the player perform an action worth to be traced
-     * form of received data : {'actor': [actor], 'action': [action], 'value': [value], 'target': [target]}
+     * form of received data : {'actor': actor, 'action': action, 'value': value, 'target': target}
      */
     socket.on('trace', function(data){
         let server = rooms[socket.room];

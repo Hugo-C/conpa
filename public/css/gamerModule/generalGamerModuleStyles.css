@@ -32,6 +32,8 @@
 
 .playerDisplayer > div:last-child {
   height: 20%;
+  padding: 0;
+  overflow: hidden;
 }
 
 .playerDisplayer > div:last-child > div {
@@ -47,16 +49,6 @@
   font-size: 1vw;
   font-weight: bold;
   font-family: "Georgia", "Helvetica", "Times New Roman", sans-serif;
-}
-
-.familyDisplayer {
-  height: 90%;
-}
-.familyDisplayer > :first-child {
-  height: 70%;
-}
-.familyDisplayer > :last-child {
-  height: 30%;
 }
 
 .gamePanel {

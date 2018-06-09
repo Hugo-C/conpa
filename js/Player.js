@@ -11,33 +11,33 @@ module.exports = class Player {
     }
 
     /**
-   * Returns the pseudo of a player
-   * @return {string} : player's pseudo
-   */
+     * Returns the pseudo of a player
+     * @return {string} : player's pseudo
+     */
     getPseudo(){
         return this.pseudo;
     }
 
     /**
-   * Returns the role of a player
-   * @return {integer} : player's role flag
-   */
+     * Returns the role of a player
+     * @return {integer} : player's role flag
+     */
     getRole(){
         return this.role;
     }
 
     /**
-   * Tests if a pseudo corresponds to his own pseudo
-   * @return {boolean} : true if pseudos are equals, false if not
-   */
+     * Tests if a pseudo corresponds to his own pseudo
+     * @return {boolean} : true if pseudos are equals, false if not
+     */
     pseudoEquals(pseudo){
         return this.pseudo === pseudo;
     }
 
     /**
-   * Return the question of a player
-   * @return {string} : player's question
-   */
+     * Return the question of a player
+     * @return {string} : player's question
+     */
     getQuestion(){
         return this.question;
     }
@@ -47,9 +47,9 @@ module.exports = class Player {
     }
 
     /**
-   * Updates the question of a player
-   * @param {string} newQuestion : new version of the player's question
-   */
+     * Updates the question of a player
+     * @param {string} newQuestion : new version of the player's question
+     */
     setQuestion(newQuestion){
         this.question = newQuestion;
     }
@@ -59,9 +59,9 @@ module.exports = class Player {
     }
 
     /**
-   * Tests if a player is ready
-   * (a player is considered as ready if his question is different from an empty string)
-   */
+     * Tests if a player is ready
+     * (a player is considered as ready if his question is different from an empty string)
+     */
     isReady(){
         if(this.role === "animator"){
             return this.isAnimReady;
@@ -71,9 +71,9 @@ module.exports = class Player {
     }
 
     /**
-   * Tests if a player is an animator
-   * @return {boolean} : true if the player is an animator, false if not
-   */
+     * Tests if a player is an animator
+     * @return {boolean} : true if the player is an animator, false if not
+     */
     isAnimator(){
         return this.role === "animator";
     }

@@ -9,8 +9,8 @@
  *
  * @param {string} pseudo : player's pseudo
  */
-function addPlayerBox(pseudo){
-    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer col-lg-2 col-md-2 col-sm-2 col-xs-2">' +
+function addPlayerBox(pseudo, bootstrap){
+    let htmlBox = '<div id="profil' + pseudo + '" class="playerDisplayer ' + bootstrap + ' ">' +
                       '<div class="row">' +
                           '<img class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>' +
                       '</div>' +
@@ -30,8 +30,8 @@ function addPlayerBox(pseudo){
  * @param {string} pseudo : pseudo of the player for which we want to change the box border color
  */
 function actualizeBorderColor(pseudo){
-    $('#profil' + pseudo).css('border-color', '#4FAB1A');
-    $('#profil' + pseudo + '> div').css('border-color', '#4FAB1A');
+    $('#exitPanel #profil' + pseudo).css('border-color', '#4FAB1A');
+    $('#exitPanel #profil' + pseudo + '> div').css('border-color', '#4FAB1A');
 }
 
 /**
@@ -43,7 +43,7 @@ function initGUI(){
     parentTag.empty(); // remove all child nodes to refresh the list
     $('#exitMessage').text(''); // remove old messages
     for(let index = 0; index < players.length; index++){
-        parentTag.append(addPlayerBox(players[index]));
+        parentTag.append(addPlayerBox(players[index], 'col-lg-2 col-md-2 col-sm-2 col-xs-2'));
         setPP(players[index]);
     }
 }
@@ -59,8 +59,7 @@ function initGUI(){
 $("#exit").on("click", function(){
     if(sessionStorage.role === 'player')
         clientGame.getProduction().centerSVGToDefaultPosition();
-    $('#productionPanel').css('display', 'none'); // hide productionArea panel
-    $('#exitPanel').css('display', 'block'); // display exit panel
+    displayPanel($('#exitPanel'), 'block');
     initGUI(); // initialize exit panel
 });
 
@@ -69,7 +68,7 @@ $("#exit").on("click", function(){
  * On click in this button, hide the exit panel and display the productionArea panel
  */
 $("#closeExitPanel").on("click", function(){
-    $('#productionPanel').css('display', 'block'); // display productionArea panel
+    $('#productionPanel').css('display', 'flex'); // display productionArea panel
     $('#exitPanel').css('display', 'none'); // hide exit panel
 });
 
@@ -85,7 +84,7 @@ function getPlayerProduction(){
 function getPlayerLegend(){
     let currentProductionOwner = $('.selectedProduction')[0].id.split('_')[0];
     if(currentProductionOwner === sessionStorage.pseudo){
-        return Legend.saveLegend();
+        return clientGame.getProduction().saveLegend();
     }else{
         return clientGame.getPlayerProduction()[sessionStorage.pseudo]['legend'];
     }
