@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const keys = require('./dbConstants');
 const logger = require('../js/logger.js');
+const CONFIG = require('../config.json');
 const crypto = require('crypto');
 const md5 = require('md5');
 
@@ -15,8 +16,8 @@ var state = {
     mode: null, // selected database
 };
 
-const TOKEN_EXPIRATION_DELAY = 1;
-const TOKEN_SALT = "conpa174567";
+const TOKEN_EXPIRATION_DELAY = CONFIG.tokenDelay;
+const TOKEN_SALT = CONFIG.tokenSalt;
 
 /**
  * Creates a connection instance to the database and store it into state record
@@ -26,10 +27,10 @@ const TOKEN_SALT = "conpa174567";
  */
 exports.connect = function(mode, done){
     state.pool = mysql.createPool({
-        host: '',
-        user: '',
-        port: '',
-        password: '',
+        host: CONFIG.dbHost,
+        user: CONFIG.dbUser,
+        port: CONFIG.dbPort,
+        password: CONFIG.dbPassword,
         database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
     });
     state.mode = mode;

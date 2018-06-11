@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 const logger = require('../js/logger.js');
 const db = require('../js/db');
+const CONFIG = require('../config.json');
 const md5 = require('md5');
 const jade = require('jade');
 const nodemailer = require('nodemailer');
@@ -33,7 +34,7 @@ router.post('/register', urlencodedParser, function(req, res){
     logger.info("new register");
     let username = req.body.username;
     let email = req.body.email;
-    let password = md5(req.body.password + "conpa35411");
+    let password = md5(req.body.password + CONFIG.connectionSalt);
     db.registerUser(username, email, password, function(err){
         if(err){
             if(err.sqlMessage.match('PRIMARY')){
@@ -54,7 +55,7 @@ router.post('/register', urlencodedParser, function(req, res){
 
 router.post('/login', urlencodedParser, function(req, res, next){
     var username = req.body.username;
-    var password = md5(req.body.password + "conpa35411");
+    var password = md5(req.body.password + CONFIG.connectionSalt);
 
     function connectUser(){
         db.connectUser(username, function(err){
@@ -133,7 +134,7 @@ router.post('/resetPassword', urlencodedParser, function(req, res) {
 });
 
 router.post('/setPassword', urlencodedParser, function(req, res) {
-    const password = md5(req.body.password + "conpa35411");
+    const password = md5(req.body.password + CONFIG.connectionSalt);
     const token = req.body.token;
 
     let handlePasswordChanged = function(err, name){
@@ -166,10 +167,10 @@ router.post('/setPassword', urlencodedParser, function(req, res) {
 
 // create reusable transporter object using the default SMTP transport
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: CONFIG.emailService,
     auth: {
-        user: 'testconpa2@gmail.com',
-        pass: 'testTest'
+        user: CONFIG.emailUser,
+        pass: CONFIG.emailPassword
     }
 });
 
@@ -194,7 +195,7 @@ function sendmail(emailAdresse, subject, htmlFile, jadeParameters) {
 
     // setup email data with unicode symbols
     const mailOptions = {
-        from: '"conpa 👋" <conpa@example.com>', // sender address
+        from: CONFIG.emailAddress, // sender address
         to: emailAdresse, // list of receivers
         subject: subject, // Subject line
         text: text,
