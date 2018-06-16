@@ -29,28 +29,32 @@ function initCards(cardGame, language){
  * @return {boolean} : true if a card is pick, false if all cards from the family were already picked
  */
 function displayNewCard(family){
-    if(cards[family] === undefined){  // support for family as a number
-        let familiesId = Object.keys(cards);
-        family = familiesId[family % familiesId.length];
-    }
-    if(cards[family] === null){
+    // the die fell on six
+    if(family == null){
         displaySelectCardPanel();
         return true;
-    }else if(cards[family]['cards'].length === 0){
-        cardTextNode.nodeValue = $.i18n("noMoreCards");
-        return false;
     }else{
-        let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];
-        displayCard(family, cardPick);
-        shareMyCard(family, cardPick);
-        return true;
+        if(cards[family] == null){  // support for family as a number
+            let familiesId = Object.keys(cards);
+            family = familiesId[family % familiesId.length];
+        }
+        if(cards[family]['cards'].length === 0){
+            cardTextNode.nodeValue = $.i18n("noMoreCards");
+            showDice();
+            return false;
+        }else{
+            let cardPick = cards[family]["cards"][Math.floor(Math.random() * cards[family]["cards"].length)];
+            displayCard(family, cardPick);
+            shareMyCard(family, cardPick);
+            return true;
+        }
     }
 }
 
 /**
  * Share a card with all the other member of the server
- * @param family {String} : the family of the card picked
- * @param card {String} : the content of the card picked
+ * @param {String} family  : the family of the card picked
+ * @param {String} card  : the content of the card picked
  */
 function shareMyCard(family, card) {
     let question = $('#question').text();
@@ -83,8 +87,8 @@ socket.on('downloadCardGame', function(data){
 
 /**
  * Display a card and it's family with the specified text content then remove it from local deck
- * @param family {String} : the family of the card picked
- * @param text {String} : the content of the card picked
+ * @param {String} family : the family of the card picked
+ * @param {String} text : the content of the card picked
  */
 function displayCard(family, text){
     let cardContent = document.getElementById("cardContent");
@@ -104,7 +108,7 @@ function displayCard(family, text){
 
 /**
  * Trigger the css animation applied on the element id
- * @param element {HTMLElement}
+ * @param {HTMLElement} element
  */
 function triggerCssAnimation(element){
     let id = element.id;
