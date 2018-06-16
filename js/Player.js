@@ -79,7 +79,7 @@ module.exports = class Player {
     }
 
     recordPlayer(party){
-        db.linkPlayerAndParty(this.pseudo, party, this.question, function(err){
+        db.linkPlayerAndGame(this.pseudo, party, this.question, function(err){
             if(err) logger.error(err);
         });
     }

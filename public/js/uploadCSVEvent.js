@@ -121,7 +121,7 @@ function overwriteCardgame(overwrite){
     $('#importAlertMessage').text('Please wait !'); // reset alert displayer
     $.ajax({
         type: 'POST',
-        url: '/updateCardGame',
+        url: '/editor/updateCardGame',
         data: {
             name: $('#importPage input[name="cardgameName"]').val(),
             language: $('#importPage input[name="cardgameLanguage"]').val(),
@@ -138,7 +138,6 @@ function overwriteCardgame(overwrite){
                 displayPanel($('#editorTab'), $('#tagsPanel'), '85%', '60%');
                 refreshTagsPanel(response);
             }else{
-                console.log(response['send']);
                 displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
             }
         }
@@ -187,13 +186,11 @@ $('#tagsPanel textarea').on('focus', function(){
 });
 
 $('#addTag').on('click', function(){
-    console.log('add a new tag');
     let tagToAdd =  $('#tagsPanel input[name="cardgameTag"]').val();
     if(tagToAdd != null && tagToAdd != ''){
-        console.log('adding a new tag');
         $.ajax({
             type: 'POST',
-            url: '/addATag',
+            url: '/editor/addATag',
             data: {
                 name: $('#tagsPanel input[name="cardgameName"]').val(),
                 language: $('#tagsPanel input[name="cardgameLanguage"]').val(),
@@ -205,8 +202,6 @@ $('#addTag').on('click', function(){
             success: function(response){
                 if(response['msg'] === 'OK'){
                     refreshCardgameTagsList($('#tagsPanel table'), response['tags']);
-                }else{
-                    console.log(response['msg']);
                 }
             }
         });
@@ -218,7 +213,7 @@ $('#removeTag').on('click', function(){
     if(tagToAdd != null && tagToAdd != ''){
         $.ajax({
             type: 'POST',
-            url: '/removeATag',
+            url: '/editor/removeATag',
             data: {
                 name: $('#tagsPanel input[name="cardgameName"]').val(),
                 language: $('#tagsPanel input[name="cardgameLanguage"]').val(),
@@ -230,8 +225,6 @@ $('#removeTag').on('click', function(){
             success: function(response){
                 if(response['msg'] === 'OK'){
                     refreshCardgameTagsList($('#tagsPanel table'), response['tags']);
-                }else{
-                    console.log(response['msg']);
                 }
             }
         });
@@ -240,11 +233,10 @@ $('#removeTag').on('click', function(){
 
 $('#valideUpdate').on('click', function(){
     let updatedDescription = $('#tagsPanel textarea').val();
-    console.log(updatedDescription);
     if(updatedDescription != '' && updatedDescription != 'No description'){
         $.ajax({
             type: 'POST',
-            url: '/updateCardgameDescription',
+            url: '/editor/updateCardgameDescription',
             data: {
                 name: $('#tagsPanel input[name="cardgameName"]').val(),
                 language: $('#tagsPanel input[name="cardgameLanguage"]').val(),
@@ -296,7 +288,7 @@ function uploadCSV(csvFile){
         }
     };
 
-    let query = "/importCardGame?author=" + sessionStorage.pseudo +
+    let query = "/editor/importCardGame?author=" + sessionStorage.pseudo +
                 "&name=" + $('#importPage input[name="cardgameName"]').val() +
                 "&language=" + $('#importPage input[name="cardgameLanguage"]').val();
 

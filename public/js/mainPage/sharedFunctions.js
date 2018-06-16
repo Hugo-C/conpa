@@ -1,7 +1,7 @@
 function refreshCardGames(myTags, callback){
     $.ajax({
         type: 'POST',
-        url: '/getCardGames',
+        url: '/editor/getCardGames',
         data: {
             tags: JSON.stringify(myTags)
         },
@@ -47,7 +47,7 @@ function refreshTagsSelector(container, tags){
 function refreshTags(container){
     $.ajax({
         type: 'POST',
-        url: '/getAllTags',
+        url: '/editor/getAllTags',
         data: null,
         error: function(){
             console.log("tags retrieving has failed");
@@ -96,7 +96,7 @@ function getCardGameInfo(parent, table){
     if(selectedCardGame != null){
         $.ajax({
             type: 'POST',
-            url: '/getCardGameInfo',
+            url: '/editor/getCardGameInfo',
             data: {
                 name: selectedCardGame[0].innerHTML,
                 language: selectedCardGame[1].innerHTML

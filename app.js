@@ -61,7 +61,7 @@ app.use(function(err, req, res, next) {
 });
 
 // connect to MySQL on start
-db.connect(db.MODE_TEST, function(err){
+db.connect(db.MODE_PRODUCTION, function(err){
     if(err){
         logger.error('Unable to connect to MySQL');
         process.exit(1);

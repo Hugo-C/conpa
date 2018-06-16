@@ -163,8 +163,7 @@ module.exports = function(io, socket){
     function recordGameServer(gameServer){
         if(socket.translater == null) initTranslater();
         let animator = gameServer.getHost().isAnimator() ? gameServer.getHost().getPseudo() : socket.translater.__('partyWithoutAnimator');
-        let date = (new Date()).toISOString().substring(0, 19).replace('T', ' ');
-        db.recordNewParty(gameServer.getName(), animator, date, function(err, partyId){
+        db.recordNewGame(gameServer.getName(), animator, function(err, partyId){
             if(err){
                 logger.error(err);
             }else{
@@ -189,7 +188,7 @@ module.exports = function(io, socket){
             if(err){
                 logger.error(err);
             }else{
-                db.recordPlayerProductionWithPartyId(pseudo, partyHistoricId, result, function(err){
+                db.recordPlayerProductionWithGameId(pseudo, partyHistoricId, result, function(err){
                     if(err) logger.error(err);
                 });
             }
