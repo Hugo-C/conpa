@@ -5,7 +5,11 @@
   "scripts": {
     "start": "node ./bin/www",
     "postinstall": "bower install",
-    "test": "jest"
+    "test": "jest --runInBand"
+  },
+  "jest": {
+    "verbose": true,
+    "testPathIgnorePatterns": ["/node_modules/", "/bower_components/"]
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -26,7 +30,6 @@
     "html-to-text": "^4.0.0",
     "i18n-nodejs": "^3.0.0",
     "jade": "~1.11.0",
-    "jest": "^23.1.0",
     "jimp": "^0.2.28",
     "jquery": "^3.3.1",
     "md5": "^2.2.1",
@@ -47,6 +50,7 @@
     "yarn": "^1.7.0"
   },
   "devDependencies": {
+    "jest": "^23.1.0",
     "jsdoc": "^3.5.5"
   }
 }
