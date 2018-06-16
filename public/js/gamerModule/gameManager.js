@@ -3,6 +3,12 @@ var clientGame = new GameState();
 var castControler = null;
 initializeProductionPanel();
 
+$(document).ready(function(){
+    // informs the server that we have joined the game
+    socket.emit('joinGame', {'pseudo': sessionStorage.pseudo,
+                             'server': sessionStorage.server});
+});
+
 /**
  * Create a button to allow a player to access to another player's production
  *

@@ -4,9 +4,6 @@ const DEFAULT_IMG_URL = "//a0.muscache.com/im/pictures/87d6d531-78e2-43d5-9ccc-6
 var socket = io();
 displayQuestionPanel();
 
-// informs the server that we have joined the game
-socket.emit('joinGame', {'pseudo': sessionStorage.pseudo,
-                         'server': sessionStorage.server});
 
 // -----------------------------------------------------------------------------
 // ------------------------- INTERFACE LISTENERS -------------------------------
