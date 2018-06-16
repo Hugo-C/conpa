@@ -294,7 +294,7 @@ router.post('/importCardGame', function (req, res) {
 
     function processFile(fileName){
         importCSV.importFromCsv(params['name'], params['language'], params['author'], "./upload/" + fileName, true);
-        getCardGameInformation(req.body.name, req.body.language, function(err, data){
+        getCardGameInformation(params['name'], params['language'], function(err, data){
             if(err){
                 res.send({'msg': 'ERROR'});
             }else{

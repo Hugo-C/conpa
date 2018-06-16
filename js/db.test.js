@@ -516,7 +516,7 @@ describe("Tests : historic and games' archive", async () => {
         // when a player leave a game
         function productionHasBeenSaved(err){
             expect(err).toBeNull();
-            db.getProductionIDFromPlayerHistoric('MrSomeone', globalGameID, checksIfProductionHasBeenAssociatedToTheGame);
+            db.getProductionIDFromPlayerHistoricWithGameId('MrSomeone', globalGameID, checksIfProductionHasBeenAssociatedToTheGame);
         }
         // then the production is saved into the database and associated to the
         // game during which the production has been created

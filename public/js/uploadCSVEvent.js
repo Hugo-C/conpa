@@ -231,6 +231,13 @@ $('#removeTag').on('click', function(){
     }
 });
 
+function newCardGameHasBeenAdded(){
+    displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
+    refreshCardGames([], function(data){
+        displayCardGames('editorTab', 'myCardgames', data);
+    });
+}
+
 $('#valideUpdate').on('click', function(){
     let updatedDescription = $('#tagsPanel textarea').val();
     if(updatedDescription != '' && updatedDescription != 'No description'){
@@ -244,17 +251,14 @@ $('#valideUpdate').on('click', function(){
             },
             error: function(){
                 console.log('request failed');
+                displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
             },
             success: function(response){
-                if(response === 'OK'){
-                    displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
-                }else{
-                    console.log(response);
-                }
+                newCardGameHasBeenAdded();
             }
         });
     }else{
-        displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
+        newCardGameHasBeenAdded();
     }
 });
 
@@ -283,7 +287,6 @@ function uploadCSV(csvFile){
         }else if(response['msg'] === 'UNAUTHORIZED'){
             displayAlert('editorTab', 'access', 'This cardgame already exists and you are not allowed to overwrite it !', 'confirm');
         }else{
-            console.log(response['msg']);
             displayPanel($('#editorTab'), $('#editorTab .tabContent'), '90%', '40%');
         }
     };
