@@ -636,6 +636,8 @@ module.exports = function(io, socket){
                 socket.join(socket.room);
                 clients[player.getPseudo()] = socket.id;
                 initTranslater();
+                socket.emit('downloadCardGame', {'cardGameName': server.getCardGameName(),
+                                                 'cardGameLanguage': server.getCardGameLanguage()});
                 if(server.isAllQuestionsDefined()){
                     socket.emit('allQuestionsDefined', getQuestionTimeState(server));
                     socket.emit('initGameTime', {'players': server.getActivePlayers(),
@@ -647,8 +649,6 @@ module.exports = function(io, socket){
                 }else{
                     socket.emit('initQuestionTime', {'players': server.getPlayers(), 'animator': server.getAnimatorPseudo()});
                     socket.emit('actualizeQuestions', getQuestionTimeState(server));
-                    socket.emit('downloadCardGame', {'cardGameName': server.getCardGameName(),
-                                                     'cardGameLanguage': server.getCardGameLanguage()});
                 }
             }
         }

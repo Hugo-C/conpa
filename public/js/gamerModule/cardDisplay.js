@@ -33,7 +33,7 @@ function displayNewCard(family){
         let familiesId = Object.keys(cards);
         family = familiesId[family % familiesId.length];
     }
-    if(cards[family] === undefined){
+    if(cards[family] === null){
         displaySelectCardPanel();
         return true;
     }else if(cards[family]['cards'].length === 0){
@@ -76,7 +76,9 @@ socket.on('cardPicked', function(data){
 });
 
 socket.on('downloadCardGame', function(data){
-    initCards(data['cardGameName'], data['cardGameLanguage']);
+    if(cards.length == null){
+        initCards(data['cardGameName'], data['cardGameLanguage']);
+    }
 });
 
 /**

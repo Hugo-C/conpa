@@ -132,7 +132,7 @@ function initLogoForDie(cards){
             sidePictures.push(DIR_IMG + NO_LOGO_IMG);
         } else {
             let family = cards[families[i]];
-            if(family["logo"] !== undefined) {
+            if(family["logo"] !== null) {
                 hasLogo = true;
                 sidePictures.push(DIR_IMG + family["logo"]);
             } else {
