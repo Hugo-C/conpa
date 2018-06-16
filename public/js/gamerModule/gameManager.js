@@ -232,6 +232,14 @@ function sendTrace(actor, action, value, target){
     socket.emit('trace', {'actor': actor, 'action': action, 'value': value, 'target': target});
 }
 
+function createWizzButton(){
+    let button = document.createElement('button');
+    button.id = 'wizz';
+    button.classList.add('col-lg-3', 'col-sm-3', 'col-md-3', 'myCustomButton');
+    button.setAttribute('data-i18n', 'wizz');
+    $('.SWA_Production')[0].appendChild(button);
+}
+
 /**
  * Initialize the production panel interface
  * - creates a button to access to his production
@@ -242,6 +250,7 @@ function initializeProductionPanel(){
     $('.myAccess > div')[0].id = sessionStorage.pseudo + '_productionAccess';
     $('.myAccess > div').attr('onclick', 'changeDisplayedProduction(' + $('.myAccess > div')[0].id + ')');
     clientGame.initProduction($('.SWA_Master'), false);
+    createWizzButton();
     if(sessionStorage.role === 'player'){
         displayPlayerProductionPanel();
     }else if(sessionStorage.role === 'animator'){
@@ -562,7 +571,7 @@ $('#endOfTurn').on('click', function(){
 
 $('#wizz').on('click', function(){
     let targetedPlayer = getCurrentProductionOwner();
-    socket.emit('message', {'dest': targetedPlayer, 'msg': 'I would like to consult your production'});
+    socket.emit('message', {'dest': targetedPlayer, 'msg': $.i18n('wizz')});
 });
 
 $('#questions').on('click', function(){

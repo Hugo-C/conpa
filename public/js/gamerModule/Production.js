@@ -261,8 +261,8 @@ class Production {
         // ---------------------------------------------------------------------
 
         this.resizeSVG = function(){
-            let dimHeight = self.parent.height();
-            let dimWidth = self.parent.width();
+            let dimHeight = self.parent.find('.SWA_SVGContainer').height();
+            let dimWidth = self.parent.find('.SWA_SVGContainer').width();
             self.draw.attr({'height': dimHeight, 'width': dimWidth});
         }
 

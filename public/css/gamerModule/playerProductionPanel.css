@@ -207,10 +207,11 @@ button#questions {
 }
 
 #wizz {
+  position: absolute;
   width: 30%;
   height: 8%;
   top: 80%;
-  left: 35%;
+  left: 40%;
   font-size: 1vw;
   float: none;
   display: none;
