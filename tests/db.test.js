@@ -29,25 +29,22 @@ function getArrayFromResult(result, key){
     return res;
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // Tests
 // /!\ Tests must be run with the option --runInBand ( -i ) !
 // Tests must be run sequentially
 
-test('Database is reachable', async () => {
+test('Database is reachable', done => {
     expect.assertions(1);
     db.connect(db.MODE_TEST, function(err){
         expect(err).toBeNull();
+        done();
     });
 });
 
 describe("Tests : card games", () => {
-    test("When a player imports a card game, then it must be added in the database", async (done) => {
+    test("When a player imports a card game, then it must be added in the database", done => {
         // when we add a card game into the database
-        await db.addCardGame('test1', 'Français', 'julien', cardgameAdded);
+        db.addCardGame('test1', 'Français', 'julien', cardgameAdded);
         function cardgameAdded(err, result){
             expect(err).toBeNull();
             db.cardGameExists('test1', 'Français', checkIfCardGameExists);
@@ -60,9 +57,9 @@ describe("Tests : card games", () => {
         }
     });
 
-    test("When a player updates a card game's description, then the old description must be replaced by the new one", async (done) => {
+    test("When a player updates a card game's description, then the old description must be replaced by the new one", done => {
         // when we set the description of a card game
-        await db.updateCardgameDescription('test1', 'Français', 'une petite description', descriptionHasBeenUpdated);
+        db.updateCardgameDescription('test1', 'Français', 'une petite description', descriptionHasBeenUpdated);
         function descriptionHasBeenUpdated(err){
             expect(err).toBeNull();
             db.getCardGameDescription('test1', 'Français', checkDescription);
@@ -75,9 +72,9 @@ describe("Tests : card games", () => {
         }
     });
 
-    test("When a player removes a card game, then it must be removed from the database", async (done) => {
+    test("When a player removes a card game, then it must be removed from the database", done => {
         // when a card game is removed from the database
-        await db.removeCardGame('test1', 'Français', cardGameHasBeenRemoved);
+        db.removeCardGame('test1', 'Français', cardGameHasBeenRemoved);
         function cardGameHasBeenRemoved(err){
             expect(err).toBeNull();
             db.cardGameExists('test1', 'Français', checkIfCardGameExists);
@@ -94,24 +91,24 @@ describe("Tests : card games", () => {
 describe("Tests : card games' families", () => {
     let cardGameId;
 
-    beforeAll( async (done) => {
-        await db.addCardGame('test', 'Français', 'julien', function(err, result){
+    beforeAll( done => {
+        db.addCardGame('test', 'Français', 'julien', function(err, result){
             expect(err).toBeNull();
             cardGameId = result.insertId;
             done();
         });
     });
 
-    afterAll( async (done) => {
-        await db.removeCardGame('test', 'Français', function(err){
+    afterAll( done => {
+        db.removeCardGame('test', 'Français', function(err){
             expect(err).toBeNull();
             done();
         });
     });
 
-    test("When a player adds a family to a card game, then the family must be well added to the database", async (done) => {
+    test("When a player adds a family to a card game, then the family must be well added to the database", done => {
         // when wa add a family to a card game
-        await db.addCardFamilyWithoutLogo('familyTest', cardGameId, familyHasBeenAdded);
+        db.addCardFamilyWithoutLogo('familyTest', cardGameId, familyHasBeenAdded);
         function familyHasBeenAdded(err, result){
             expect(err).toBeNull();
             db.getFamilies(cardGameId, checksCardGameFamily);
@@ -125,9 +122,9 @@ describe("Tests : card games' families", () => {
         }
     });
 
-    test("When a player removes card game's families, then the families must be removed from the database", async (done) => {
+    test("When a player removes card game's families, then the families must be removed from the database", done => {
         // when we removed a family from a card game
-        await db.removeCardGameFamilies('test', 'Français', familiesHasBeenRemoved);
+        db.removeCardGameFamilies('test', 'Français', familiesHasBeenRemoved);
         function familiesHasBeenRemoved(err){
             expect(err).toBeNull();
             db.getFamilies(cardGameId, checksCardGameFamily);
@@ -145,8 +142,8 @@ describe("Tests : card games' families' cards", () => {
     let cardGameId;
     let familyId;
 
-    beforeAll( async (done) => {
-        await db.addCardGame('test', 'Français', 'julien', function(err, result){
+    beforeAll( done => {
+        db.addCardGame('test', 'Français', 'julien', function(err, result){
             expect(err).toBeNull();
             cardGameId = result.insertId;
             db.addCardFamilyWithoutLogo('familyTest', cardGameId, function(err, result){
@@ -157,8 +154,8 @@ describe("Tests : card games' families' cards", () => {
         });
     });
 
-    afterAll( async (done) => {
-        await db.removeCardGame('test', 'Français', function(err){
+    afterAll( done => {
+        db.removeCardGame('test', 'Français', function(err){
             expect(err).toBeNull();
             db.removeCardGameFamilies('test', 'Français', function(err){
                 expect(err).toBeNull();
@@ -167,9 +164,9 @@ describe("Tests : card games' families' cards", () => {
         });
     });
 
-    test("When a player adds a card, then it must be added and associated to the selected family", async (done) => {
+    test("When a player adds a card, then it must be added and associated to the selected family", done => {
         // when we add a card to a card game's family
-        await db.addCard('contentTest', 'descriptionTest', familyId, cardHasBeenAdded);
+        db.addCard('contentTest', 'descriptionTest', familyId, cardHasBeenAdded);
         function cardHasBeenAdded(err, result){
             expect(err).toBeNull();
             db.getFamilyCards(familyId, checksFamilyCards);
@@ -185,9 +182,9 @@ describe("Tests : card games' families' cards", () => {
         }
     });
 
-    test("When a player removes a card game's family, then the family's cards must be removed", async (done) => {
+    test("When a player removes a card game's family, then the family's cards must be removed", done => {
         // when a family is removed from a card game
-        await db.removeCardGameFamilies('test', 'Français', familiesHasBeenRemoved);
+        db.removeCardGameFamilies('test', 'Français', familiesHasBeenRemoved);
         function familiesHasBeenRemoved(err){
             expect(err).toBeNull();
             db.getFamilyCards(familyId, checksFamilyCards);
@@ -202,9 +199,9 @@ describe("Tests : card games' families' cards", () => {
 });
 
 describe("Tests : tags", () => {
-    test("When a player adds a tag, then the tag must be added to the database", async (done) => {
+    test("When a player adds a tag, then the tag must be added to the database", done => {
         // when we add a tag into the database
-        await db.addANewTag('tagTest1', tagHasBeenAdded);
+        db.addANewTag('tagTest1', tagHasBeenAdded);
         function tagHasBeenAdded(err){
             expect(err).toBeNull();
             db.existsTag('tagTest1', tagExists);
@@ -217,9 +214,9 @@ describe("Tests : tags", () => {
         }
     });
 
-    test("When a player removes a tag, then the tag must be removed from the database", async (done) => {
+    test("When a player removes a tag, then the tag must be removed from the database", done => {
         // when we remove a tag from the database
-        await db.removeATag('tagTest1', tagHasBeenRemoved);
+        db.removeATag('tagTest1', tagHasBeenRemoved);
         function tagHasBeenRemoved(err){
             expect(err).toBeNull();
             db.existsTag('tagTest1', tagExists);
@@ -238,7 +235,7 @@ describe("Tests : card games' tags", () => {
     let myTags = [];
     let sampleSizeMax = 5;
 
-    beforeAll( async (done) => {
+    beforeAll( done => {
         function addTags(nb){
             let tag = 'tagTest' + nb;
             myTags.push(tag);
@@ -251,7 +248,7 @@ describe("Tests : card games' tags", () => {
                 }
             });
         }
-        await db.addCardGame('test', 'Français', 'julien', function(err, result){
+        db.addCardGame('test', 'Français', 'julien', function(err, result){
             expect(err).toBeNull();
             cardGameId = result.insertId;
             addTags(sampleSizeMax);
@@ -276,9 +273,9 @@ describe("Tests : card games' tags", () => {
         });
     });
 
-    test("When a player wants to retrieve all tags, all tags which are present in the database must be retrieved", async (done) => {
+    test("When a player wants to retrieve all tags, all tags which are present in the database must be retrieved", done => {
         // when we retrieve all tags
-        await db.getAllTags(checkRetrievedTags);
+        db.getAllTags(checkRetrievedTags);
         // then we are sure that all tags are well retrieved
         function checkRetrievedTags(err, result){
             let cardGameTags = getArrayFromResult(result, keys.TT_KEY_TAG);
@@ -291,7 +288,7 @@ describe("Tests : card games' tags", () => {
         }
     });
 
-    test("When a player adds a tag to a card game, then the tag must be associated to it", async (done) => {
+    test("When a player adds a tag to a card game, then the tag must be associated to it", done => {
         // we add as many tags as the sample's size
         // for each new tag, we check if the old tags are always a card game's tags
         // and the new one is a card game's tag
@@ -316,7 +313,7 @@ describe("Tests : card games' tags", () => {
         doTheTestOnSample(0);
     });
 
-    test("When a player removes a tag from a card game, then the tag must be unassociated from it", async (done) => {
+    test("When a player removes a tag from a card game, then the tag must be unassociated from it", done => {
         // we remove each tag that has been add while the previous test
         // for each removed tag, we check if the old tags are always a card game's
         // tags and if the removed tag is no more a card game's tag
@@ -344,9 +341,9 @@ describe("Tests : card games' tags", () => {
 });
 
 describe("Tests : users", () => {
-    test("When a user creates an account, then it must be added to database", async (done) => {
+    test("When a user creates an account, then it must be added to database", done => {
         // when a new user creates an account
-        await db.registerUser('MrTest', 'MrTestPassword', 'MrTest@gmail.com', userHasBeenAdded);
+        db.registerUser('MrTest', 'MrTestPassword', 'MrTest@gmail.com', userHasBeenAdded);
         function userHasBeenAdded(err, result){
             expect(err).toBeNull();
             // then the user is added to the database (exists in the database)
@@ -357,9 +354,9 @@ describe("Tests : users", () => {
         }
     });
 
-    test("When a user changes his password, then the old password must be replaced by the new one", async (done) => {
+    test("When a user changes his password, then the old password must be replaced by the new one", done => {
         // when a user changes his password
-        await db.setPassword('MrTest', 'MrTestPasswordBis', passwordHasBeenChanged);
+        db.setPassword('MrTest', 'MrTestPasswordBis', passwordHasBeenChanged);
         function passwordHasBeenChanged(err, result){
             expect(err).toBeNull();
             // then the password is well updated
@@ -371,9 +368,9 @@ describe("Tests : users", () => {
         }
     });
 
-    test("When a user deletes his account, then it must be removed from the database", async (done) => {
+    test("When a user deletes his account, then it must be removed from the database", done => {
         // when a user removes his account
-        await db.removeUser('MrTest', userHasBeenRemoved);
+        db.removeUser('MrTest', userHasBeenRemoved);
         function userHasBeenRemoved(err){
             expect(err).toBeNull();
             // then the user is removed from the database (no more exists in the database)
@@ -387,9 +384,9 @@ describe("Tests : users", () => {
 
 describe("Tests : players' production", () => {
     let prodID;
-    test("When a player saves his production, then the production must be well added in the database", async (done) => {
+    test("When a player saves his production, then the production must be well added in the database", done => {
         // when we add a production
-        await db.addNewProduction('data of the production', 'data of the legend', productionHasBeenAdded);
+        db.addNewProduction('data of the production', 'data of the legend', productionHasBeenAdded);
         function productionHasBeenAdded(err, result){
             expect(err).toBeNull();
             prodID = result;
@@ -404,9 +401,9 @@ describe("Tests : players' production", () => {
         }
     });
 
-    test("When a player updates his production, then the old data must be replaced by the news one", async (done) => {
+    test("When a player updates his production, then the old data must be replaced by the news one", done => {
         // when a player updates his production
-        await db.updateProduction(prodID,
+        db.updateProduction(prodID,
           'new data of the production',
           'new data of the legend',
           productionHasBeenUpdated);
@@ -423,9 +420,9 @@ describe("Tests : players' production", () => {
         }
     });
 
-    test("When a player removes his production, then the production must be removed from the database", async (done) => {
+    test("When a player removes his production, then the production must be removed from the database", done => {
         // when a player removes his production
-        await db.removeProduction(prodID, productionHasBeenRemoved);
+        db.removeProduction(prodID, productionHasBeenRemoved);
         function productionHasBeenRemoved(err){
             expect(err).toBeNull();
             db.getProduction(prodID, checksIfProductionAlreadyExists);
@@ -440,10 +437,10 @@ describe("Tests : players' production", () => {
     });
 });
 
-describe("Tests : historic and games' archive", async () => {
+describe("Tests : historic and games' archive", () => {
 
-    beforeAll( async (done) => {
-        await db.registerUser('MrSomeone', 'MrSomeonePassword', 'MrSomeone@gmail.com', function(err, result){
+    beforeAll( done => {
+        db.registerUser('MrSomeone', 'MrSomeonePassword', 'MrSomeone@gmail.com', function(err, result){
             expect(err).toBeNull();
             db.registerUser('MrNobody', 'MrNobodyPassword', 'MrNobody@gmail.com', function(err, result){
                 expect(err).toBeNull();
@@ -452,8 +449,8 @@ describe("Tests : historic and games' archive", async () => {
         });
     });
 
-    afterAll( async (done) => {
-        await db.removeUser('MrSomeone', function(err){
+    afterAll( done => {
+        db.removeUser('MrSomeone', function(err){
             expect(err).toBeNull();
             db.removeUser('MrNobody', function(err){
                 expect(err).toBeNull();
@@ -463,6 +460,7 @@ describe("Tests : historic and games' archive", async () => {
                         expect(err).toBeNull();
                         db.removeGameRecord(globalGameName, globalGameDate, function(err){
                             expect(err).toBeNull();
+                            db.disconnect();
                             done();
                         });
                     });
@@ -476,9 +474,9 @@ describe("Tests : historic and games' archive", async () => {
     let globalGameID; // id of the game used to do our tests
     let globalGameName; // name of the game used to do our tests
     let globalGameDate; // date of the game used to do our tests
-    test("When a game is recorded, then a new entry must be created in the historic", async (done) => {
+    test("When a game is recorded, then a new entry must be created in the historic", done => {
         // when a game is recorded into the database
-        await db.recordNewGame('serverTest', 'MrTest', gameHasBeenRecorded);
+        db.recordNewGame('serverTest', 'MrTest', gameHasBeenRecorded);
         function gameHasBeenRecorded(err, gameId){
             expect(err).toBeNull();
             globalGameID = gameId;
@@ -505,9 +503,9 @@ describe("Tests : historic and games' archive", async () => {
     });
 
     let firstPlayerProdID; //MrSomeone's production's id
-    test("When productions are saved at the end of a game, then they must be associated to the game during which they have been made", async (done) => {
+    test("When productions are saved at the end of a game, then they must be associated to the game during which they have been made", done => {
         // knowing that a player has a production
-        await db.addNewProduction('data of the production', 'data of the legend', productionHasBeenAdded);
+        db.addNewProduction('data of the production', 'data of the legend', productionHasBeenAdded);
         function productionHasBeenAdded(err, prodID){
             expect(err).toBeNull();
             firstPlayerProdID = prodID;
@@ -533,9 +531,9 @@ describe("Tests : historic and games' archive", async () => {
     });
 
     let secondPlayerProdID; // MrNobody's productions's id
-    test("When a player wants to retrieve the list of players who have played in a game, then all players who have played must be present", async (done) => {
+    test("When a player wants to retrieve the list of players who have played in a game, then all players who have played must be present", done => {
         // knowing that we have another player in the game who made a production
-        await db.linkPlayerAndGame('MrNobody', globalGameID, 'MrNobodyQuestion', playerEntryHasBeenAdded);
+        db.linkPlayerAndGame('MrNobody', globalGameID, 'MrNobodyQuestion', playerEntryHasBeenAdded);
         function playerEntryHasBeenAdded(err){
             expect(err).toBeNull();
             db.addNewProduction('data of the production', 'data of the legend', function(err, prodID){
@@ -560,9 +558,9 @@ describe("Tests : historic and games' archive", async () => {
         }
     });
 
-    test("When a player removes a production associated to a game, then this game must be no more retrievable", async (done) => {
+    test("When a player removes a production associated to a game, then this game must be no more retrievable", done => {
         // when a player removes one of his production in the historic
-        await db.removeProduction(firstPlayerProdID, productionHasBeenRemoved); // MrSomeone removes his production
+        db.removeProduction(firstPlayerProdID, productionHasBeenRemoved); // MrSomeone removes his production
         function productionHasBeenRemoved(err){
             expect(err).toBeNull();
             db.getHistoricEntries('MrSomeone', checksIfTheEntryIsRetrieved);
@@ -576,9 +574,9 @@ describe("Tests : historic and games' archive", async () => {
         }
     });
 
-    test("When a player archives a production, then it's associated to the same game as in the historic", async (done) => {
+    test("When a player archives a production, then it's associated to the same game as in the historic", done => {
         // when a player archives a production (knowing that it's the first one to be archived for this game)
-        await db.addNewProduction('my prod data 1', 'my legend data 1', function(err, prodID){
+        db.addNewProduction('my prod data 1', 'my legend data 1', function(err, prodID){
             expect(err).toBeNull();
             db.archivePlayerProduction('MrNobody', globalGameID, prodID, productionHasBeenArchived);
         });
@@ -598,13 +596,15 @@ describe("Tests : historic and games' archive", async () => {
         }
     });
 
-    test("When a player archives more than one production associated to the same game, then their are associated to the same game's archive", async (done) => {
-        await sleep(1000); // because we can't have two archives at the same date (in the website it's impossible because of the page animation)
+    test("When a player archives more than one production associated to the same game, then their are associated to the same game's archive", done => {
+        // because we can't have two archives at the same date (in the website it's impossible because of the page animation)
         // when a player archives a production (knowing that it's the first one to be archived for this game)
-        await db.addNewProduction('my prod data 2', 'my legend data 2', function(err, prodID){
-            expect(err).toBeNull();
-            db.archivePlayerProduction('MrNobody', globalGameID, prodID, productionHasBeenArchived);
-        });
+        setTimeout(function () {
+            db.addNewProduction('my prod data 2', 'my legend data 2', function(err, prodID){
+                expect(err).toBeNull();
+                db.archivePlayerProduction('MrNobody', globalGameID, prodID, productionHasBeenArchived);
+            });
+        }, 1000);
         function productionHasBeenArchived(err){
             expect(err).toBeNull();
             db.getArchiveEntries('MrNobody', checksArchiveEntries);
@@ -621,10 +621,10 @@ describe("Tests : historic and games' archive", async () => {
         }
     });
 
-    test("When a player opens a game's archive, then all productions associated to it are retrieved", async (done) => {
+    test("When a player opens a game's archive, then all productions associated to it are retrieved", done => {
         // knowing that the player has archived more than one production (associated to the same game) : previous tests !
         // when he retrieves the archived productions for this game
-        await db.getProductionsFromArchive('MrNobody', globalGameName, globalGameDate, productionsHasBeenRetrieved);
+        db.getProductionsFromArchive('MrNobody', globalGameName, globalGameDate, productionsHasBeenRetrieved);
         // then all archived productions associated to this game are retrieved
         function productionsHasBeenRetrieved(err, result){
             expect(err).toBeNull();
@@ -633,9 +633,9 @@ describe("Tests : historic and games' archive", async () => {
         }
     });
 
-    test("When a player removes all productions associated to a game's archive, then the archive is removed", async (done) => {
+    test("When a player removes all productions associated to a game's archive, then the archive is removed", done => {
         // when all productions of a game's archive are removed
-        await db.removeProductionsFromArchive(globalGameName, globalGameDate, 'MrNobody', productionsHasBeenRemoved);
+        db.removeProductionsFromArchive(globalGameName, globalGameDate, 'MrNobody', productionsHasBeenRemoved);
         function productionsHasBeenRemoved(err){
             expect(err).toBeNull();
             db.getArchiveEntries('MrNobody', checksArchiveEntries);

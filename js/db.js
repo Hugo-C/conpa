@@ -127,6 +127,7 @@ function getWhereClauseFromTags(tags){
 /**
  * Retrieves all card game stored in database
  *
+ * @param {string} tags : TODO
  * @param {callback} callback : function called to process on retrieved data
  */
 exports.getCardGamesByTags = function(tags, callback){
@@ -278,7 +279,7 @@ exports.removeCardGame = function(name, language, callback){
  *
  * @param {String} name : cardgame's name
  * @param {String} language : cardgame's language
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.removeCardGameFamilies = function(name, language, callback){
     let sql = 'DELETE cft' +
@@ -292,13 +293,14 @@ exports.removeCardGameFamilies = function(name, language, callback){
         if(err) callback(err);
         else callback(null);
     });
-}
+};
 
 /**
  * Adds a new cardgame in the database (the cardgame mustn't already exist)
  *
  * @param {string} name : cardgame's name
  * @param {string} language : cardgame's language
+ * @param {string} author : cardgame's author
  * @param {callback} callback : function use to throw errors or return cardgame's id
  */
 exports.addCardGame = function(name, language, author, callback){
@@ -351,7 +353,7 @@ exports.existsTag = function(tag, callback){
  * Adds a new tag in the database
  *
  * @param {String} tag : tag to add
- * @param {callback} callback : function used to return errors if errors occured
+ * @param {callback} callback : function used to return errors if errors occurred
  */
 exports.addANewTag = function(tag, callback){
     let sql = 'INSERT INTO ' + keys.TAGS_TABLE +
@@ -368,7 +370,7 @@ exports.addANewTag = function(tag, callback){
  * Removes a tag from the database
  *
  * @param {String} tag : tag to be removed
- * @param {callback} callback : function used to return errors if errors occured
+ * @param {callback} callback : function used to return errors if errors occurred
  */
 exports.removeATag = function(tag, callback){
     let sql = 'DELETE FROM ' + keys.TAGS_TABLE +
@@ -385,7 +387,7 @@ exports.removeATag = function(tag, callback){
  *
  * @param {Number} cardgameId : id of the cardgame for which we want to add a tag
  * @param {String} tag : tag to add
- * @param {callback} callback : function used to return errors (if an error occured)
+ * @param {callback} callback : function used to return errors (if an error occurred)
  */
 exports.addANewTagToCardgame = function(cardgameId, tag, callback){
     let sql = 'INSERT INTO ' + keys.HAS_TAGS_TABLE +
@@ -403,7 +405,7 @@ exports.addANewTagToCardgame = function(cardgameId, tag, callback){
  *
  * @param {Number} cardgameId : id of the cardgame for which we want to remove a tag
  * @param {String} tag : tag to remove
- * @param {callback} callback : function used to return errors (if an error occured)
+ * @param {callback} callback : function used to return errors (if an error occurred)
  */
 exports.removeATagFromCardgame = function(cardgameId, tag, callback){
     let sql = 'DELETE FROM ' + keys.HAS_TAGS_TABLE +
@@ -421,7 +423,7 @@ exports.removeATagFromCardgame = function(cardgameId, tag, callback){
  *
  * @param {String} name : cardgame's name
  * @param {String} language : cardgame's language
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getCardGameTags = function(name, language, callback){
     let sql = 'SELECT ' + keys.HTT_KEY_TAG +
@@ -442,7 +444,7 @@ exports.getCardGameTags = function(name, language, callback){
  *
  * @param {String} name : cardgame's name
  * @param {String} language : cardgame's language
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getCardGameDescription = function(name, language, callback){
     let sql = 'SELECT ' + keys.CGT_KEY_DESCRIPTION +
@@ -469,7 +471,7 @@ exports.getCardGameDescription = function(name, language, callback){
  * @param {String} name : cardgame's name
  * @param {String} language : cardgame's language
  * @param {String} description : new version of the cardgame's description
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.updateCardgameDescription = function(name, language, description, callback){
     let sql = 'UPDATE ' + keys.CARD_GAME_TABLE +
@@ -506,7 +508,7 @@ exports.registerUser = function(pseudo, email, password, callback){
  * Removes a player from the database
  *
  * @param {String} pseudo : player's pseudo
- * @param {callback} callback : function used to return errors if errors occured
+ * @param {callback} callback : function used to return errors if errors occurred
  */
 exports.removeUser = function(pseudo, callback){
     let sql = 'DELETE FROM ' + keys.USER_TABLE +
@@ -789,7 +791,7 @@ exports.recordNewGame = function(gameName, animator, callback){
  *
  * @param {String} gameName : game's name in the historic
  * @param {String} gameDate : date at which game has been played
- * @param {callback} callback : function used to return errors if errors occured
+ * @param {callback} callback : function used to return errors if errors occurred
  */
 exports.removeGameRecord = function(gameName, gameDate, callback){
     let sql = 'DELETE FROM ' + keys.PARTY_TABLE +
@@ -833,7 +835,7 @@ exports.linkPlayerAndGame = function(pseudo, gameID, question, callback){
  *
  * @param {String} pseudo : player's pseudo
  * @param {callback} callback : function used to return the result or errors if
- *                              errors occured
+ *                              errors occurred
  */
 exports.getHistoricEntries = function(pseudo, callback){
     let sql = 'SELECT ' + keys.PT_KEY_NAME +
@@ -859,7 +861,7 @@ exports.getHistoricEntries = function(pseudo, callback){
  *
  * @param {String} pseudo : player's pseudo
  * @param {callback} callback : function used to return the result or errors if
- *                              errors occured
+ *                              errors occurred
  */
 exports.getGamesRecord = function(pseudo, callback){
     let sql = 'SELECT ' + keys.PT_KEY_NAME +
@@ -883,7 +885,7 @@ exports.getGamesRecord = function(pseudo, callback){
  *
  * @param {String} gameName : game's name
  * @param {String} gameDate : date at which game has been played
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getPlayersInGame = function(gameName, gameDate, callback){
     let sql = 'SELECT ' + keys.HPT_KEY_PSEUDO +
@@ -905,7 +907,7 @@ exports.getPlayersInGame = function(gameName, gameDate, callback){
  * @param {String} production : production's data
  * @param {String} legend : data of the production's legend
  * @param {callback} callback : function used to return the production's id or errors
- *                              (if an error occured)
+ *                              (if an error occurred)
  */
 exports.addNewProduction = function(production, legend, callback){
     let sql = 'INSERT INTO ' + keys.PRODUCTION_TABLE +
@@ -948,7 +950,7 @@ exports.removeProduction = function(prodID, callback){
  * @param {String} prodID : id of the production to update
  * @param {String} production : production's data
  * @param {String} legend : data of the production's legend
- * @param {callback} callback : function used to return errors (if an error occured)
+ * @param {callback} callback : function used to return errors (if an error occurred)
  */
 exports.updateProduction = function(prodID, production, legend, callback){
     let sql = 'UPDATE ' + keys.PRODUCTION_TABLE +
@@ -969,7 +971,7 @@ exports.updateProduction = function(prodID, production, legend, callback){
  * Retrieves production's data (include legend)
  *
  * @param {Number} prodID : production's id
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getProduction = function(prodID, callback){
     let sql = 'SELECT ' + keys.PRODT_KEY_PRODUCTION +
@@ -1016,7 +1018,7 @@ exports.recordPlayerProductionWithGameId = function(pseudo, gameID, prodID, call
  * @param {String} pseudo : player's pseudo
  * @param {String} gameName : game's name during which player has created the production
  * @param {String} gameDate : date at which game has been played
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getProductionIDFromPlayerHistoric = function(pseudo, gameName, gameDate, callback){
     let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
@@ -1042,7 +1044,7 @@ exports.getProductionIDFromPlayerHistoric = function(pseudo, gameName, gameDate,
  *
  * @param {String} pseudo : player's pseudo
  * @param {Number} gameID : game's id during which player has created the production
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getProductionIDFromPlayerHistoricWithGameId = function(pseudo, gameID, callback){
     let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
@@ -1070,7 +1072,7 @@ exports.getProductionIDFromPlayerHistoricWithGameId = function(pseudo, gameID, c
  * @param {String} gameName : game's name in the historic
  * @param {String} gameDate : date at which the game has been played
  * @param {callback} callback : function used to return the question and the
- *                              production's id or errors if errors occured;
+ *                              production's id or errors if errors occurred;
  */
 exports.getQuestionAndProduction = function(pseudo, gameName, gameDate, callback){
     let sql = 'SELECT ' + keys.HPT_KEY_PRODUCTION +
@@ -1121,7 +1123,7 @@ exports.archivePlayerProduction = function(pseudo, gameID, prodID, callback){
  * Retrieves games' archive
  *
  * @param {String} pseudo : player's pseudo for who we want to retrieve the games' archive
- * @param {callback} callback : function used to return the result or errors (if errors occured)
+ * @param {callback} callback : function used to return the result or errors (if errors occurred)
  */
 exports.getArchiveEntries = function(pseudo, callback){
     let pt_prefix = keys.PARTY_TABLE + '.';
@@ -1158,7 +1160,7 @@ exports.getArchiveEntries = function(pseudo, callback){
  * @param {String} gameName : name of the game for which we want to retrieve
  *                             the archived productions
  * @param {String} gameDate : date at which game has been played
- * @param {callback} callback : function used to return the result or errors (if an error occured)
+ * @param {callback} callback : function used to return the result or errors (if an error occurred)
  */
 exports.getProductionsFromArchive = function(pseudo, gameName, gameDate, callback){
     let sql = 'SELECT DATE_FORMAT(' + keys.AT_KEY_DATE + ', "%Y-%m-%d %k:%i:%s") AS ' + keys.AT_KEY_DATE +
@@ -1180,12 +1182,12 @@ exports.getProductionsFromArchive = function(pseudo, gameName, gameDate, callbac
 };
 
 /**
- * Retrives the id of a production thanks to his insertion's date
+ * Retrieves the id of a production thanks to his insertion's date
  * In an archive, productions are identified by their insertions dates
  *
  * @param {String} pseudo : production's owner
  * @param {String} insertDate : production's insertion date
- * @param {callback} callback : function used to return the production's id or errors (if errors occured)
+ * @param {callback} callback : function used to return the production's id or errors (if errors occurred)
  */
 exports.getProductionIDFromArchive = function(pseudo, insertDate, callback){
     let sql = 'SELECT ' + keys.AT_KEY_PRODUCTION +
@@ -1200,7 +1202,7 @@ exports.getProductionIDFromArchive = function(pseudo, insertDate, callback){
             callback(null, result.length > 0 ? result[0][keys.AT_KEY_PRODUCTION] : null);
         }
     });
-}
+};
 
 /**
  * Removes all productions in a game's archive
@@ -1208,7 +1210,7 @@ exports.getProductionIDFromArchive = function(pseudo, insertDate, callback){
  * @param {String} gameName : game's name for which we want to remove the archive
  * @param {String} gameDate : date at which the game has been played
  * @param {String} pseudo : archive's owner
- * @param {callback} callback : function used to return errors (if errors occured)
+ * @param {callback} callback : function used to return errors (if errors occurred)
  */
 exports.removeProductionsFromArchive = function(gameName, gameDate, pseudo, callback){
     let pt_prefix = keys.PARTY_TABLE + '.';
@@ -1230,12 +1232,12 @@ exports.removeProductionsFromArchive = function(gameName, gameDate, pseudo, call
             callback(null);
         }
     });
-}
+};
 
 /**
  * @param {String} gameName : game server's name
  * @param {String} gameDate : date at which game has been played ("%Y-%m-%d %k:%i:%s")
- * @return {Number} : game server's id
+ * @param {callback} callback : function used to return errors (if errors occurred) and the game serve's id
  */
 exports.getGameID = function(gameName, gameDate, callback){
     let sql = 'SELECT ' + keys.PT_KEY_ID +
@@ -1250,7 +1252,14 @@ exports.getGameID = function(gameName, gameDate, callback){
             callback(null, result.length > 0 ? result[0][keys.PT_KEY_ID] : null);
         }
     });
-}
+};
+
+/**
+ * Disconnect the database
+ */
+exports.disconnect = function(){
+    state.pool.end();
+};
 
 /**
  * Convert a js Date to a mysql DATETIME
